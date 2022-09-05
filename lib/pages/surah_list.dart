@@ -13,7 +13,38 @@ class SurahList extends StatefulWidget {
 class _SurahListState extends State<SurahList> {
   late Database database;
   late String path;
+  String surah_type = '';
   List<Map> surah_name_arabic = [], surah_name_translated = [];
+  List<int> madani_surah = [
+    2,
+    3,
+    4,
+    5,
+    8,
+    9,
+    13,
+    22,
+    24,
+    33,
+    47,
+    48,
+    49,
+    55,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    76,
+    98,
+    99,
+    110
+  ];
 
   @override
   void initState() {
@@ -83,94 +114,125 @@ class _SurahListState extends State<SurahList> {
                       // padding: EdgeInsets.all(11),
                       itemCount: 114,
                       itemBuilder: (BuildContext context, int index) {
+                        for (int i = 0; i < madani_surah.length; i++) {
+                          if (index + 1 == madani_surah[i]) {
+                            surah_type = 'Madani Surah';
+                            break;
+                          } else {
+                            surah_type = 'Makki Surah';
+                            // break;
+                          }
+                        }
                         return Padding(
                           padding: const EdgeInsets.all(3.0),
                           child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               // width: size.width,
                               children: [
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Padding(
                                       padding:
-                                          const EdgeInsets.fromLTRB(0, 7, 7, 7),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xff1d3f5e),
-                                            borderRadius:
-                                                BorderRadius.circular(1000)),
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(1.0),
-                                              child: Image.asset(
-                                                'lib/assets/images/index image.png',
-                                                height: size.width * .09,
-                                              ),
+                                          const EdgeInsets.fromLTRB(0, 7, 0, 7),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(1.0),
+                                            child: Image.asset(
+                                              'lib/assets/images/indexDesign.png',
+                                              height: size.width * .11,
+                                              width: size.width * .11,
                                             ),
-                                            Text(
-                                              arabicNumber.convert(index + 1),
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                color: const Color(0xff1d3f5e),
-                                                fontSize: size.width * .039,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            )
-                                          ],
-                                        ),
+                                          ),
+                                          Text(
+                                            arabicNumber.convert(index + 1),
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: const Color(0xff1d3f5e),
+                                              fontSize: size.width * .041,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ),
                                     Expanded(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xff1d3f5e),
-                                            borderRadius:
-                                                BorderRadius.circular(17)),
-                                        child: Wrap(
-                                          direction: Axis.vertical,
-                                          crossAxisAlignment:
-                                              WrapCrossAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      17, 17, 17, 5),
-                                              child: Text(
-                                                surah_name_translated[index]
-                                                    ['translation'],
-                                                style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily:
-                                                        'varela-round.regular'),
-                                              ),
+                                      child: Wrap(
+                                        direction: Axis.vertical,
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.fromLTRB(
+                                                    17, 17, 17, 0),
+                                            child: Text(
+                                              surah_name_translated[index]
+                                                  ['translation'],
+                                              style: const TextStyle(
+                                                  color: Color(0xff1d3f5e),
+                                                  // fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily:
+                                                      'varela-round.regular'),
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      17, 0, 17, 17),
-                                              child: Text(
-                                                surah_name_arabic[index]
-                                                    ['translation'],
-                                                style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily:
-                                                        'varela-round.regular'),
-                                              ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.fromLTRB(
+                                                    17, 0, 17, 5),
+                                            child: Text(
+                                              '(${surah_name_arabic[index]['translation']})',
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  // fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily:
+                                                      'Al Qalam Quran Majeed Web Regular'),
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(17 + size.width * .11,0,17,0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(9),
+                                        border: Border.all(width: 1.5, color: const Color(0xffa69963))
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Wrap(
+                                        alignment: WrapAlignment.center,
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+                                          Image.asset(surah_type == 'Makki Surah' ? 'lib/assets/images/makkaIcon.png'
+                                              : 'lib/assets/images/madinaIcon.png',
+                                            height: 13,
+                                            width: 13,
+                                          ),
+                                          const SizedBox(
+                                            width: 7,
+                                          ),
+                                          Text(surah_type,
+                                            style: const TextStyle(
+                                                color: Color(0xffa69963),
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11,
+                                                fontFamily: 'varela-round.regular'
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )
                               ]),
                           // child: Column(
                           //
