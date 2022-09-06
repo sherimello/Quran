@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quran/pages/home.dart';
 import 'package:quran/pages/surah_DB_initializer.dart';
 import 'package:quran/pages/surah_list.dart';
+import 'package:quran/pages/surah_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const SurahDBInitializer(),
+      // home: const SurahPage(surah_id: '2',),
     );
   }
 }

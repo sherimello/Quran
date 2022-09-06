@@ -5,943 +5,932 @@ class SQLQueries {
   late Database database;
   late String path;
 
-  Future<Database> crazy0() async{
-  var databasesPath = await getDatabasesPath();
+  Future<Database> crazy0() async {
+    var databasesPath = await getDatabasesPath();
     path = join(databasesPath, 'quran.db');
+    await deleteDatabase(path);
     database = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
-          await db.execute('DROP TABLE IF EXISTS languages');
-          await db.execute(
-              'CREATE TABLE IF NOT EXISTS languages (id INTEGER UNSIGNED, ISO NVARCHAR, english_name NVARCHAR, name NVARCHAR)');
-      await db.execute('DROP TABLE IF EXISTS surahnames');
+      await db.execute(
+          'CREATE TABLE IF NOT EXISTS verses (lang_id INTEGER UNSIGNED, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED, text NVARCHAR)');
+
+      await db.execute(
+          'CREATE TABLE IF NOT EXISTS languages (id INTEGER UNSIGNED, ISO NVARCHAR, english_name NVARCHAR, name NVARCHAR)');
+
       await db.execute(
           'CREATE TABLE IF NOT EXISTS surahnames (surah_id INTEGER UNSIGNED, lang_id INTEGER UNSIGNED, translation NVARCHAR)');
-          await db.execute('DROP TABLE IF EXISTS verses');
-          await db.execute(
-              'CREATE TABLE verses (lang_id INTEGER UNSIGNED, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED, text NVARCHAR)');
     });
     return database;
   }
 
-  Future<void> crazy1(Database db) async{
-
-  await db.transaction((txn) async {
-        await txn.rawInsert(
-          'INSERT INTO languages VALUES(1, \'AR\', \'Arabic\', \'العربية\')',
-        );
-        await txn.rawInsert(
-          'INSERT INTO languages VALUES(2, \'EN\', \'English\', \'English\')',
-        );
-        await txn.rawInsert(
-          'INSERT INTO languages VALUES(3, \'FR\', \'French\', \'Français\')',
-        );
-        await txn.rawInsert(
-          'INSERT INTO languages VALUES(4, \'IT\', \'Italian\', \'Italiano\')',
-        );
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(1, 3, \'Al-Fatiha: Prologue\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(1, 2, \'Al-Faatiha: The Opening\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(1, 1, \'سورة الفاتحة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(1, 4, \'Al-Fâtiha (L’Aprente)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(2, 3, \'Al-Baqara: La Génisse\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(2, 2, \'Al-Baqara: The Cow\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(2, 1, \'سورة البقرة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(2, 4, \'Al-Baqara (La Giovenca)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(3, 3, \'Al-i-Imran: La famille d’Imram\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(3, 2, \'Aal-i-Imraan: The Family of Imraan\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(3, 1, \'سورة آل عمران\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(3, 4, \'Âl-‘Imrân (La Famiglia di Imran)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(4, 3, \'An-Nisa: Les Femmes\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(4, 2, \'An-Nisaa: The Women\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(4, 1, \'سورة النساء\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(4, 4, \'An-Nisâ’ (Le Donne)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(5, 3, \'Al-Maeda: La Table servie\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(5, 2, \'Al-Maaida: The Table\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(5, 1, \'سورة المائدة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(5, 4, \'Al-Mâ’ida (La Tavola Imbandita)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(6, 3, \'Al-Anaam: Les Bestiaux\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(6, 2, \'Al-An\'\'aam: The Cattle\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(6, 1, \'سورة الأنعام\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(6, 4, \'Al-An‘âm (Il bestiame)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(7, 3, \'Al-Araf: Les Hauteurs\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(7, 2, \'Al-A\'\'raaf: The Heights\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(7, 1, \'سورة الأعراف\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(7, 4, \'Al-A‘râf\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(8, 3, \'Al-Anfal: Le Butin\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(8, 2, \'Al-Anfaal: The Spoils of War\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(8, 1, \'سورة الأنفال\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(8, 4, \'Al-’Anfâl (Il Bottino)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(9, 3, \'At-Taubah: Le Repentir\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(9, 2, \'At-Tawba: The Repentance\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(9, 1, \'سورة التوبة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(9, 4, \'At-Tawba (Il Pentimento o la Disapprovazione)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(10, 3, \'Yunus: Jonas\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(10, 2, \'Yunus: Jonas\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(10, 1, \'سورة يونس\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(10, 4, \'Yûnus (Giona)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(11, 3, \'Hud: Hoûd (prophète ou patriarche Héber)\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(11, 2, \'Hud: Hud\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(11, 1, \'سورة هود\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(11, 4, \'Hûd\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(12, 3, \'Yusuf: Joseph\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(12, 2, \'Yusuf: Joseph\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(12, 1, \'سورة يوسف\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(12, 4, \'Yûsuf (Giuseppe)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(13, 3, \'Ar-Rad: Le Tonnerre\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(13, 2, \'Ar-Ra\'\'d: The Thunder\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(13, 1, \'سورة الرعد\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(13, 4, \'Ar-Ra‘d (Il Tuono)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(14, 3, \'Ibrahim: Abraham\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(14, 2, \'Ibrahim: Abraham\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(14, 1, \'سورة ابراهيم\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(14, 4, \'Ibrâhîm (Abramo)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(15, 3, \'Al-Hijr: La Vallée des Pierres\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(15, 2, \'Al-Hijr: The Rock\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(15, 1, \'سورة الحجر\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(15, 4, \'Al-Hijr\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(16, 3, \'An-Nahl: Les Abeilles\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(16, 2, \'An-Nahl: The Bee\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(16, 1, \'سورة النحل\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(16, 4, \'An-Nahl (Le Api)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(17, 3, \'Al-Isra: Le Voyage nocturne\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(17, 2, \'Al-Israa: The Night Journey\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(17, 1, \'سورة الإسراء\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(17, 4, \'Al-Isrâ’ (Il Viaggio Notturno)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(18, 3, \'Al-Kahf: La Caverne\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(18, 2, \'Al-Kahf: The Cave\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(18, 1, \'سورة الكهف\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(18, 4, \'Al-Kahf (La Caverna)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(19, 3, \'Maryam: Marie\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(19, 2, \'Maryam: Mary\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(19, 1, \'سورة مريم\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(19, 4, \'Maryam (Maria)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(20, 3, \'Taha: Lettres Ta-Ha\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(20, 2, \'Taa-Haa: Taa-Haa\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(20, 1, \'سورة طه\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(20, 4, \'Tâ-Hâ\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(21, 3, \'Al-Ambiya: Les Prophètes\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(21, 2, \'Al-Anbiyaa: The Prophets\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(21, 1, \'سورة الأنبياء\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(21, 4, \'Al-Anbiyâ’ (I Profeti)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(22, 3, \'Al-Hajj: Le Pélerinage\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(22, 2, \'Al-Hajj: The Pilgrimage\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(22, 1, \'سورة الحج\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(22, 4, \'Al-Hajj (Il Pellegrinaggio)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(23, 3, \'Al-Mumenoon: Les Croyants\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(23, 2, \'Al-Muminoon: The Believers\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(23, 1, \'سورة المؤمنون\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(23, 4, \'Al-Mu’minûn (I Credenti)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(24, 3, \'An-Noor: La Lumière\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(24, 2, \'An-Noor: The Light\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(24, 1, \'سورة النور\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(24, 4, \'An-Nûr (La Luce)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(25, 3, \'Al-Furqan: Le Discernement\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(25, 2, \'Al-Furqaan: The Criterion\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(25, 1, \'سورة الفرقان\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(25, 4, \'Al-Furqân (Il Discrimine)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(26, 3, \'Ash-Shuara: Les Poètes\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(26, 2, \'Ash-Shu\'\'araa: The Poets\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(26, 1, \'سورة الشعراء\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(26, 4, \'Ash-Shu‘arâ’ (I Poeti)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(27, 3, \'An-Naml: Les Fourmis\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(27, 2, \'An-Naml: The Ant\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(27, 1, \'سورة النمل\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(27, 4, \'An-Naml (Le Formiche)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(28, 3, \'Al-Qasas: Les Histoires\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(28, 2, \'Al-Qasas: The Stories\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(28, 1, \'سورة القصص\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(28, 4, \'Al-Qasas (Il Racconto)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(29, 3, \'Al-Ankaboot: L’Araignée\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(29, 2, \'Al-Ankaboot: The Spider\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(29, 1, \'سورة العنكبوت\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(29, 4, \'Al-‘Ankabût (Il Ragno)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(30, 3, \'Ar-Room: Les Romains\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(30, 2, \'Ar-Room: The Romans\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(30, 1, \'سورة الروم\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(30, 4, \'Ar-Rûm (I Romani)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(31, 3, \'Luqman: Le Sage Luqman\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(31, 2, \'Luqman: Luqman\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(31, 1, \'سورة لقمان\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(31, 4, \'Luqmàn\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(32, 3, \'As-Sajda: La Prosternation\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(32, 2, \'As-Sajda: The Prostration\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(32, 1, \'سورة السجدة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(32, 4, \'As-Sajda  (La Prosternazione)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(33, 3, \'Al-Ahzab: Les Coalisés\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(33, 2, \'Al-Ahzaab: The Clans\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(33, 1, \'سورة الأحزاب\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(33, 4, \'Al-Ahzâb (I Coalizzati)\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(34, 3, \'Saba: Sabah\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(34, 2, \'Saba: Sheba\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(34, 1, \'سورة سبإ\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(34, 4, \'Sabâ’\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(35, 3, \'Fatir: Le Créateur\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(35, 2, \'Faatir: The Originator\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(35, 1, \'سورة فاطر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(35, 4, \'Fâtir (Colui Che dà origine)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(36, 3, \'Ya-Sin: Yā Sīn\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(36, 2, \'Yaseen: Yaseen\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(36, 1, \'سورة يس\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(36, 4, \'Yâ Sîn\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(37, 3, \'As-Saaffat: Les Rangées\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(37, 2, \'As-Saaffaat: Those drawn up in Ranks\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(37, 1, \'سورة الصافات\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(37, 4, \'As-Sâffât (I Ranghi)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(38, 3, \'Sad: La Lettre Sad\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(38, 2, \'Saad: The letter Saad\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(38, 1, \'سورة ص\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(38, 4, \'Sâd\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(39, 3, \'Az-Zumar: Les Groupes\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(39, 2, \'Az-Zumar: The Groups\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(39, 1, \'سورة الزمر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(39, 4, \'Az-Zumar (I Gruppi)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(40, 3, \'Al-Ghafir: Le Pardonneur\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(40, 2, \'Ghafir: The Forgiver\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(40, 1, \'سورة غافر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(40, 4, \'Ghâfir (Il Perdonatore)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(41, 3, \'Fussilat: Les Versets détaillés\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(41, 2, \'Fussilat: Explained in detail\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(41, 1, \'سورة فصلت\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(41, 4, \'Fussilat (Esposti chiaramente)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(42, 3, \'Ash-Shura: La Consultation\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(42, 2, \'Ash-Shura: Consultation\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(42, 1, \'سورة الشورى\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(42, 4, \'Ash-Shûrâ (La Consultazione)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(43, 3, \'Az-Zukhruf: Les Ornements d’Or\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(43, 2, \'Az-Zukhruf: Ornaments of gold\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(43, 1, \'سورة الزخرف\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(43, 4, \'Az-Zukhruf (Gli Ornamenti d’Oro)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(44, 3, \'Ad-Dukhan: La Fumée\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(44, 2, \'Ad-Dukhaan: The Smoke\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(44, 1, \'سورة الدخان\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(44, 4, \'Ad-Dukhân (Il Fumo)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(45, 3, \'Al-Jathiya: L’Agenouillée\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(45, 2, \'Al-Jaathiya: Crouching\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(45, 1, \'سورة الجاثية\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(45, 4, \'Al-Jâthiya (La Genuflessa)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(46, 3, \'Al-Ahqaf: Les Dunes\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(46, 2, \'Al-Ahqaf: The Dunes\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(46, 1, \'سورة الأحقاف\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(46, 4, \'Al-’Ahqàf\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(47, 3, \'Muhammad: Mahomet\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(47, 2, \'Muhammad: Muhammad\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(47, 1, \'سورة محمد\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(47, 4, \'Muhammad\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(48, 3, \'Al-Fath: La Victoire Eclatante\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(48, 2, \'Al-Fath: The Victory\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(48, 1, \'سورة الفتح\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(48, 4, \'Al-Fath (La Vittoria)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(49, 3, \'Al-Hujraat: Les Appartements\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(49, 2, \'Al-Hujuraat: The Inner Apartments\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(49, 1, \'سورة الحجرات\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(49, 4, \'Al-Hujurat (Le Stanze ìntime)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(50, 3, \'Qaf: La Lettre Qaf\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(50, 2, \'Qaaf: The letter Qaaf\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(50, 1, \'سورة ق\')');
-        await txn.rawInsert('INSERT INTO surahnames VALUES(50, 4, \'Qâf\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(51, 3, \'Adh-Dhariyat: Les Vents qui éparpillent\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(51, 2, \'Adh-Dhaariyat: The Winnowing Winds\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(51, 1, \'سورة الذاريات\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(51, 4, \'Adh-Dhâriyât (Quelle che spargono)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(52, 3, \'At-Tur: La Montagne\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(52, 2, \'At-Tur: The Mount\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(52, 1, \'سورة الطور\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(52, 4, \'At-Tûr (Il Monte)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(53, 3, \'An-Najm: L’Etoile\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(53, 2, \'An-Najm: The Star\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(53, 1, \'سورة النجم\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(53, 4, \'An-Najm (La Stella)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(54, 3, \'Al-Qamar: La Lune\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(54, 2, \'Al-Qamar: The Moon\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(54, 1, \'سورة القمر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(54, 4, \'Al-Qamar (La Luna)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(55, 3, \'Al-Rahman: Le Tout Miséricordieux\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(55, 2, \'Ar-Rahmaan: The Beneficent\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(55, 1, \'سورة الرحمن\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(55, 4, \'Ar-Rahmân (Il Compassionevole)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(56, 3, \'Al-Waqia: L’Evênement\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(56, 2, \'Al-Waaqia: The Inevitable\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(56, 1, \'سورة الواقعة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(56, 4, \'Al-Wâqi‘a (L’Evento)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(57, 3, \'Al-Hadid: Le Fer\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(57, 2, \'Al-Hadid: The Iron\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(57, 1, \'سورة الحديد\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(57, 4, \'Al-Hadîd (Il Ferro)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(58, 3, \'Al-Mujadila: La Discussion\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(58, 2, \'Al-Mujaadila: The Pleading Woman\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(58, 1, \'سورة المجادلة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(58, 4, \'Al-Mujadila (La Disputante)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(59, 3, \'Al-Hashr: L’Exode\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(59, 2, \'Al-Hashr: The Exile\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(59, 1, \'سورة الحشر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(59, 4, \'Al-Hashr (L’Esodo)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(60, 3, \'Al-Mumtahina: L’Eprouvée\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(60, 2, \'Al-Mumtahana: She that is to be examined\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(60, 1, \'سورة الممتحنة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(60, 4, \'Al-Mumtahana ( L’Esaminata)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(61, 3, \'As-Saff: Le Rang\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(61, 2, \'As-Saff: The Ranks\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(61, 1, \'سورة الصف\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(61, 4, \'Aṣ-Ṣaff (I Ranghi Serrati)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(62, 3, \'Al-Jumua: La Jemâa\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(62, 2, \'Al-Jumu\'\'a: Friday\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(62, 1, \'سورة الجمعة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(62, 4, \'Al-Jumu‘a (Il Venerdì)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(63, 3, \'Al-Munafiqoon: Les Hypocrites\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(63, 2, \'Al-Munaafiqoon: The Hypocrites\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(63, 1, \'سورة المنافقون\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(63, 4, \'Al-Munâfiqûn (Gli Ipocriti)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(64, 3, \'At-Taghabun: La Grande Perte\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(64, 2, \'At-Taghaabun: Mutual Disillusion\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(64, 1, \'سورة التغابن\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(64, 4, \'At-Taghâbun (Il Reciproco Inganno)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(65, 3, \'At-Talaq: Le Divorce\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(65, 2, \'At-Talaaq: Divorce\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(65, 1, \'سورة الطلاق\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(65, 4, \'At-Talâq (Il Divorzio)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(66, 3, \'At-Tahrim: L’Interdiction\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(66, 2, \'At-Tahrim: The Prohibition\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(66, 1, \'سورة التحريم\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(66, 4, \'At-Tahrîm  (L’Interdizione)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(67, 3, \'Al-Mulk: La Souveraineté\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(67, 2, \'Al-Mulk: The Sovereignty\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(67, 1, \'سورة الملك\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(67, 4, \'Al-Mulk (La Sovranità)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(68, 3, \'Al-Qalam: La Plume (Calame)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(68, 2, \'Al-Qalam: The Pen\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(68, 1, \'سورة القلم\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(68, 4, \'Al-Qalam (Il Calamo)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(69, 3, \'Al-Haaqqa: La Vérité\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(69, 2, \'Al-Haaqqa: The Reality\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(69, 1, \'سورة الحاقة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(69, 4, \'Al-Hâqqah (L’Inevitabile)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(70, 3, \'Al-Maarij: Les Voies montantes\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(70, 2, \'Al-Ma\'\'aarij: The Ascending Stairways\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(70, 1, \'سورة المعارج\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(70, 4, \'Al-Ma‘ârij (Le Vie dell’Ascesa)\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(71, 3, \'Nooh: Noé\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(71, 2, \'Nooh: Noah\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(71, 1, \'سورة نوح\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(71, 4, \'Nûh  (Noè)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(72, 3, \'Al-Jinn: Les Djinns\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(72, 2, \'Al-Jinn: The Jinn\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(72, 1, \'سورة الجن\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(72, 4, \'Al-Jinn (I Dèmoni)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(73, 3, \'Al-Muzzammil: L’Enveloppe\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(73, 2, \'Al-Muzzammil: The Enshrouded One\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(73, 1, \'سورة المزمل\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(73, 4, \'Al-Muzzammil  (L’Avvolto)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(74, 3, \'Al-Muddathir: Le Revêtu du Manteau\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(74, 2, \'Al-Muddaththir: The Cloaked One\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(74, 1, \'سورة المدثر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(74, 4, \'Al-Muddaththir  (L’ Avvolto nel Mantello)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(75, 3, \'Al-Qiyama: La Résurrection\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(75, 2, \'Al-Qiyaama: The Resurrection\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(75, 1, \'سورة القيامة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(75, 4, \'Al-Qiyâma (La Resurrezione)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(76, 3, \'Al-Insan: L’Homme\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(76, 2, \'Al-Insaan: Man\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(76, 1, \'سورة الانسان\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(76, 4, \'Al-Insân  (L’Uomo)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(77, 3, \'Al-Mursalat: Les Envoyés\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(77, 2, \'Al-Mursalaat: The Emissaries\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(77, 1, \'سورة المرسلات\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(77, 4, \'Al-Mursalât  (Le Inviate)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(78, 3, \'An-Naba: La Nouvelle\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(78, 2, \'An-Naba: The Announcement\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(78, 1, \'سورة النبإ\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(78, 4, \'An-Nabâ’  (L’Annuncio)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(79, 3, \'An-Naziat: Les Anges qui arrachent\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(79, 2, \'An-Naazi\'\'aat: Those who drag forth\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(79, 1, \'سورة النازعات\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(79, 4, \'An-Nâzi‘ât  (Le Strappanti Violente)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(80, 3, \'Abasa: Il s’est renfrogné\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(80, 2, \'Abasa: He frowned\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(80, 1, \'سورة عبس\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(80, 4, \'‘Abasa  (Si Accigliò)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(81, 3, \'At-Takwir: L’Obscurcissement\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(81, 2, \'At-Takwir: The Overthrowing\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(81, 1, \'سورة التكوير\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(81, 4, \'At-Takwîr (L’Oscuramento)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(82, 3, \'Al-Infitar: La Rupture\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(82, 2, \'Al-Infitaar: The Cleaving\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(82, 1, \'سورة الإنفطار\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(82, 4, \'Al-Infitâr  (Lo Squarciarsi)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(83, 3, \'Al-Mutaffifin: Les Fraudeurs\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(83, 2, \'Al-Mutaffifin: Defrauding\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(83, 1, \'سورة المطففين\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(83, 4, \'Al-Mutaffifìn (I Frodatori)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(84, 3, \'Al-Inshiqaq: La Déchirure\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(84, 2, \'Al-Inshiqaaq: The Splitting Open\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(84, 1, \'سورة الإنشقاق\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(84, 4, \'Al-Inshiqâq  (La Fenditura)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(85, 3, \'Al-Burooj: Les Constellations\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(85, 2, \'Al-Burooj: The Constellations\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(85, 1, \'سورة البروج\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(85, 4, \'Al-Burûj (Le Costellazioni)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(86, 3, \'At-Tariq: L’Astre Nocturne\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(86, 2, \'At-Taariq: The Morning Star\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(86, 1, \'سورة الطارق\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(86, 4, \'At-Târiq  (L’Astro Notturno)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(87, 3, \'Al-Ala: Le Très-Haut\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(87, 2, \'Al-A\'\'laa: The Most High\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(87, 1, \'سورة الأعلى\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(87, 4, \'Al-Alâ  (L’Altissimo)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(88, 3, \'Al-Ghashiya: L’Enveloppante\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(88, 2, \'Al-Ghaashiya: The Overwhelming\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(88, 1, \'سورة الغاشية\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(88, 4, \'Al-Ghâshiya  L ‘Avvolgente\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(89, 3, \'Al-Fajr: L’Aube\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(89, 2, \'Al-Fajr: The Dawn\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(89, 1, \'سورة الفجر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(89, 4, \'Al-Fajr  (L’Alba)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(90, 3, \'Al-Balad: La Cité\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(90, 2, \'Al-Balad: The City\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(90, 1, \'سورة البلد\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(90, 4, \'Al-Balad  (La Contrada)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(91, 3, \'Ash-Shams: Le Soleil\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(91, 2, \'Ash-Shams: The Sun\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(91, 1, \'سورة الشمس\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(91, 4, \'Ash-Shams (Il Sole)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(92, 3, \'Al-Lail: La Nuit\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(92, 2, \'Al-Lail: The Night\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(92, 1, \'سورة الليل\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(92, 4, \'Al-Layl  (La Notte)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(93, 3, \'Ad-Dhuha: Le Jour qui monte\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(93, 2, \'Ad-Dhuhaa: The Morning Hours\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(93, 1, \'سورة الضحى\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(93, 4, \'Ad-Duhâ  (La Luce del Mattino)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(94, 3, \'Al-Inshirah: L’Ouverture\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(94, 2, \'Ash-Sharh: The Consolation\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(94, 1, \'سورة الشرح\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(94, 4, \'Ash-Sharh  (L’Apertura)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(95, 3, \'At-Tin: Le Figuier\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(95, 2, \'At-Tin: The Fig\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(95, 1, \'سورة التين\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(95, 4, \'At-Tîn (Il Fico)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(96, 3, \'Al-Alaq: L’Adhérence\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(96, 2, \'Al-Alaq: The Clot\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(96, 1, \'سورة العلق\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(96, 4, \'Al-‘Alaq  (L’Aderenza)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(97, 3, \'Al-Qadr: La Destinée\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(97, 2, \'Al-Qadr: The Power, Fate\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(97, 1, \'سورة القدر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(97, 4, \'Al-Qadr  (Il Destino)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(98, 3, \'Al-Bayyina: La Preuve\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(98, 2, \'Al-Bayyina: The Evidence\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(98, 1, \'سورة البينة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(98, 4, \'Al-Bayyina  (La prova)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(99, 3, \'Al-Zalzala: La Secousse\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(99, 2, \'Az-Zalzala: The Earthquake\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(99, 1, \'سورة الزلزلة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(99, 4, \'Az-Zalzalah  (Il Terremoto)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(100, 3, \'Al-Adiyat: Les Coursiers\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(100, 2, \'Al-Aadiyaat: The Chargers\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(100, 1, \'سورة العاديات\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(100, 4, \'Al-‘Âdiyât  (Le Scalpitanti)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(101, 3, \'Al-Qaria: Le Fracas\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(101, 2, \'Al-Qaari\'\'a: The Calamity\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(101, 1, \'سورة القارعة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(101, 4, \'Al-Qâri’ah (La Percotente)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(102, 3, \'At-Takathur: La Course aux Richesses\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(102, 2, \'At-Takaathur: Competition\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(102, 1, \'سورة التكاثر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(102, 4, \'At-Takâthur  (Il Rivaleggiare)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(103, 3, \'Al-Asr: Le Temps\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(103, 2, \'Al-Asr: The Declining Day, Epoch\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(103, 1, \'سورة العصر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(103, 4, \'Al-‘Asr  (Il Tempo)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(104, 3, \'Al-Humaza: Les Calomniateurs\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(104, 2, \'Al-Humaza: The Traducer\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(104, 1, \'سورة الهمزة\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(104, 4, \'Al-Humaza  (Il Diffamatore)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(105, 3, \'Al-Fil: L’Eléphant\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(105, 2, \'Al-Fil: The Elephant\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(105, 1, \'سورة الفيل\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(105, 4, \'Al-Fîl  (L’Elefante)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(106, 3, \'Quraish: Les Quraychites\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(106, 2, \'Quraish: Quraysh\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(106, 1, \'سورة قريش\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(106, 4, \'Quraysh  (I Coreisciti)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(107, 3, \'Al-Maun: L’Ustensile\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(107, 2, \'Al-Maa\'\'un: Almsgiving\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(107, 1, \'سورة الماعون\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(107, 4, \'Al-Mâ‘un (L’Utensile)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(108, 3, \'Al-Kauther: L’Abondance\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(108, 2, \'Al-Kawthar: Abundance\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(108, 1, \'سورة الكوثر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(108, 4, \'Al-Kawthar  (L’Abbondanza)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(109, 3, \'Al-Kafiroon: Les Infidèles\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(109, 2, \'Al-Kaafiroon: The Disbelievers\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(109, 1, \'سورة الكافرون\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(109, 4, \'Al-Kâfirûn  (I Miscredenti)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(110, 3, \'An-Nasr: Le Secours Divin\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(110, 2, \'An-Nasr: Divine Support\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(110, 1, \'سورة النصر\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(110, 4, \'An-Nasr  ( L’Ausilio)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(111, 3, \'Al-Masadd: La Corde torsadée en Fibres\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(111, 2, \'Al-Masad: The Palm Fibre\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(111, 1, \'سورة المسد\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(111, 4, \'Al-Masad  (Le Fibre di Palma)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(112, 3, \'Al-Ikhlas: La Pureté de la Foi\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(112, 2, \'Al-Ikhlaas: Sincerity\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(112, 1, \'سورة الإخلاص\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(112, 4, \'Al-Ikhlâs  (Il Puro Monoteismo)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(113, 3, \'Al-Falaq: L’Aube naissante\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(113, 2, \'Al-Falaq: The Dawn\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(113, 1, \'سورة الفلق\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(113, 4, \'Al-Falaq  (L’Alba Nascente)\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(114, 3, \'An-Nas: Les Hommes\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(114, 2, \'An-Naas: Mankind\')');
-        await txn
-            .rawInsert('INSERT INTO surahnames VALUES(114, 1, \'سورة الناس\')');
-        await txn.rawInsert(
-            'INSERT INTO surahnames VALUES(114, 4, \'An-Nâs  (Gli Uomini)\')');
-        await txn.rawInsert(
+  Future<void> crazy1(Database db) async {
+    await db.transaction((txn) async {
+      await txn.rawInsert(
+        'INSERT INTO languages VALUES(1, \'AR\', \'Arabic\', \'العربية\')',
+      );
+      await txn.rawInsert(
+        'INSERT INTO languages VALUES(2, \'EN\', \'English\', \'English\')',
+      );
+      await txn.rawInsert(
+        'INSERT INTO languages VALUES(3, \'FR\', \'French\', \'Français\')',
+      );
+      await txn.rawInsert(
+        'INSERT INTO languages VALUES(4, \'IT\', \'Italian\', \'Italiano\')',
+      );
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(1, 3, \'Al-Fatiha: Prologue\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(1, 2, \'Al-Faatiha: The Opening\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(1, 1, \'سورة الفاتحة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(1, 4, \'Al-Fâtiha (L’Aprente)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(2, 3, \'Al-Baqara: La Génisse\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(2, 2, \'Al-Baqara: The Cow\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(2, 1, \'سورة البقرة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(2, 4, \'Al-Baqara (La Giovenca)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(3, 3, \'Al-i-Imran: La famille d’Imram\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(3, 2, \'Aal-i-Imraan: The Family of Imraan\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(3, 1, \'سورة آل عمران\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(3, 4, \'Âl-‘Imrân (La Famiglia di Imran)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(4, 3, \'An-Nisa: Les Femmes\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(4, 2, \'An-Nisaa: The Women\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(4, 1, \'سورة النساء\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(4, 4, \'An-Nisâ’ (Le Donne)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(5, 3, \'Al-Maeda: La Table servie\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(5, 2, \'Al-Maaida: The Table\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(5, 1, \'سورة المائدة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(5, 4, \'Al-Mâ’ida (La Tavola Imbandita)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(6, 3, \'Al-Anaam: Les Bestiaux\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(6, 2, \'Al-An\'\'aam: The Cattle\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(6, 1, \'سورة الأنعام\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(6, 4, \'Al-An‘âm (Il bestiame)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(7, 3, \'Al-Araf: Les Hauteurs\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(7, 2, \'Al-A\'\'raaf: The Heights\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(7, 1, \'سورة الأعراف\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(7, 4, \'Al-A‘râf\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(8, 3, \'Al-Anfal: Le Butin\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(8, 2, \'Al-Anfaal: The Spoils of War\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(8, 1, \'سورة الأنفال\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(8, 4, \'Al-’Anfâl (Il Bottino)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(9, 3, \'At-Taubah: Le Repentir\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(9, 2, \'At-Tawba: The Repentance\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(9, 1, \'سورة التوبة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(9, 4, \'At-Tawba (Il Pentimento o la Disapprovazione)\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(10, 3, \'Yunus: Jonas\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(10, 2, \'Yunus: Jonas\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(10, 1, \'سورة يونس\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(10, 4, \'Yûnus (Giona)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(11, 3, \'Hud: Hoûd (prophète ou patriarche Héber)\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(11, 2, \'Hud: Hud\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(11, 1, \'سورة هود\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(11, 4, \'Hûd\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(12, 3, \'Yusuf: Joseph\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(12, 2, \'Yusuf: Joseph\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(12, 1, \'سورة يوسف\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(12, 4, \'Yûsuf (Giuseppe)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(13, 3, \'Ar-Rad: Le Tonnerre\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(13, 2, \'Ar-Ra\'\'d: The Thunder\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(13, 1, \'سورة الرعد\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(13, 4, \'Ar-Ra‘d (Il Tuono)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(14, 3, \'Ibrahim: Abraham\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(14, 2, \'Ibrahim: Abraham\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(14, 1, \'سورة ابراهيم\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(14, 4, \'Ibrâhîm (Abramo)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(15, 3, \'Al-Hijr: La Vallée des Pierres\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(15, 2, \'Al-Hijr: The Rock\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(15, 1, \'سورة الحجر\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(15, 4, \'Al-Hijr\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(16, 3, \'An-Nahl: Les Abeilles\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(16, 2, \'An-Nahl: The Bee\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(16, 1, \'سورة النحل\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(16, 4, \'An-Nahl (Le Api)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(17, 3, \'Al-Isra: Le Voyage nocturne\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(17, 2, \'Al-Israa: The Night Journey\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(17, 1, \'سورة الإسراء\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(17, 4, \'Al-Isrâ’ (Il Viaggio Notturno)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(18, 3, \'Al-Kahf: La Caverne\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(18, 2, \'Al-Kahf: The Cave\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(18, 1, \'سورة الكهف\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(18, 4, \'Al-Kahf (La Caverna)\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(19, 3, \'Maryam: Marie\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(19, 2, \'Maryam: Mary\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(19, 1, \'سورة مريم\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(19, 4, \'Maryam (Maria)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(20, 3, \'Taha: Lettres Ta-Ha\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(20, 2, \'Taa-Haa: Taa-Haa\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(20, 1, \'سورة طه\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(20, 4, \'Tâ-Hâ\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(21, 3, \'Al-Ambiya: Les Prophètes\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(21, 2, \'Al-Anbiyaa: The Prophets\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(21, 1, \'سورة الأنبياء\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(21, 4, \'Al-Anbiyâ’ (I Profeti)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(22, 3, \'Al-Hajj: Le Pélerinage\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(22, 2, \'Al-Hajj: The Pilgrimage\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(22, 1, \'سورة الحج\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(22, 4, \'Al-Hajj (Il Pellegrinaggio)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(23, 3, \'Al-Mumenoon: Les Croyants\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(23, 2, \'Al-Muminoon: The Believers\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(23, 1, \'سورة المؤمنون\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(23, 4, \'Al-Mu’minûn (I Credenti)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(24, 3, \'An-Noor: La Lumière\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(24, 2, \'An-Noor: The Light\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(24, 1, \'سورة النور\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(24, 4, \'An-Nûr (La Luce)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(25, 3, \'Al-Furqan: Le Discernement\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(25, 2, \'Al-Furqaan: The Criterion\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(25, 1, \'سورة الفرقان\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(25, 4, \'Al-Furqân (Il Discrimine)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(26, 3, \'Ash-Shuara: Les Poètes\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(26, 2, \'Ash-Shu\'\'araa: The Poets\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(26, 1, \'سورة الشعراء\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(26, 4, \'Ash-Shu‘arâ’ (I Poeti)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(27, 3, \'An-Naml: Les Fourmis\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(27, 2, \'An-Naml: The Ant\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(27, 1, \'سورة النمل\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(27, 4, \'An-Naml (Le Formiche)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(28, 3, \'Al-Qasas: Les Histoires\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(28, 2, \'Al-Qasas: The Stories\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(28, 1, \'سورة القصص\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(28, 4, \'Al-Qasas (Il Racconto)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(29, 3, \'Al-Ankaboot: L’Araignée\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(29, 2, \'Al-Ankaboot: The Spider\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(29, 1, \'سورة العنكبوت\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(29, 4, \'Al-‘Ankabût (Il Ragno)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(30, 3, \'Ar-Room: Les Romains\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(30, 2, \'Ar-Room: The Romans\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(30, 1, \'سورة الروم\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(30, 4, \'Ar-Rûm (I Romani)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(31, 3, \'Luqman: Le Sage Luqman\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(31, 2, \'Luqman: Luqman\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(31, 1, \'سورة لقمان\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(31, 4, \'Luqmàn\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(32, 3, \'As-Sajda: La Prosternation\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(32, 2, \'As-Sajda: The Prostration\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(32, 1, \'سورة السجدة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(32, 4, \'As-Sajda  (La Prosternazione)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(33, 3, \'Al-Ahzab: Les Coalisés\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(33, 2, \'Al-Ahzaab: The Clans\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(33, 1, \'سورة الأحزاب\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(33, 4, \'Al-Ahzâb (I Coalizzati)\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(34, 3, \'Saba: Sabah\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(34, 2, \'Saba: Sheba\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(34, 1, \'سورة سبإ\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(34, 4, \'Sabâ’\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(35, 3, \'Fatir: Le Créateur\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(35, 2, \'Faatir: The Originator\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(35, 1, \'سورة فاطر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(35, 4, \'Fâtir (Colui Che dà origine)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(36, 3, \'Ya-Sin: Yā Sīn\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(36, 2, \'Yaseen: Yaseen\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(36, 1, \'سورة يس\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(36, 4, \'Yâ Sîn\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(37, 3, \'As-Saaffat: Les Rangées\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(37, 2, \'As-Saaffaat: Those drawn up in Ranks\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(37, 1, \'سورة الصافات\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(37, 4, \'As-Sâffât (I Ranghi)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(38, 3, \'Sad: La Lettre Sad\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(38, 2, \'Saad: The letter Saad\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(38, 1, \'سورة ص\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(38, 4, \'Sâd\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(39, 3, \'Az-Zumar: Les Groupes\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(39, 2, \'Az-Zumar: The Groups\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(39, 1, \'سورة الزمر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(39, 4, \'Az-Zumar (I Gruppi)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(40, 3, \'Al-Ghafir: Le Pardonneur\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(40, 2, \'Ghafir: The Forgiver\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(40, 1, \'سورة غافر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(40, 4, \'Ghâfir (Il Perdonatore)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(41, 3, \'Fussilat: Les Versets détaillés\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(41, 2, \'Fussilat: Explained in detail\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(41, 1, \'سورة فصلت\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(41, 4, \'Fussilat (Esposti chiaramente)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(42, 3, \'Ash-Shura: La Consultation\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(42, 2, \'Ash-Shura: Consultation\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(42, 1, \'سورة الشورى\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(42, 4, \'Ash-Shûrâ (La Consultazione)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(43, 3, \'Az-Zukhruf: Les Ornements d’Or\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(43, 2, \'Az-Zukhruf: Ornaments of gold\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(43, 1, \'سورة الزخرف\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(43, 4, \'Az-Zukhruf (Gli Ornamenti d’Oro)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(44, 3, \'Ad-Dukhan: La Fumée\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(44, 2, \'Ad-Dukhaan: The Smoke\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(44, 1, \'سورة الدخان\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(44, 4, \'Ad-Dukhân (Il Fumo)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(45, 3, \'Al-Jathiya: L’Agenouillée\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(45, 2, \'Al-Jaathiya: Crouching\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(45, 1, \'سورة الجاثية\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(45, 4, \'Al-Jâthiya (La Genuflessa)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(46, 3, \'Al-Ahqaf: Les Dunes\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(46, 2, \'Al-Ahqaf: The Dunes\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(46, 1, \'سورة الأحقاف\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(46, 4, \'Al-’Ahqàf\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(47, 3, \'Muhammad: Mahomet\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(47, 2, \'Muhammad: Muhammad\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(47, 1, \'سورة محمد\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(47, 4, \'Muhammad\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(48, 3, \'Al-Fath: La Victoire Eclatante\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(48, 2, \'Al-Fath: The Victory\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(48, 1, \'سورة الفتح\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(48, 4, \'Al-Fath (La Vittoria)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(49, 3, \'Al-Hujraat: Les Appartements\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(49, 2, \'Al-Hujuraat: The Inner Apartments\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(49, 1, \'سورة الحجرات\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(49, 4, \'Al-Hujurat (Le Stanze ìntime)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(50, 3, \'Qaf: La Lettre Qaf\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(50, 2, \'Qaaf: The letter Qaaf\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(50, 1, \'سورة ق\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(50, 4, \'Qâf\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(51, 3, \'Adh-Dhariyat: Les Vents qui éparpillent\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(51, 2, \'Adh-Dhaariyat: The Winnowing Winds\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(51, 1, \'سورة الذاريات\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(51, 4, \'Adh-Dhâriyât (Quelle che spargono)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(52, 3, \'At-Tur: La Montagne\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(52, 2, \'At-Tur: The Mount\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(52, 1, \'سورة الطور\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(52, 4, \'At-Tûr (Il Monte)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(53, 3, \'An-Najm: L’Etoile\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(53, 2, \'An-Najm: The Star\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(53, 1, \'سورة النجم\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(53, 4, \'An-Najm (La Stella)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(54, 3, \'Al-Qamar: La Lune\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(54, 2, \'Al-Qamar: The Moon\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(54, 1, \'سورة القمر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(54, 4, \'Al-Qamar (La Luna)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(55, 3, \'Al-Rahman: Le Tout Miséricordieux\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(55, 2, \'Ar-Rahmaan: The Beneficent\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(55, 1, \'سورة الرحمن\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(55, 4, \'Ar-Rahmân (Il Compassionevole)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(56, 3, \'Al-Waqia: L’Evênement\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(56, 2, \'Al-Waaqia: The Inevitable\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(56, 1, \'سورة الواقعة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(56, 4, \'Al-Wâqi‘a (L’Evento)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(57, 3, \'Al-Hadid: Le Fer\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(57, 2, \'Al-Hadid: The Iron\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(57, 1, \'سورة الحديد\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(57, 4, \'Al-Hadîd (Il Ferro)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(58, 3, \'Al-Mujadila: La Discussion\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(58, 2, \'Al-Mujaadila: The Pleading Woman\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(58, 1, \'سورة المجادلة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(58, 4, \'Al-Mujadila (La Disputante)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(59, 3, \'Al-Hashr: L’Exode\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(59, 2, \'Al-Hashr: The Exile\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(59, 1, \'سورة الحشر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(59, 4, \'Al-Hashr (L’Esodo)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(60, 3, \'Al-Mumtahina: L’Eprouvée\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(60, 2, \'Al-Mumtahana: She that is to be examined\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(60, 1, \'سورة الممتحنة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(60, 4, \'Al-Mumtahana ( L’Esaminata)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(61, 3, \'As-Saff: Le Rang\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(61, 2, \'As-Saff: The Ranks\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(61, 1, \'سورة الصف\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(61, 4, \'Aṣ-Ṣaff (I Ranghi Serrati)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(62, 3, \'Al-Jumua: La Jemâa\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(62, 2, \'Al-Jumu\'\'a: Friday\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(62, 1, \'سورة الجمعة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(62, 4, \'Al-Jumu‘a (Il Venerdì)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(63, 3, \'Al-Munafiqoon: Les Hypocrites\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(63, 2, \'Al-Munaafiqoon: The Hypocrites\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(63, 1, \'سورة المنافقون\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(63, 4, \'Al-Munâfiqûn (Gli Ipocriti)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(64, 3, \'At-Taghabun: La Grande Perte\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(64, 2, \'At-Taghaabun: Mutual Disillusion\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(64, 1, \'سورة التغابن\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(64, 4, \'At-Taghâbun (Il Reciproco Inganno)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(65, 3, \'At-Talaq: Le Divorce\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(65, 2, \'At-Talaaq: Divorce\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(65, 1, \'سورة الطلاق\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(65, 4, \'At-Talâq (Il Divorzio)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(66, 3, \'At-Tahrim: L’Interdiction\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(66, 2, \'At-Tahrim: The Prohibition\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(66, 1, \'سورة التحريم\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(66, 4, \'At-Tahrîm  (L’Interdizione)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(67, 3, \'Al-Mulk: La Souveraineté\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(67, 2, \'Al-Mulk: The Sovereignty\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(67, 1, \'سورة الملك\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(67, 4, \'Al-Mulk (La Sovranità)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(68, 3, \'Al-Qalam: La Plume (Calame)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(68, 2, \'Al-Qalam: The Pen\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(68, 1, \'سورة القلم\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(68, 4, \'Al-Qalam (Il Calamo)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(69, 3, \'Al-Haaqqa: La Vérité\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(69, 2, \'Al-Haaqqa: The Reality\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(69, 1, \'سورة الحاقة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(69, 4, \'Al-Hâqqah (L’Inevitabile)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(70, 3, \'Al-Maarij: Les Voies montantes\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(70, 2, \'Al-Ma\'\'aarij: The Ascending Stairways\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(70, 1, \'سورة المعارج\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(70, 4, \'Al-Ma‘ârij (Le Vie dell’Ascesa)\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(71, 3, \'Nooh: Noé\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(71, 2, \'Nooh: Noah\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(71, 1, \'سورة نوح\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(71, 4, \'Nûh  (Noè)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(72, 3, \'Al-Jinn: Les Djinns\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(72, 2, \'Al-Jinn: The Jinn\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(72, 1, \'سورة الجن\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(72, 4, \'Al-Jinn (I Dèmoni)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(73, 3, \'Al-Muzzammil: L’Enveloppe\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(73, 2, \'Al-Muzzammil: The Enshrouded One\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(73, 1, \'سورة المزمل\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(73, 4, \'Al-Muzzammil  (L’Avvolto)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(74, 3, \'Al-Muddathir: Le Revêtu du Manteau\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(74, 2, \'Al-Muddaththir: The Cloaked One\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(74, 1, \'سورة المدثر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(74, 4, \'Al-Muddaththir  (L’ Avvolto nel Mantello)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(75, 3, \'Al-Qiyama: La Résurrection\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(75, 2, \'Al-Qiyaama: The Resurrection\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(75, 1, \'سورة القيامة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(75, 4, \'Al-Qiyâma (La Resurrezione)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(76, 3, \'Al-Insan: L’Homme\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(76, 2, \'Al-Insaan: Man\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(76, 1, \'سورة الانسان\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(76, 4, \'Al-Insân  (L’Uomo)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(77, 3, \'Al-Mursalat: Les Envoyés\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(77, 2, \'Al-Mursalaat: The Emissaries\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(77, 1, \'سورة المرسلات\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(77, 4, \'Al-Mursalât  (Le Inviate)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(78, 3, \'An-Naba: La Nouvelle\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(78, 2, \'An-Naba: The Announcement\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(78, 1, \'سورة النبإ\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(78, 4, \'An-Nabâ’  (L’Annuncio)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(79, 3, \'An-Naziat: Les Anges qui arrachent\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(79, 2, \'An-Naazi\'\'aat: Those who drag forth\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(79, 1, \'سورة النازعات\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(79, 4, \'An-Nâzi‘ât  (Le Strappanti Violente)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(80, 3, \'Abasa: Il s’est renfrogné\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(80, 2, \'Abasa: He frowned\')');
+      await txn.rawInsert('INSERT INTO surahnames VALUES(80, 1, \'سورة عبس\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(80, 4, \'‘Abasa  (Si Accigliò)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(81, 3, \'At-Takwir: L’Obscurcissement\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(81, 2, \'At-Takwir: The Overthrowing\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(81, 1, \'سورة التكوير\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(81, 4, \'At-Takwîr (L’Oscuramento)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(82, 3, \'Al-Infitar: La Rupture\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(82, 2, \'Al-Infitaar: The Cleaving\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(82, 1, \'سورة الإنفطار\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(82, 4, \'Al-Infitâr  (Lo Squarciarsi)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(83, 3, \'Al-Mutaffifin: Les Fraudeurs\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(83, 2, \'Al-Mutaffifin: Defrauding\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(83, 1, \'سورة المطففين\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(83, 4, \'Al-Mutaffifìn (I Frodatori)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(84, 3, \'Al-Inshiqaq: La Déchirure\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(84, 2, \'Al-Inshiqaaq: The Splitting Open\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(84, 1, \'سورة الإنشقاق\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(84, 4, \'Al-Inshiqâq  (La Fenditura)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(85, 3, \'Al-Burooj: Les Constellations\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(85, 2, \'Al-Burooj: The Constellations\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(85, 1, \'سورة البروج\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(85, 4, \'Al-Burûj (Le Costellazioni)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(86, 3, \'At-Tariq: L’Astre Nocturne\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(86, 2, \'At-Taariq: The Morning Star\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(86, 1, \'سورة الطارق\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(86, 4, \'At-Târiq  (L’Astro Notturno)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(87, 3, \'Al-Ala: Le Très-Haut\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(87, 2, \'Al-A\'\'laa: The Most High\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(87, 1, \'سورة الأعلى\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(87, 4, \'Al-Alâ  (L’Altissimo)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(88, 3, \'Al-Ghashiya: L’Enveloppante\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(88, 2, \'Al-Ghaashiya: The Overwhelming\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(88, 1, \'سورة الغاشية\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(88, 4, \'Al-Ghâshiya  L ‘Avvolgente\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(89, 3, \'Al-Fajr: L’Aube\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(89, 2, \'Al-Fajr: The Dawn\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(89, 1, \'سورة الفجر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(89, 4, \'Al-Fajr  (L’Alba)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(90, 3, \'Al-Balad: La Cité\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(90, 2, \'Al-Balad: The City\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(90, 1, \'سورة البلد\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(90, 4, \'Al-Balad  (La Contrada)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(91, 3, \'Ash-Shams: Le Soleil\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(91, 2, \'Ash-Shams: The Sun\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(91, 1, \'سورة الشمس\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(91, 4, \'Ash-Shams (Il Sole)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(92, 3, \'Al-Lail: La Nuit\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(92, 2, \'Al-Lail: The Night\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(92, 1, \'سورة الليل\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(92, 4, \'Al-Layl  (La Notte)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(93, 3, \'Ad-Dhuha: Le Jour qui monte\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(93, 2, \'Ad-Dhuhaa: The Morning Hours\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(93, 1, \'سورة الضحى\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(93, 4, \'Ad-Duhâ  (La Luce del Mattino)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(94, 3, \'Al-Inshirah: L’Ouverture\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(94, 2, \'Ash-Sharh: The Consolation\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(94, 1, \'سورة الشرح\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(94, 4, \'Ash-Sharh  (L’Apertura)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(95, 3, \'At-Tin: Le Figuier\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(95, 2, \'At-Tin: The Fig\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(95, 1, \'سورة التين\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(95, 4, \'At-Tîn (Il Fico)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(96, 3, \'Al-Alaq: L’Adhérence\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(96, 2, \'Al-Alaq: The Clot\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(96, 1, \'سورة العلق\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(96, 4, \'Al-‘Alaq  (L’Aderenza)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(97, 3, \'Al-Qadr: La Destinée\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(97, 2, \'Al-Qadr: The Power, Fate\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(97, 1, \'سورة القدر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(97, 4, \'Al-Qadr  (Il Destino)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(98, 3, \'Al-Bayyina: La Preuve\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(98, 2, \'Al-Bayyina: The Evidence\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(98, 1, \'سورة البينة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(98, 4, \'Al-Bayyina  (La prova)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(99, 3, \'Al-Zalzala: La Secousse\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(99, 2, \'Az-Zalzala: The Earthquake\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(99, 1, \'سورة الزلزلة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(99, 4, \'Az-Zalzalah  (Il Terremoto)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(100, 3, \'Al-Adiyat: Les Coursiers\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(100, 2, \'Al-Aadiyaat: The Chargers\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(100, 1, \'سورة العاديات\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(100, 4, \'Al-‘Âdiyât  (Le Scalpitanti)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(101, 3, \'Al-Qaria: Le Fracas\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(101, 2, \'Al-Qaari\'\'a: The Calamity\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(101, 1, \'سورة القارعة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(101, 4, \'Al-Qâri’ah (La Percotente)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(102, 3, \'At-Takathur: La Course aux Richesses\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(102, 2, \'At-Takaathur: Competition\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(102, 1, \'سورة التكاثر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(102, 4, \'At-Takâthur  (Il Rivaleggiare)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(103, 3, \'Al-Asr: Le Temps\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(103, 2, \'Al-Asr: The Declining Day, Epoch\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(103, 1, \'سورة العصر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(103, 4, \'Al-‘Asr  (Il Tempo)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(104, 3, \'Al-Humaza: Les Calomniateurs\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(104, 2, \'Al-Humaza: The Traducer\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(104, 1, \'سورة الهمزة\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(104, 4, \'Al-Humaza  (Il Diffamatore)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(105, 3, \'Al-Fil: L’Eléphant\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(105, 2, \'Al-Fil: The Elephant\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(105, 1, \'سورة الفيل\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(105, 4, \'Al-Fîl  (L’Elefante)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(106, 3, \'Quraish: Les Quraychites\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(106, 2, \'Quraish: Quraysh\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(106, 1, \'سورة قريش\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(106, 4, \'Quraysh  (I Coreisciti)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(107, 3, \'Al-Maun: L’Ustensile\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(107, 2, \'Al-Maa\'\'un: Almsgiving\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(107, 1, \'سورة الماعون\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(107, 4, \'Al-Mâ‘un (L’Utensile)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(108, 3, \'Al-Kauther: L’Abondance\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(108, 2, \'Al-Kawthar: Abundance\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(108, 1, \'سورة الكوثر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(108, 4, \'Al-Kawthar  (L’Abbondanza)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(109, 3, \'Al-Kafiroon: Les Infidèles\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(109, 2, \'Al-Kaafiroon: The Disbelievers\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(109, 1, \'سورة الكافرون\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(109, 4, \'Al-Kâfirûn  (I Miscredenti)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(110, 3, \'An-Nasr: Le Secours Divin\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(110, 2, \'An-Nasr: Divine Support\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(110, 1, \'سورة النصر\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(110, 4, \'An-Nasr  ( L’Ausilio)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(111, 3, \'Al-Masadd: La Corde torsadée en Fibres\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(111, 2, \'Al-Masad: The Palm Fibre\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(111, 1, \'سورة المسد\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(111, 4, \'Al-Masad  (Le Fibre di Palma)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(112, 3, \'Al-Ikhlas: La Pureté de la Foi\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(112, 2, \'Al-Ikhlaas: Sincerity\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(112, 1, \'سورة الإخلاص\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(112, 4, \'Al-Ikhlâs  (Il Puro Monoteismo)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(113, 3, \'Al-Falaq: L’Aube naissante\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(113, 2, \'Al-Falaq: The Dawn\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(113, 1, \'سورة الفلق\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(113, 4, \'Al-Falaq  (L’Alba Nascente)\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(114, 3, \'An-Nas: Les Hommes\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(114, 2, \'An-Naas: Mankind\')');
+      await txn
+          .rawInsert('INSERT INTO surahnames VALUES(114, 1, \'سورة الناس\')');
+      await txn.rawInsert(
+          'INSERT INTO surahnames VALUES(114, 4, \'An-Nâs  (Gli Uomini)\')');
+      await txn.rawInsert(
         'INSERT INTO verses VALUES (1, 1, 1, \'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\'), (1, 1, 2, \'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ\'), (1, 1, 3, \'ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\'), (1, 1, 4, \'مَٰلِكِ يَوْمِ ٱلدِّينِ\'), (1, 1, 5, \'إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ\'), (1, 1, 6, \'ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ\'), (1, 1, 7, \'صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ\')',
       );
       await txn.rawInsert(
@@ -1283,7 +1272,6 @@ class SQLQueries {
       await txn.rawInsert(
         'INSERT INTO verses VALUES (1, 114, 1, \'قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ\'), (1, 114, 2, \'مَلِكِ ٱلنَّاسِ\'), (1, 114, 3, \'إِلَٰهِ ٱلنَّاسِ\'), (1, 114, 4, \'مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ\'), (1, 114, 5, \'ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ\'), (1, 114, 6, \'مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ\')',
       );
-      });
-
+    });
   }
 }

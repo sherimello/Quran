@@ -112,9 +112,12 @@ flutter:
     - family: Quran karim 114
       fonts:
         - asset: lib/assets/fonts/Quran karim 114.ttf
-    - family: Al Qalam Quran Majeed Web
+    - family: Al Qalam Quran Majeed Web Regular
       fonts:
         - asset: lib/assets/fonts/Al Qalam Quran Majeed Web Regular.ttf
+    - family: _PDMS_Saleem_QuranFont Regular
+      fonts:
+        - asset: lib/assets/fonts/_PDMS_Saleem_QuranFont Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
