@@ -100,7 +100,7 @@ flutter:
     - family: Besmellah_1
       fonts:
         - asset: lib/assets/fonts/Besmellah_1.ttf
-    - family: AayatQuraan
+    - family: AayatQuraan-E6AW
       fonts:
         - asset: lib/assets/fonts/AayatQuraan2-E6AW.ttf
     - family: FelicitationArabicFeasts-a12g
@@ -118,6 +118,12 @@ flutter:
     - family: _PDMS_Saleem_QuranFont Regular
       fonts:
         - asset: lib/assets/fonts/_PDMS_Saleem_QuranFont Regular.ttf
+    - family: 110_Besmellah
+      fonts:
+        - asset: lib/assets/fonts/110_Besmellah.TTF
+    - family: Al Majeed Quranic Font_shiped
+      fonts:
+        - asset: lib/assets/fonts/Al Majeed Quranic Font_shiped.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
