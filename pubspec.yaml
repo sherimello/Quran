@@ -124,6 +124,9 @@ flutter:
     - family: Al Majeed Quranic Font_shiped
       fonts:
         - asset: lib/assets/fonts/Al Majeed Quranic Font_shiped.ttf
+    - family: Diwanltr
+      fonts:
+        - asset: lib/assets/fonts/Diwanltr.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
