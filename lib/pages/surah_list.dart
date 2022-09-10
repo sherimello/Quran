@@ -238,6 +238,11 @@ class _SurahListState extends State<SurahList> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var appBar = AppBar();
+
+    bool isPortraitMode() {
+      return size.height > size.width ? true : false;
+    }
+
     ArabicNumbers arabicNumber = ArabicNumbers();
     return Scaffold(
       appBar: AppBar(
@@ -251,9 +256,9 @@ class _SurahListState extends State<SurahList> {
               padding: const EdgeInsets.only(right: 11.0),
               child: Container(
                   width: appBar.preferredSize.height -
-                      appBar.preferredSize.height * .29,
+                      appBar.preferredSize.height * .35,
                   height: appBar.preferredSize.height -
-                      appBar.preferredSize.height * .29,
+                      appBar.preferredSize.height * .35,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(1000),
                       color: Colors.white.withOpacity(.5)),
@@ -376,8 +381,8 @@ class _SurahListState extends State<SurahList> {
                                                       child: Image.asset(
                                                         'lib/assets/images/indexDesign.png',
                                                         height:
-                                                            size.width * .11,
-                                                        width: size.width * .11,
+                                                            isPortraitMode() ? size.width * .10 : size.height * .10,
+                                                        width: isPortraitMode() ? size.width * .10 : size.height * .10,
                                                       ),
                                                     ),
                                                     Text(
@@ -389,7 +394,7 @@ class _SurahListState extends State<SurahList> {
                                                           color: const Color(
                                                               0xff1d3f5e),
                                                           fontSize:
-                                                              size.width * .029,
+                                                              isPortraitMode() ? size.width * .029 : size.height * .029,
                                                           // fontWeight: FontWeight.bold,
                                                           fontFamily:
                                                               'varela-round.regular'),
@@ -406,7 +411,7 @@ class _SurahListState extends State<SurahList> {
                                                     Padding(
                                                       padding: const EdgeInsets
                                                               .fromLTRB(
-                                                          17, 0, 17, 0),
+                                                          11, 0, 17, 0),
                                                       child: Text(
                                                         surah_name_translated[
                                                                     index]
@@ -434,7 +439,7 @@ class _SurahListState extends State<SurahList> {
                                                     Padding(
                                                       padding: const EdgeInsets
                                                               .fromLTRB(
-                                                          17, 5, 17, 0),
+                                                          11, 5, 17, 0),
                                                       child: Text(
                                                         '${surah_name_translated[index]['translation'].toString().substring(surah_name_translated[index]['translation'].toString().indexOf(':') + 2)} ●',
                                                         style: const TextStyle(
@@ -449,7 +454,7 @@ class _SurahListState extends State<SurahList> {
                                                     Padding(
                                                       padding: const EdgeInsets
                                                               .fromLTRB(
-                                                          17, 5, 17, 0),
+                                                          11, 5, 17, 0),
                                                       child: Wrap(
                                                         alignment: WrapAlignment
                                                             .center,

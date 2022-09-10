@@ -120,6 +120,28 @@ class _HomeState extends State<Home> {
                 const SizedBox(
                   height: 31,
                 ),
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(1000),
+                      color: const Color(0xff1d3f5e)),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(19, 06, 19, 06),
+                    child: Text(
+                      language1,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        // fontFamily: 'Al Majeed Quranic Font_shiped',
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xffeceae8),
+                        // height: size.width/size.height
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 21,
+                ),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -134,33 +156,13 @@ class _HomeState extends State<Home> {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(19, 11, 19, 11),
                       child: Text(
-                        language1,
+                        language2,
                         style: const TextStyle(
                           fontFamily: 'Rounded_Elegance',
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: Color(0xffeceae8),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 21,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(1000),
-                      color: const Color(0xff1d3f5e)),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(19, 11, 19, 11),
-                    child: Text(
-                      language2,
-                      style: const TextStyle(
-                        fontFamily: 'Rounded_Elegance',
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xffeceae8),
                       ),
                     ),
                   ),
