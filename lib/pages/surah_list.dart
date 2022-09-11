@@ -14,9 +14,14 @@ class SurahList extends StatefulWidget {
 class _SurahListState extends State<SurahList> {
   late Database database;
   late String path;
+  late int sujood_index;
   String surah_type = '';
-  List<Map> surah_name_arabic = [], surah_name_translated = [];
-  List<int> verse_numbers = [
+  List<Map> sujood_surah_indices = [],
+      sujood_verse_indices = [],
+      surah_name_arabic = [],
+      surah_name_translated = [];
+  List<int>
+      verse_numbers = [
         7,
         286,
         200,
@@ -209,13 +214,34 @@ class _SurahListState extends State<SurahList> {
           await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 1');
       surah_name_translated =
           await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 2');
+      sujood_surah_indices = await database.rawQuery('SELECT surah_id FROM sujood_verses');
+      sujood_verse_indices = await database.rawQuery('SELECT verse_id FROM sujood_verses');
       setState(() {
         // surahs.add(surah_name_arabic_temp);
         surah_name_arabic = surah_name_arabic;
         surah_name_translated = surah_name_translated;
       });
-      print(surah_name_translated[1]['translation']);
     });
+  }
+
+  int getSujoodSurahIndex(int id) {
+    for(int i = 0; i < sujood_surah_indices.length; i++) {
+      if(sujood_surah_indices[i]['surah_id'] == id) {
+        // sujood_surah_indices.removeAt(i);
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  int getSujoodVerseIndex(int id) {
+    for(int i = 0; i < sujood_verse_indices.length; i++) {
+      if(sujood_verse_indices[i]['surah_id'] == id) {
+        sujood_verse_indices.removeAt(i);
+        return i;
+      }
+    }
+    return -1;
   }
 
   List<BoxShadow> boxShadow(double blurRadius, double offset1, double offset2,
@@ -268,7 +294,7 @@ class _SurahListState extends State<SurahList> {
                   )),
             ),
             const Text(
-              'Applied Qur\'an',
+              'Qur\'an - Al Huda',
               style: TextStyle(
                   fontFamily: 'varela-round.regular',
                   fontWeight: FontWeight.bold,
@@ -278,18 +304,6 @@ class _SurahListState extends State<SurahList> {
         ),
         backgroundColor: const Color(0xff1d3f5e),
         elevation: 0,
-        // leading: Padding(
-        //   padding: const EdgeInsets.all(11.0),
-        //   child: Container(
-        //       decoration: BoxDecoration(
-        //         borderRadius: BorderRadius.circular(1000),
-        //         color: Colors.white.withOpacity(.5)
-        //       ),
-        //       child: Padding(
-        //         padding: const EdgeInsets.all(2.0),
-        //         child: Image.asset('lib/assets/images/quran icon.png'),
-        //       )),
-        // ),
       ),
       backgroundColor: const Color(0xfffaf7f7),
       body: Container(
@@ -307,6 +321,8 @@ class _SurahListState extends State<SurahList> {
                       itemCount: 114,
                       cacheExtent: 114,
                       itemBuilder: (BuildContext bcontext, int index) {
+                        // sujood_surah_indices.clear();
+
                         for (int i = 0; i < madani_surah.length; i++) {
                           if (index + 1 == madani_surah[i]) {
                             disputed_types.contains(index + 1)
@@ -319,9 +335,11 @@ class _SurahListState extends State<SurahList> {
                                 : surah_type = 'Makki Surah';
                             // break;
                           }
+                          sujood_index = getSujoodSurahIndex(index + 1);
                         }
                         return GestureDetector(
                           onTap: () {
+                            sujood_index = getSujoodSurahIndex(index + 1);
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -331,20 +349,18 @@ class _SurahListState extends State<SurahList> {
                                                   .contains(index + 1)
                                               ? 'lib/assets/images/madinaWhiteIcon.png'
                                               : 'lib/assets/images/makkaWhiteIcon.png',
-                                          surah_name:
-                                          surah_name_translated[
-                                          index]
-                                          ['translation']
+                                          surah_name: surah_name_translated[
+                                                  index]['translation']
                                               .toString()
                                               .substring(
-                                              0,
-                                              surah_name_translated[
-                                              index]
-                                              [
-                                              'translation']
-                                                  .toString()
-                                                  .indexOf(
-                                                  ':')), arabic_name: surah_name_arabic[index]['translation'],
+                                                  0,
+                                                  surah_name_translated[index]
+                                                          ['translation']
+                                                      .toString()
+                                                      .indexOf(':')),
+                                          arabic_name: surah_name_arabic[index]
+                                              ['translation'],
+                                          sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
                                         )));
                           },
                           child: Card(
@@ -380,9 +396,12 @@ class _SurahListState extends State<SurahList> {
                                                               1.0),
                                                       child: Image.asset(
                                                         'lib/assets/images/indexDesign.png',
-                                                        height:
-                                                            isPortraitMode() ? size.width * .10 : size.height * .10,
-                                                        width: isPortraitMode() ? size.width * .10 : size.height * .10,
+                                                        height: isPortraitMode()
+                                                            ? size.width * .10
+                                                            : size.height * .10,
+                                                        width: isPortraitMode()
+                                                            ? size.width * .10
+                                                            : size.height * .10,
                                                       ),
                                                     ),
                                                     Text(
@@ -394,7 +413,11 @@ class _SurahListState extends State<SurahList> {
                                                           color: const Color(
                                                               0xff1d3f5e),
                                                           fontSize:
-                                                              isPortraitMode() ? size.width * .029 : size.height * .029,
+                                                              isPortraitMode()
+                                                                  ? size.width *
+                                                                      .029
+                                                                  : size.height *
+                                                                      .029,
                                                           // fontWeight: FontWeight.bold,
                                                           fontFamily:
                                                               'varela-round.regular'),
@@ -462,40 +485,37 @@ class _SurahListState extends State<SurahList> {
                                                             WrapCrossAlignment
                                                                 .center,
                                                         children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(.0),
-                                                            child: Wrap(
-                                                              alignment:
-                                                                  WrapAlignment
-                                                                      .center,
-                                                              crossAxisAlignment:
-                                                                  WrapCrossAlignment
-                                                                      .center,
-                                                              children: [
-                                                                Image.asset(
-                                                                  surah_type ==
-                                                                          'Makki Surah' || surah_type == 'Makki Surah (?)'
-                                                                      ? 'lib/assets/images/makkaIcon.png'
-                                                                      : 'lib/assets/images/madinaIcon.png',
-                                                                  height: 13,
-                                                                  width: 13,
-                                                                ),
-                                                                const SizedBox(
-                                                                  width: 7,
-                                                                ),
-                                                                Text(
-                                                                  surah_type,
-                                                                  style: const TextStyle(
-                                                                      color: Color(0xffa69963),
-                                                                      // fontWeight:
-                                                                      //     FontWeight.bold,
-                                                                      fontSize: 13,
-                                                                      fontFamily: 'varela-round.regular'),
-                                                                ),
-                                                              ],
-                                                            ),
+                                                          Wrap(
+                                                            alignment:
+                                                                WrapAlignment
+                                                                    .center,
+                                                            crossAxisAlignment:
+                                                                WrapCrossAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Image.asset(
+                                                                surah_type ==
+                                                                            'Makki Surah' ||
+                                                                        surah_type ==
+                                                                            'Makki Surah (?)'
+                                                                    ? 'lib/assets/images/makkaIcon.png'
+                                                                    : 'lib/assets/images/madinaIcon.png',
+                                                                height: 13,
+                                                                width: 13,
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 7,
+                                                              ),
+                                                              Text(
+                                                                surah_type,
+                                                                style: const TextStyle(
+                                                                    color: Color(0xffa69963),
+                                                                    // fontWeight:
+                                                                    //     FontWeight.bold,
+                                                                    fontSize: 13,
+                                                                    fontFamily: 'varela-round.regular'),
+                                                              ),
+                                                            ],
                                                           ),
                                                           Padding(
                                                             padding:
@@ -519,10 +539,47 @@ class _SurahListState extends State<SurahList> {
                                                                       fontSize:
                                                                           13,
                                                                       fontFamily:
-                                                                          'varela-round.regular'))
+                                                                          'varela-round.regular')),
                                                         ],
                                                       ),
                                                     ),
+                                                    sujood_index != -1
+                                                        ? Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    left: 11,
+                                                                    top: 5),
+                                                            child: Wrap(
+                                                              alignment:
+                                                                  WrapAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  WrapCrossAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Image.asset(
+                                                                  'lib/assets/images/sujoodIcon.png',
+                                                                  height: 13,
+                                                                  width: 13,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 7,
+                                                                ),
+                                                                const Text(
+                                                                  'contains verse(s) of prostration.',
+                                                                  style: TextStyle(
+                                                                      color: Color(0xff518050),
+                                                                      // fontWeight:
+                                                                      //     FontWeight.bold,
+                                                                      fontSize: 13,
+                                                                      fontWeight: FontWeight.bold,
+                                                                      fontFamily: 'varela-round.regular'),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        : const SizedBox()
                                                   ],
                                                 ),
                                               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quran/classes/sql_queries.dart';
+import 'package:quran/pages/surah_list.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'home.dart';
@@ -18,7 +19,7 @@ class _SurahDBInitializerState extends State<SurahDBInitializer> {
   SQLQueries sqlQueries = SQLQueries();
 
   prepareDB() async {
-    await sqlQueries.crazy1(await sqlQueries.crazy0()).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Home())));
+    await sqlQueries.crazy1(await sqlQueries.crazy0()).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const SurahList())));
     // sqlQueries.test1(await sqlQueries.test0()).whenComplete(() async => sqlQueries.test11(await sqlQueries.test00()).whenComplete(() async => sqlQueries.test111(await sqlQueries.test000())));
     // sqlQueries.test11(await sqlQueries.test00());
     // sqlQueries.test111(await sqlQueries.test000());

@@ -4,9 +4,9 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SurahPage extends StatefulWidget {
-  final String surah_id, image, surah_name, arabic_name;
+  final String surah_id, image, surah_name, arabic_name, sujood_index;
 
-  const SurahPage({Key? key, required this.surah_id, required this.image, required this.surah_name, required this.arabic_name}) : super(key: key);
+  const SurahPage({Key? key, required this.surah_id, required this.image, required this.surah_name, required this.arabic_name, required this.sujood_index}) : super(key: key);
 
   @override
   State<SurahPage> createState() => _SurahPageState();
@@ -24,7 +24,7 @@ class _SurahPageState extends State<SurahPage> {
 
     database = await openDatabase(path);
 
-    print(database.isOpen);
+    print(widget.sujood_index);
   }
 
   fetchVersesData() async {
@@ -234,7 +234,7 @@ class _SurahPageState extends State<SurahPage> {
                                                   ),
                                                 ),
                                                 const TextSpan(
-                                                  text: '﴿',
+                                                  text: '﴿  ',
                                                   style: TextStyle(
                                                     wordSpacing: 3,
                                                     fontWeight: FontWeight.bold,
@@ -253,7 +253,7 @@ class _SurahPageState extends State<SurahPage> {
                                                   ),
                                                 ),
                                                 const TextSpan(
-                                                  text: '﴾',
+                                                  text: '  ﴾        ',
                                                   style: TextStyle(
                                                       wordSpacing: 3,
                                                       fontFamily:
@@ -261,13 +261,33 @@ class _SurahPageState extends State<SurahPage> {
                                                       fontSize: 07,
                                                       fontWeight: FontWeight.bold),
                                                 ),
+                                                index + 1 == int.parse(widget.sujood_index) ? WidgetSpan(
+                                                    alignment: PlaceholderAlignment.bottom,
+                                                    child: Image.asset('lib/assets/images/sujoodIcon.png', width: 12, height: 12,)) : WidgetSpan(child: SizedBox())
                                               ])),
                                           const SizedBox(height: 11,),
-                                          Text(translated_verse[index]['text'] + ' [${widget.surah_id}:${index + 1}]',
-                                            textAlign: TextAlign.start,
-                                            style: const TextStyle(
-                                            fontFamily: 'varela-round.regular'
-                                          ),)
+                                          Text.rich(
+                                              textAlign: TextAlign.start,
+                                            TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: translated_verse[index]['text'] + ' [${widget.surah_id}:${index + 1}]',
+                                                  style: const TextStyle(
+                                                      fontFamily: 'varela-round.regular'
+                                                  ),
+                                                ),
+                                                index + 1 == int.parse(widget.sujood_index) ?
+                                                    const TextSpan(
+                                                      text: '\n\nverse of prostration ***',
+                                                      style: TextStyle(
+                                                        color: Color(0xff518050),
+                                                        fontWeight: FontWeight.bold,
+                                                          fontFamily: 'varela-round.regular',
+                                                        fontSize: 15
+                                                      )
+                                                    ): const TextSpan()
+                                              ]
+                                            ))
                                         ],
                                       ),
                                     )
