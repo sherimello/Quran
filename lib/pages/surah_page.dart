@@ -4,9 +4,9 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SurahPage extends StatefulWidget {
-  final String surah_id, image, surah_name, arabic_name, sujood_index;
+  final String surah_id, image, surah_name, arabic_name, sujood_index, verse_numbers;
 
-  const SurahPage({Key? key, required this.surah_id, required this.image, required this.surah_name, required this.arabic_name, required this.sujood_index}) : super(key: key);
+  const SurahPage({Key? key, required this.surah_id, required this.image, required this.surah_name, required this.arabic_name, required this.sujood_index, required this.verse_numbers}) : super(key: key);
 
   @override
   State<SurahPage> createState() => _SurahPageState();
@@ -28,6 +28,7 @@ class _SurahPageState extends State<SurahPage> {
   }
 
   fetchVersesData() async {
+    // print(widget.verse_numbers);
     verses.clear();
     await initiateDB().whenComplete(() async {
       verses = await database.rawQuery(
@@ -127,14 +128,14 @@ class _SurahPageState extends State<SurahPage> {
           ],
         ),
       ),
-      body: SafeArea(
+      body: verses.length.toString() == widget.verse_numbers ? SafeArea(
         child: Stack(
           children: [
             Container(
               width: size.width,
               color: const Color(0xfff4f4ff),
               height: AppBar().preferredSize.height,
-              padding: EdgeInsets.all(0),
+              padding: const EdgeInsets.all(0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -298,10 +299,20 @@ class _SurahPageState extends State<SurahPage> {
                           ),
                         ),
                       );
-                    }),
+                    }
+                    ),
               ),
             ),
           ],
+        ),
+      ) : Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.white,
+        child: const Center(
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.black,
+          ),
         ),
       ),
     );

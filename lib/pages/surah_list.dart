@@ -1,5 +1,5 @@
-import 'package:arabic_numbers/arabic_numbers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:quran/pages/surah_page.dart';
 import 'package:sqflite/sqflite.dart';
@@ -269,288 +269,287 @@ class _SurahListState extends State<SurahList> {
       return size.height > size.width ? true : false;
     }
 
-    ArabicNumbers arabicNumber = ArabicNumbers();
-    return Scaffold(
-      appBar: AppBar(
-        // titleSpacing: 7,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 11.0),
-              child: Container(
-                  width: appBar.preferredSize.height -
-                      appBar.preferredSize.height * .35,
-                  height: appBar.preferredSize.height -
-                      appBar.preferredSize.height * .35,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(1000),
-                      color: Colors.white.withOpacity(.5)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: Image.asset('lib/assets/images/quran icon.png'),
-                  )),
+    // ArabicNumbers arabicNumber = ArabicNumbers();
+
+    Future<bool> showExitPopup() async {
+      return await showDialog( //show confirm dialogue
+        //the return value will be from "Yes" or "No" options
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Exit App'),
+          content: const Text('Do you want to exit an App?'),
+          actions:[
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              //return false when click on "NO"
+              child: const Text('No'),
             ),
-            const Text(
-              'Qur\'an - Al Huda',
-              style: TextStyle(
-                  fontFamily: 'varela-round.regular',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15),
+
+            ElevatedButton(
+              onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+              //return true when click on "Yes"
+              child: const Text('Yes'),
             ),
+
           ],
         ),
-        backgroundColor: const Color(0xff1d3f5e),
-        elevation: 0,
-      ),
-      backgroundColor: const Color(0xfffaf7f7),
-      body: Container(
-          color: const Color(0xfffaf7f7),
-          // color: const Color(0xffd7e3fd),
-          child: surah_name_arabic.isEmpty
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      // padding: EdgeInsets.all(11),
-                      itemCount: 114,
-                      cacheExtent: 114,
-                      itemBuilder: (BuildContext bcontext, int index) {
-                        // sujood_surah_indices.clear();
+      )??false; //if showDialouge had returned null, then return false
+    }
 
-                        for (int i = 0; i < madani_surah.length; i++) {
-                          if (index + 1 == madani_surah[i]) {
-                            disputed_types.contains(index + 1)
-                                ? surah_type = 'Madani Surah (?)'
-                                : surah_type = 'Madani Surah';
-                            break;
-                          } else {
-                            disputed_types.contains(index + 1)
-                                ? surah_type = 'Makki Surah (?)'
-                                : surah_type = 'Makki Surah';
-                            // break;
-                          }
-                          sujood_index = getSujoodSurahIndex(index + 1);
-                        }
-                        return GestureDetector(
-                          onTap: () {
+
+
+    return WillPopScope(
+      onWillPop: () => showExitPopup(),
+      child: Scaffold(
+        appBar: AppBar(
+          // titleSpacing: 7,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 11.0),
+                child: Container(
+                    width: appBar.preferredSize.height -
+                        appBar.preferredSize.height * .35,
+                    height: appBar.preferredSize.height -
+                        appBar.preferredSize.height * .35,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(1000),
+                        color: Colors.white.withOpacity(.5)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Image.asset('lib/assets/images/quran icon.png'),
+                    )),
+              ),
+              const Text(
+                'Qur\'an - Al Huda',
+                style: TextStyle(
+                    fontFamily: 'varela-round.regular',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15),
+              ),
+            ],
+          ),
+          backgroundColor: const Color(0xff1d3f5e),
+          elevation: 0,
+        ),
+        backgroundColor: const Color(0xfffaf7f7),
+        body: Container(
+            color: const Color(0xfffaf7f7),
+            // color: const Color(0xffd7e3fd),
+            child: surah_name_arabic.isEmpty
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        // padding: EdgeInsets.all(11),
+                        itemCount: 114,
+                        cacheExtent: 114,
+                        itemBuilder: (BuildContext bcontext, int index) {
+                          // sujood_surah_indices.clear();
+
+                          for (int i = 0; i < madani_surah.length; i++) {
+                            if (index + 1 == madani_surah[i]) {
+                              disputed_types.contains(index + 1)
+                                  ? surah_type = 'Madani Surah (?)'
+                                  : surah_type = 'Madani Surah';
+                              break;
+                            } else {
+                              disputed_types.contains(index + 1)
+                                  ? surah_type = 'Makki Surah (?)'
+                                  : surah_type = 'Makki Surah';
+                              // break;
+                            }
                             sujood_index = getSujoodSurahIndex(index + 1);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SurahPage(
-                                          surah_id: '${index + 1}',
-                                          image: madani_surah
-                                                  .contains(index + 1)
-                                              ? 'lib/assets/images/madinaWhiteIcon.png'
-                                              : 'lib/assets/images/makkaWhiteIcon.png',
-                                          surah_name: surah_name_translated[
-                                                  index]['translation']
-                                              .toString()
-                                              .substring(
-                                                  0,
-                                                  surah_name_translated[index]
-                                                          ['translation']
-                                                      .toString()
-                                                      .indexOf(':')),
-                                          arabic_name: surah_name_arabic[index]
-                                              ['translation'],
-                                          sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
-                                        )));
-                          },
-                          child: Card(
-                            elevation: 0,
-                            margin: const EdgeInsets.all(0),
-                            color: Colors.transparent,
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                // width: size.width,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(3.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 7, 0, 7),
-                                                child: Stack(
-                                                  alignment: Alignment.center,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              1.0),
-                                                      child: Image.asset(
-                                                        'lib/assets/images/indexDesign.png',
-                                                        height: isPortraitMode()
-                                                            ? size.width * .10
-                                                            : size.height * .10,
-                                                        width: isPortraitMode()
-                                                            ? size.width * .10
-                                                            : size.height * .10,
+                          }
+                          return GestureDetector(
+                            onTap: () {
+                              sujood_index = getSujoodSurahIndex(index + 1);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SurahPage(
+                                            surah_id: '${index + 1}',
+                                            image: madani_surah
+                                                    .contains(index + 1)
+                                                ? 'lib/assets/images/madinaWhiteIcon.png'
+                                                : 'lib/assets/images/makkaWhiteIcon.png',
+                                            surah_name: surah_name_translated[
+                                                    index]['translation']
+                                                .toString()
+                                                .substring(
+                                                    0,
+                                                    surah_name_translated[index]
+                                                            ['translation']
+                                                        .toString()
+                                                        .indexOf(':')),
+                                            arabic_name: surah_name_arabic[index]
+                                                ['translation'],
+                                            sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
+                                        verse_numbers: verse_numbers[index].toString(),
+                                          )));
+                            },
+                            child: Card(
+                              elevation: 0,
+                              margin: const EdgeInsets.all(0),
+                              color: Colors.transparent,
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  // width: size.width,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(3.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 7, 0, 7),
+                                                  child: Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                                1.0),
+                                                        child: Image.asset(
+                                                          'lib/assets/images/indexDesign.png',
+                                                          height: isPortraitMode()
+                                                              ? size.width * .10
+                                                              : size.height * .10,
+                                                          width: isPortraitMode()
+                                                              ? size.width * .10
+                                                              : size.height * .10,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Text(
-                                                      '${index + 1}',
-                                                      // arabicNumber.convert(index + 1),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      style: TextStyle(
-                                                          color: const Color(
-                                                              0xff1d3f5e),
-                                                          fontSize:
-                                                              isPortraitMode()
-                                                                  ? size.width *
-                                                                      .029
-                                                                  : size.height *
-                                                                      .029,
-                                                          // fontWeight: FontWeight.bold,
-                                                          fontFamily:
-                                                              'varela-round.regular'),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: Wrap(
-                                                  direction: Axis.vertical,
-                                                  crossAxisAlignment:
-                                                      WrapCrossAlignment.start,
-                                                  children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .fromLTRB(
-                                                          11, 0, 17, 0),
-                                                      child: Text(
-                                                        surah_name_translated[
-                                                                    index]
-                                                                ['translation']
-                                                            .toString()
-                                                            .substring(
-                                                                0,
-                                                                surah_name_translated[
-                                                                            index]
-                                                                        [
-                                                                        'translation']
-                                                                    .toString()
-                                                                    .indexOf(
-                                                                        ':')),
-                                                        style: const TextStyle(
-                                                            color: Color(
+                                                      Text(
+                                                        '${index + 1}',
+                                                        // arabicNumber.convert(index + 1),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                            color: const Color(
                                                                 0xff1d3f5e),
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontFamily:
-                                                                'varela-round.regular'),
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .fromLTRB(
-                                                          11, 5, 17, 0),
-                                                      child: Text(
-                                                        '${surah_name_translated[index]['translation'].toString().substring(surah_name_translated[index]['translation'].toString().indexOf(':') + 2)} ●',
-                                                        style: const TextStyle(
-                                                            color: Color(
-                                                                0xff1d3f5e),
-                                                            fontSize: 13,
+                                                            fontSize:
+                                                                isPortraitMode()
+                                                                    ? size.width *
+                                                                        .029
+                                                                    : size.height *
+                                                                        .029,
                                                             // fontWeight: FontWeight.bold,
                                                             fontFamily:
                                                                 'varela-round.regular'),
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .fromLTRB(
-                                                          11, 5, 17, 0),
-                                                      child: Wrap(
-                                                        alignment: WrapAlignment
-                                                            .center,
-                                                        crossAxisAlignment:
-                                                            WrapCrossAlignment
-                                                                .center,
-                                                        children: [
-                                                          Wrap(
-                                                            alignment:
-                                                                WrapAlignment
-                                                                    .center,
-                                                            crossAxisAlignment:
-                                                                WrapCrossAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Image.asset(
-                                                                surah_type ==
-                                                                            'Makki Surah' ||
-                                                                        surah_type ==
-                                                                            'Makki Surah (?)'
-                                                                    ? 'lib/assets/images/makkaIcon.png'
-                                                                    : 'lib/assets/images/madinaIcon.png',
-                                                                height: 13,
-                                                                width: 13,
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Wrap(
+                                                    direction: Axis.vertical,
+                                                    crossAxisAlignment:
+                                                        WrapCrossAlignment.start,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                        const EdgeInsets.only(right: 11.0, left: 11),
+                                                        child: Text.rich(
+                                                            textDirection: TextDirection.rtl,
+                                                            textAlign: TextAlign.center,
+                                                            TextSpan(children: [
+                                                              const TextSpan(
+                                                                text: '﴿  ',
+                                                                style: TextStyle(
+                                                                  wordSpacing: 3,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontFamily:
+                                                                  'Al Majeed Quranic Font_shiped',
+                                                                  fontSize: 17,
+                                                                ),
                                                               ),
-                                                              const SizedBox(
-                                                                width: 7,
-                                                              ),
-                                                              Text(
-                                                                surah_type,
+                                                              TextSpan(
+                                                                text:
+                                                                '${surah_name_arabic[index]['translation']}',
                                                                 style: const TextStyle(
-                                                                    color: Color(0xffa69963),
-                                                                    // fontWeight:
-                                                                    //     FontWeight.bold,
-                                                                    fontSize: 13,
-                                                                    fontFamily: 'varela-round.regular'),
+                                                                    color: Colors.black,
+                                                                    fontSize: 17,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontFamily: 'Diwanltr'),
                                                               ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    horizontal:
-                                                                        5.0),
-                                                            child: Container(
-                                                                width: 1,
-                                                                height: 15,
-                                                                color: const Color(
-                                                                    0xffa69963)),
-                                                          ),
-                                                          Text(
-                                                              '${verse_numbers[index]} verses',
-                                                              style:
-                                                                  const TextStyle(
-                                                                      color: Color(
-                                                                          0xffa69963),
-                                                                      // fontWeight: FontWeight.bold,
-                                                                      fontSize:
-                                                                          13,
-                                                                      fontFamily:
-                                                                          'varela-round.regular')),
-                                                        ],
+                                                              const TextSpan(
+                                                                text: '  ﴾',
+                                                                style: TextStyle(
+                                                                  wordSpacing: 3,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontFamily:
+                                                                  'Al Majeed Quranic Font_shiped',
+                                                                  fontSize: 17,
+                                                                ),
+                                                              ),
+                                                              TextSpan(
+                                                                text: "    ${surah_name_translated[
+                                                                index]
+                                                                ['translation']
+                                                                    .toString()
+                                                                    .substring(
+                                                                    0,
+                                                                    surah_name_translated[
+                                                                    index]
+                                                                    [
+                                                                    'translation']
+                                                                        .toString()
+                                                                        .indexOf(
+                                                                        ':'))}",
+                                                                style: const TextStyle(
+                                                                    color: Color(
+                                                                        0xff1d3f5e),
+                                                                    fontSize: 15,
+                                                                    fontWeight:
+                                                                    FontWeight.bold,
+                                                                    fontFamily:
+                                                                    'varela-round.regular'),
+                                                              ),
+                                                            ])),
                                                       ),
-                                                    ),
-                                                    sujood_index != -1
-                                                        ? Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    left: 11,
-                                                                    top: 5),
-                                                            child: Wrap(
+                                                      Padding(
+                                                        padding: const EdgeInsets
+                                                                .fromLTRB(
+                                                            11, 5, 17, 0),
+                                                        child: Text(
+                                                          '${surah_name_translated[index]['translation'].toString().substring(surah_name_translated[index]['translation'].toString().indexOf(':') + 2)} ●',
+                                                          style: const TextStyle(
+                                                              color: Color(
+                                                                  0xff1d3f5e),
+                                                              fontSize: 13,
+                                                              // fontWeight: FontWeight.bold,
+                                                              fontFamily:
+                                                                  'varela-round.regular'),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets
+                                                                .fromLTRB(
+                                                            11, 5, 17, 0),
+                                                        child: Wrap(
+                                                          alignment: WrapAlignment
+                                                              .center,
+                                                          crossAxisAlignment:
+                                                              WrapCrossAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Wrap(
                                                               alignment:
                                                                   WrapAlignment
                                                                       .center,
@@ -559,81 +558,110 @@ class _SurahListState extends State<SurahList> {
                                                                       .center,
                                                               children: [
                                                                 Image.asset(
-                                                                  'lib/assets/images/sujoodIcon.png',
+                                                                  surah_type ==
+                                                                              'Makki Surah' ||
+                                                                          surah_type ==
+                                                                              'Makki Surah (?)'
+                                                                      ? 'lib/assets/images/makkaIcon.png'
+                                                                      : 'lib/assets/images/madinaIcon.png',
                                                                   height: 13,
                                                                   width: 13,
                                                                 ),
                                                                 const SizedBox(
                                                                   width: 7,
                                                                 ),
-                                                                const Text(
-                                                                  'contains verse(s) of prostration.',
-                                                                  style: TextStyle(
-                                                                      color: Color(0xff518050),
+                                                                Text(
+                                                                  surah_type,
+                                                                  style: const TextStyle(
+                                                                      color: Color(0xffa69963),
                                                                       // fontWeight:
                                                                       //     FontWeight.bold,
                                                                       fontSize: 13,
-                                                                      fontWeight: FontWeight.bold,
                                                                       fontFamily: 'varela-round.regular'),
                                                                 ),
                                                               ],
                                                             ),
-                                                          )
-                                                        : const SizedBox()
-                                                  ],
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .symmetric(
+                                                                      horizontal:
+                                                                          5.0),
+                                                              child: Container(
+                                                                  width: 1,
+                                                                  height: 15,
+                                                                  color: const Color(
+                                                                      0xffa69963)),
+                                                            ),
+                                                            Text(
+                                                                '${verse_numbers[index]} verses',
+                                                                style:
+                                                                    const TextStyle(
+                                                                        color: Color(
+                                                                            0xffa69963),
+                                                                        // fontWeight: FontWeight.bold,
+                                                                        fontSize:
+                                                                            13,
+                                                                        fontFamily:
+                                                                            'varela-round.regular')),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      sujood_index != -1
+                                                          ? Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 11,
+                                                                      top: 5),
+                                                              child: Wrap(
+                                                                alignment:
+                                                                    WrapAlignment
+                                                                        .center,
+                                                                crossAxisAlignment:
+                                                                    WrapCrossAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  Image.asset(
+                                                                    'lib/assets/images/sujoodIcon.png',
+                                                                    height: 13,
+                                                                    width: 13,
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    width: 7,
+                                                                  ),
+                                                                  const Text(
+                                                                    'contains verse(s) of prostration.',
+                                                                    style: TextStyle(
+                                                                        color: Color(0xff518050),
+                                                                        // fontWeight:
+                                                                        //     FontWeight.bold,
+                                                                        fontSize: 13,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        fontFamily: 'varela-round.regular'),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )
+                                                          : const SizedBox()
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 11.0),
-                                        child: Text.rich(
-                                            textDirection: TextDirection.rtl,
-                                            TextSpan(children: [
-                                              const TextSpan(
-                                                text: '﴿  ',
-                                                style: TextStyle(
-                                                  wordSpacing: 3,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily:
-                                                      'Al Majeed Quranic Font_shiped',
-                                                  fontSize: 17,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text:
-                                                    '${surah_name_arabic[index]['translation']}',
-                                                style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 17,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: 'Diwanltr'),
-                                              ),
-                                              const TextSpan(
-                                                text: '  ﴾',
-                                                style: TextStyle(
-                                                  wordSpacing: 3,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily:
-                                                      'Al Majeed Quranic Font_shiped',
-                                                  fontSize: 17,
-                                                ),
-                                              ),
-                                            ])),
-                                      )
-                                    ],
-                                  ),
-                                  const Divider(
-                                    color: Color(0xffdad4b7),
-                                  )
-                                ]),
-                          ),
-                        );
-                      }),
-                )),
+                                      ],
+                                    ),
+                                    const Divider(
+                                      color: Color(0xffdad4b7),
+                                    )
+                                  ]),
+                            ),
+                          );
+                        }),
+                  )),
+      ),
     );
   }
 }

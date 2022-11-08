@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:quran/pages/surah_list.dart';
 import 'package:sqflite/sqflite.dart';
@@ -85,78 +86,125 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    Future<bool> showExitPopup() async {
+      return await showDialog( //show confirm dialogue
+        //the return value will be from "Yes" or "No" options
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Exit App'),
+          content: const Text('Do you want to exit an App?'),
+          actions:[
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              //return false when click on "NO"
+              child: const Text('No'),
+            ),
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Container(
-          height: size.height,
-          width: size.width,
-          color: Colors.white,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: size.width * .11,
-                ),
-                Image.asset(
-                  'lib/assets/images/quran icon.png',
-                  width: size.width * .77,
-                  height: size.width * .77,
-                ),
-                SizedBox(
-                  height: size.width * .21,
-                ),
-                const Text(
-                  'choose language',
-                  style: TextStyle(
-                    fontFamily: 'varela-round.regular',
-                    fontSize: 31,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            ElevatedButton(
+              onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+              //return true when click on "Yes"
+              child: const Text('Yes'),
+            ),
+
+          ],
+        ),
+      )??false; //if showDialouge had returned null, then return false
+    }
+
+    return WillPopScope(
+      onWillPop: () => showExitPopup(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Container(
+            height: size.height,
+            width: size.width,
+            color: Colors.white,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: size.width * .11,
                   ),
-                ),
-                const SizedBox(
-                  height: 31,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(1000),
-                      color: const Color(0xff1d3f5e)),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(19, 06, 19, 06),
-                    child: Text(
-                      language1,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        // fontFamily: 'Al Majeed Quranic Font_shiped',
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xffeceae8),
-                        // height: size.width/size.height
+                  Image.asset(
+                    'lib/assets/images/quran icon.png',
+                    width: size.width * .77,
+                    height: size.width * .77,
+                  ),
+                  SizedBox(
+                    height: size.width * .21,
+                  ),
+                  const Text(
+                    'choose language',
+                    style: TextStyle(
+                      fontFamily: 'varela-round.regular',
+                      fontSize: 31,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 31,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(1000),
+                        color: const Color(0xff1d3f5e)),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(19, 06, 19, 06),
+                      child: Text(
+                        language1,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          // fontFamily: 'Al Majeed Quranic Font_shiped',
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xffeceae8),
+                          // height: size.width/size.height
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 21,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SurahList()));
-                  },
-                  child: Container(
+                  const SizedBox(
+                    height: 21,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SurahList()));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(1000),
+                          color: const Color(0xff1d3f5e)),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(19, 11, 19, 11),
+                        child: Text(
+                          language2,
+                          style: const TextStyle(
+                            fontFamily: 'Rounded_Elegance',
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xffeceae8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 21,
+                  ),
+                  Container(
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(1000),
                         color: const Color(0xff1d3f5e)),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(19, 11, 19, 11),
                       child: Text(
-                        language2,
+                        language3,
                         style: const TextStyle(
                           fontFamily: 'Rounded_Elegance',
                           fontSize: 15,
@@ -166,48 +214,28 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 21,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(1000),
-                      color: const Color(0xff1d3f5e)),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(19, 11, 19, 11),
-                    child: Text(
-                      language3,
-                      style: const TextStyle(
-                        fontFamily: 'Rounded_Elegance',
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xffeceae8),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(1000),
+                        color: const Color(0xff1d3f5e)),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(19, 11, 19, 11),
+                      child: Text(
+                        language4,
+                        style: const TextStyle(
+                          fontFamily: 'Rounded_Elegance',
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xffeceae8),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(1000),
-                      color: const Color(0xff1d3f5e)),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(19, 11, 19, 11),
-                    child: Text(
-                      language4,
-                      style: const TextStyle(
-                        fontFamily: 'Rounded_Elegance',
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xffeceae8),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
