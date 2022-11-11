@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:path/path.dart';
+import 'package:quran/pages/new_surah_page.dart';
 import 'package:quran/pages/surah_page.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -189,6 +191,7 @@ class _SurahListState extends State<SurahList> {
         112,
         113
       ];
+  List<Map> verses = [], translated_verse = [];
 
   @override
   void initState() {
@@ -204,6 +207,23 @@ class _SurahListState extends State<SurahList> {
     database = await openDatabase(path);
 
     print(database.isOpen);
+  }
+
+  Future<void> fetchVersesData(String surah_id) async {
+    // print(widget.verse_numbers);
+    // verses.clear();
+    await initiateDB().whenComplete(() async {
+      verses = await database.rawQuery(
+          'SELECT text FROM verses WHERE lang_id = 1 AND surah_id = ?',
+          [surah_id]);
+      translated_verse = await database.rawQuery(
+          'SELECT text FROM verses WHERE lang_id = 2 AND surah_id = ?',
+          [surah_id]);
+    });
+    setState(() {
+      verses = verses;
+      translated_verse = translated_verse;
+    });
   }
 
   fetchSurahName() {
@@ -276,19 +296,56 @@ class _SurahListState extends State<SurahList> {
         //the return value will be from "Yes" or "No" options
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Exit App'),
-          content: const Text('Do you want to exit an App?'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(31)
+          ),
+          title: const Text('Exit App',
+          style: TextStyle(
+            fontFamily: 'varela-round.regular'
+          ),),
+          content: const Text('Do you want to exit an App?',
+            style: TextStyle(
+                fontFamily: 'varela-round.regular'
+            ),),
           actions:[
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              //return false when click on "NO"
-              child: const Text('No'),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 11.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: const Color(0xff1d3f5e),
+                elevation: 7,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(31), // <-- Radius
+                ),
+              ),
+                onPressed: () => Navigator.of(context).pop(false),
+                //return false when click on "NO"
+                child: const Text('No',
+
+                  style: TextStyle(
+                      fontFamily: 'varela-round.regular'
+                  ),),
+              ),
             ),
 
-            ElevatedButton(
-              onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
-              //return true when click on "Yes"
-              child: const Text('Yes'),
+            Padding(
+              padding: const EdgeInsets.only(right: 11.0, bottom: 11),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: const Color(0xff1d3f5e),
+                  elevation: 7,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(31), // <-- Radius
+                  ),
+                ),
+                onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+                //return true when click on "Yes"
+                child: const Text('Yes',
+
+      style: TextStyle(
+      fontFamily: 'varela-round.regular'
+      ),),
+              ),
             ),
 
           ],
@@ -370,29 +427,38 @@ class _SurahListState extends State<SurahList> {
                           return GestureDetector(
                             onTap: () {
                               sujood_index = getSujoodSurahIndex(index + 1);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SurahPage(
-                                            surah_id: '${index + 1}',
-                                            image: madani_surah
-                                                    .contains(index + 1)
-                                                ? 'lib/assets/images/madinaWhiteIcon.png'
-                                                : 'lib/assets/images/makkaWhiteIcon.png',
-                                            surah_name: surah_name_translated[
-                                                    index]['translation']
-                                                .toString()
-                                                .substring(
-                                                    0,
-                                                    surah_name_translated[index]
-                                                            ['translation']
-                                                        .toString()
-                                                        .indexOf(':')),
-                                            arabic_name: surah_name_arabic[index]
-                                                ['translation'],
-                                            sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
-                                        verse_numbers: verse_numbers[index].toString(),
-                                          )));
+                              fetchVersesData('${index + 1}').whenComplete(() {
+                                print("index: $index");
+                                print("\nvnums: ${verse_numbers[index]}");
+                                Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.fade,
+                                        child: UpdatedSurahPage(
+                                          surah_id: '${index + 1}',
+                                          image: madani_surah
+                                              .contains(index + 1)
+                                              ? 'lib/assets/images/madinaWhiteIcon.png'
+                                              : 'lib/assets/images/makkaWhiteIcon.png',
+                                          surah_name: surah_name_translated[
+                                          index]['translation']
+                                              .toString()
+                                              .substring(
+                                              0,
+                                              surah_name_translated[index]
+                                              ['translation']
+                                                  .toString()
+                                                  .indexOf(':')),
+                                          arabic_name: surah_name_arabic[index]
+                                          ['translation'],
+                                          sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
+                                          verse_numbers: verse_numbers[index].toString(),
+                                          verses: verses,
+                                          translated_verse: translated_verse,
+                                        )
+                                    )
+                                );
+                              });
                             },
                             child: Card(
                               elevation: 0,
