@@ -303,7 +303,7 @@ class _SurahListState extends State<SurahList> {
           style: TextStyle(
             fontFamily: 'varela-round.regular'
           ),),
-          content: const Text('Do you want to exit an App?',
+          content: const Text('Do you want to exit?',
             style: TextStyle(
                 fontFamily: 'varela-round.regular'
             ),),

@@ -40,6 +40,7 @@ dependencies:
   flutter_secure_storage: ^5.0.2
   arabic_numbers: ^1.0.0
   page_transition: ^2.0.9
+  flutter_launcher_icons: ^0.10.0
 
 dev_dependencies:
   flutter_test:
@@ -56,6 +57,12 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "lib/assets/images/quran icon.png"
+
 flutter:
 
   # The following line ensures that the Material Icons font is
