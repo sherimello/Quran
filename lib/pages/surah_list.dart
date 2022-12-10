@@ -6,6 +6,7 @@ import 'package:quran/pages/new_surah_page.dart';
 import 'package:quran/pages/surah_page.dart';
 import 'package:sqflite/sqflite.dart';
 
+
 class SurahList extends StatefulWidget {
   const SurahList({Key? key}) : super(key: key);
 

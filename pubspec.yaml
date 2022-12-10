@@ -41,6 +41,7 @@ dependencies:
   arabic_numbers: ^1.0.0
   page_transition: ^2.0.9
   flutter_launcher_icons: ^0.10.0
+  dictionaryx: ^0.3.5
 
 dev_dependencies:
   flutter_test:
