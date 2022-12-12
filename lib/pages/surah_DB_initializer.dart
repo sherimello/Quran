@@ -4,6 +4,7 @@ import 'package:quran/pages/surah_list.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'home.dart';
+import 'menu.dart';
 
 class SurahDBInitializer extends StatefulWidget {
   const SurahDBInitializer({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class _SurahDBInitializerState extends State<SurahDBInitializer> {
   SQLQueries sqlQueries = SQLQueries();
 
   prepareDB() async {
-    await sqlQueries.crazy1(await sqlQueries.crazy0()).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const SurahList())));
+    await sqlQueries.crazy1(await sqlQueries.crazy0()).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu())));
     // sqlQueries.test1(await sqlQueries.test0()).whenComplete(() async => sqlQueries.test11(await sqlQueries.test00()).whenComplete(() async => sqlQueries.test111(await sqlQueries.test000())));
     // sqlQueries.test11(await sqlQueries.test00());
     // sqlQueries.test111(await sqlQueries.test000());

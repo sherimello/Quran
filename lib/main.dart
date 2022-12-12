@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const VersesSearch(),
+      home: const Splash(),
       // home: const SurahPage(surah_id: '2',),
     );
   }

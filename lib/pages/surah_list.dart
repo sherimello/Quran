@@ -24,6 +24,7 @@ class _SurahListState extends State<SurahList> {
       surah_name_arabic = [],
       surah_name_translated = [];
   List<int>
+  selected_surah_sujood_verses = [],
       verse_numbers = [
         7,
         286,
@@ -245,6 +246,15 @@ class _SurahListState extends State<SurahList> {
     });
   }
 
+  Future<void> fetchSurahSujoodVerses(int surah_id) async {
+    selected_surah_sujood_verses = [];
+    for(int i = 0; i < sujood_surah_indices.length; i++) {
+      if(sujood_surah_indices[i]['surah_id'] == surah_id) {
+        selected_surah_sujood_verses.add(sujood_verse_indices[i]['verse_id']);
+      }
+    }
+  }
+
   int getSujoodSurahIndex(int id) {
     for(int i = 0; i < sujood_surah_indices.length; i++) {
       if(sujood_surah_indices[i]['surah_id'] == id) {
@@ -426,8 +436,9 @@ class _SurahListState extends State<SurahList> {
                             sujood_index = getSujoodSurahIndex(index + 1);
                           }
                           return GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               sujood_index = getSujoodSurahIndex(index + 1);
+                              await fetchSurahSujoodVerses(index + 1);
                               fetchVersesData('${index + 1}').whenComplete(() {
                                 print("index: $index");
                                 print("\nvnums: ${verse_numbers[index]}");
@@ -436,6 +447,7 @@ class _SurahListState extends State<SurahList> {
                                     PageTransition(
                                       type: PageTransitionType.fade,
                                         child: UpdatedSurahPage(
+                                          sujoodVerses: selected_surah_sujood_verses,
                                           surah_id: '${index + 1}',
                                           image: madani_surah
                                               .contains(index + 1)
@@ -452,7 +464,7 @@ class _SurahListState extends State<SurahList> {
                                                   .indexOf(':')),
                                           arabic_name: surah_name_arabic[index]
                                           ['translation'],
-                                          sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
+                                          // sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
                                           verse_numbers: verse_numbers[index].toString(),
                                           verses: verses,
                                           translated_verse: translated_verse,

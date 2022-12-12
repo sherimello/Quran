@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:quran/pages/menu.dart';
 import 'package:quran/pages/surah_DB_initializer.dart';
 import 'package:quran/pages/surah_list.dart';
 import 'package:sqflite/sqflite.dart';
@@ -27,7 +28,7 @@ class _SplashState extends State<Splash> {
     databaseExists == true
         ? Timer(const Duration(seconds: 1), () {
             Navigator.of(this.context).push(
-                MaterialPageRoute(builder: (context) => const SurahList()));
+                MaterialPageRoute(builder: (context) => const Menu()));
           })
         : Timer(const Duration(seconds: 1), () {
             Navigator.of(this.context)
