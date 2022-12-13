@@ -93,7 +93,8 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     }
 
     autoScrollController = AutoScrollController(
-        axis: Axis.vertical);
+        axis: Axis.vertical,
+    );
 
     _scrollToIndex();
   }

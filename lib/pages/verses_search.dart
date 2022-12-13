@@ -95,12 +95,18 @@ class _VersesSearchState extends State<VersesSearch> {
     }
 
     setState(() {
-      loadAsset = "lib/assets/images/search.png";
-      loadVisibility = false;
-      translated_verse = translated_verse;
-      verses = verses;
-      len = verses.length;
-      loadVisibility = false;
+      if (verses.isEmpty) {
+        loadAsset = 'lib/assets/images/nothing_found.gif';
+        loadVisibility = true;
+        messageUpdate = "no matches were found!";
+      }
+      else {
+        loadAsset = "lib/assets/images/search.png";
+        loadVisibility = false;
+        translated_verse = translated_verse;
+        verses = verses;
+        len = verses.length;
+      }
     });
 
 

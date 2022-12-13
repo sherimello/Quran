@@ -76,7 +76,6 @@ flutter:
   assets:
     - lib/assets/images/
 #    - lib/assets/images/surah indices/
-    - lib/assets/quran db/
     - lib/assets/
     #   - images/a_dot_ham.jpeg
 
@@ -92,51 +91,24 @@ flutter:
     # list giving the asset and other descriptors for the font. For
     # example:
   fonts:
-    - family: PizzaismyFAVORITE
-      fonts:
-        - asset: lib/assets/fonts/PizzaismyFAVORITE.ttf
-    - family: Thin Pencil Handwriting
-      fonts:
-        - asset: lib/assets/fonts/Thin Pencil Handwriting.ttf
     - family: varela-round.regular
       fonts:
         - asset: lib/assets/fonts/varela-round.regular.ttf
-    - family: Rounded_Elegance
-      fonts:
-        - asset: lib/assets/fonts/Rounded_Elegance.ttf
     - family: 110_Besmellah
       fonts:
         - asset: lib/assets/fonts/110_Besmellah Normal.ttf
-    - family: Besmellah_1
+    - family: Rounded_Elegance
       fonts:
-        - asset: lib/assets/fonts/Besmellah_1.ttf
-    - family: AayatQuraan-E6AW
-      fonts:
-        - asset: lib/assets/fonts/AayatQuraan2-E6AW.ttf
-    - family: FelicitationArabicFeasts-a12g
-      fonts:
-        - asset: lib/assets/fonts/FelicitationArabicFeasts-a12g.ttf
-    - family: AllahNamesColor
-      fonts:
-        - asset: lib/assets/fonts/AllahNamesColor-gxpwY.ttf
-    - family: Quran karim 114
-      fonts:
-        - asset: lib/assets/fonts/Quran karim 114.ttf
-    - family: Al Qalam Quran Majeed Web Regular
-      fonts:
-        - asset: lib/assets/fonts/Al Qalam Quran Majeed Web Regular.ttf
-    - family: _PDMS_Saleem_QuranFont Regular
-      fonts:
-        - asset: lib/assets/fonts/_PDMS_Saleem_QuranFont Regular.ttf
-    - family: 110_Besmellah
-      fonts:
-        - asset: lib/assets/fonts/110_Besmellah.TTF
+        - asset: lib/assets/fonts/Rounded_Elegance.ttf
     - family: Al Majeed Quranic Font_shiped
       fonts:
         - asset: lib/assets/fonts/Al Majeed Quranic Font_shiped.ttf
     - family: Diwanltr
       fonts:
         - asset: lib/assets/fonts/Diwanltr.ttf
+    - family: Bismillah Script
+      fonts:
+        - asset: lib/assets/fonts/Bismillah Script.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
