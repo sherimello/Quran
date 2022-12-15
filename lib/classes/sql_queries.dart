@@ -22,6 +22,12 @@ class SQLQueries {
 
       await db.execute(
           'CREATE TABLE IF NOT EXISTS sujood_verses (surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED)');
+
+      await db.execute(
+          'CREATE TABLE IF NOT EXISTS bookmark_folders (folder_name NVARCHAR)');
+
+      await db.execute(
+          'CREATE TABLE IF NOT EXISTS bookmarks (folder_name NVARCHAR, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED)');
     });
     return database;
   }
@@ -1661,6 +1667,12 @@ class SQLQueries {
       );
       await txn.rawInsert(
         'INSERT INTO sujood_verses VALUES (96, 19)'
+      );
+      await txn.rawInsert(
+        'INSERT INTO bookmark_folders VALUES (\'default\')'
+      );
+      await txn.rawInsert(
+        'INSERT INTO bookmarks VALUES (\'default\', 75, 53)'
       );
     });
   }

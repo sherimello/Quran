@@ -405,7 +405,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                   ),
                                                   isSujoodVerse(translated_verse[index]['surah_id'], translated_verse[index]['verse_id']) ? WidgetSpan(
                                                       alignment: PlaceholderAlignment.bottom,
-                                                      child: Image.asset('lib/assets/images/sujoodIcon.png', width: 12, height: 12,)) : WidgetSpan(child: SizedBox())
+                                                      child: Image.asset('lib/assets/images/sujoodIcon.png', width: 12, height: 12,)) : const WidgetSpan(child: SizedBox())
                                                 ])),
                                             const SizedBox(height: 11,),
                                             Text.rich(

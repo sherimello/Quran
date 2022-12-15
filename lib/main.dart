@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quran/pages/home.dart';
 import 'package:quran/pages/splash.dart';
 import 'package:quran/pages/surah_DB_initializer.dart';
@@ -9,6 +10,9 @@ import 'package:quran/pages/verses_search.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Color(0xff1d3f5e)
+  ));
   runApp(const MyApp());
 }
 
