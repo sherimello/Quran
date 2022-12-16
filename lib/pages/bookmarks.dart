@@ -6,9 +6,9 @@ import '../hero_transition_handler/custom_rect_tween.dart';
 
 class Bookmarks extends StatefulWidget {
 
-  final String tag;
+  final String tag, verse_arabic, verse_english, surah_id, verse_id;
 
-  const Bookmarks({Key? key, required this.tag}) : super(key: key);
+  const Bookmarks({Key? key, required this.tag, required this.verse_arabic, required this.verse_english, required this.surah_id, required this.verse_id}) : super(key: key);
 
   @override
   State<Bookmarks> createState() => _BookmarksState();
@@ -46,13 +46,18 @@ class _BookmarksState extends State<Bookmarks> {
   }
 
   Future<void> addBookmarkFolder(String folder_name) async {
-    // await initiateDBforWrite().whenComplete(() async {
       await database1.transaction((txn) async {
         await txn.rawInsert(
             'INSERT INTO bookmark_folders VALUES (?)', [folder_name]
         );
       });
-    // });
+  }
+  Future<void> addToBookmark(String folder_name) async {
+      await database1.transaction((txn) async {
+        await txn.rawInsert(
+            'INSERT INTO bookmarks VALUES (?, ?, ?, ?, ?)', [folder_name, widget.verse_arabic, widget.verse_english, widget.surah_id, widget.verse_id]
+        );
+      });
   }
 
   @override
@@ -275,7 +280,14 @@ class _BookmarksState extends State<Bookmarks> {
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
                                 child: GestureDetector(
-                                  onTap: (){
+                                  onTap: () async{
+
+                                    await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                        content: Text('folder already exists'),
+                                      ));
+                                      Navigator.pop(context);
+                                    });
 
                                   },
                                   child: Container(

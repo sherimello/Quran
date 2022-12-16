@@ -11,7 +11,7 @@ class HeroDialogRoute<T> extends PageRoute<T> {
   /// {@macro hero_dialog_route}
   HeroDialogRoute({
     required WidgetBuilder builder,
-    this.bgColor = const Color(0x55000000),
+    this.bgColor = const Color(0x95000000),
     // required RouteSettings settings,
     bool fullscreenDialog = false,
   })  : _builder = builder,

@@ -287,8 +287,9 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                           child: GestureDetector(
                             onTap: (){
                               Navigator.of(context).push(HeroDialogRoute(
+                                bgColor: Colors.white.withOpacity(.75),
                                 builder: (context) => Center(
-                                  child: VerseOptionsCard(tag: index.toString()),
+                                  child: VerseOptionsCard(tag: index.toString(), verse_english: widget.translated_verse[index]['text'] + "", verse_arabic: widget.verses[index]['text'], surah_name: widget.surah_name, surah_number: widget.surah_id, verse_number: (index + 1).toString(),),
                                 ),
                               ));
                             },

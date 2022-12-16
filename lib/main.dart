@@ -6,6 +6,7 @@ import 'package:quran/pages/surah_DB_initializer.dart';
 import 'package:quran/pages/surah_list.dart';
 import 'package:quran/pages/surah_page.dart';
 import 'package:quran/pages/test.dart';
+import 'package:quran/pages/verse_image_preset.dart';
 import 'package:quran/pages/verses_search.dart';
 
 void main() {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran/pages/bookmark_folders.dart';
 
 import '../hero_transition_handler/custom_rect_tween.dart';
 import '../hero_transition_handler/hero_dialog_route.dart';
@@ -18,6 +19,7 @@ class _OptionsState extends State<Options> {
   Widget build(BuildContext context) {
 
     var size = MediaQuery.of(context).size;
+    AppBar appBar = AppBar();
 
     return SafeArea(child: Padding(
       padding: const EdgeInsets.all(19.0),
@@ -46,17 +48,63 @@ class _OptionsState extends State<Options> {
                       color: Colors.transparent,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children: [
+                        children: [Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 17.0, vertical: 17),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 11.0),
+                                child: Container(
+                                    width: appBar.preferredSize.height -
+                                        appBar.preferredSize.height * .35,
+                                    height: appBar.preferredSize.height -
+                                        appBar.preferredSize.height * .35,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(1000),
+                                        color: Colors.white.withOpacity(.5)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: Image.asset('lib/assets/images/quran icon.png'),
+                                    )),
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    'Qur\'an',
+                                    style: TextStyle(
+                                        fontFamily: 'Bismillah Script',
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.5,
+                                        color: Colors.white,
+                                        fontSize: 21),
+                                  ),
+                                ],
+                              ),
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Icon(Icons.cancel_rounded, color: Colors.white,)),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                           const SizedBox(
                             height: 21,
                           ),
                           GestureDetector(
                             onTap: () {
-                              // Navigator.of(context).push(HeroDialogRoute(
-                              //   builder: (context) => Center(
-                              //     child: Bookmarks(tag: widget.tag),
-                              //   ),
-                              // ));
+                              Navigator.of(context).push(HeroDialogRoute(
+                                bgColor: Colors.transparent,
+                                builder: (context) => BookmarkFolders(tag: widget.tag),
+                              ));
                             },
                             child: const Text.rich(
                                 TextSpan(
