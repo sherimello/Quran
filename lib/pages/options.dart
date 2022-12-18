@@ -3,6 +3,7 @@ import 'package:quran/pages/bookmark_folders.dart';
 
 import '../hero_transition_handler/custom_rect_tween.dart';
 import '../hero_transition_handler/hero_dialog_route.dart';
+import 'favorite_verses.dart';
 
 class Options extends StatefulWidget {
 
@@ -130,11 +131,10 @@ class _OptionsState extends State<Options> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              // Navigator.of(context).push(HeroDialogRoute(
-                              //   builder: (context) => Center(
-                              //     child: Bookmarks(tag: widget.tag),
-                              //   ),
-                              // ));
+                              Navigator.of(context).push(HeroDialogRoute(
+                                bgColor: Colors.white.withOpacity(0.85),
+                                builder: (context) => Center(child: FavoriteVerses(tag: widget.tag,)),
+                              ));
                             },
                             child: const Text.rich(
                                 TextSpan(
@@ -160,11 +160,9 @@ class _OptionsState extends State<Options> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              // Navigator.of(context).push(HeroDialogRoute(
-                              //   builder: (context) => Center(
-                              //     child: Bookmarks(tag: widget.tag),
-                              //   ),
-                              // ));
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                content: Text('under development...'),
+                              ));
                             },
                             child: const Text.rich(
                                 TextSpan(

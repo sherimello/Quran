@@ -28,6 +28,9 @@ class SQLQueries {
 
       await db.execute(
           'CREATE TABLE IF NOT EXISTS bookmarks (folder_name NVARCHAR, arabic NVARCHAR, english NVARCHAR, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED)');
+
+      await db.execute(
+          'CREATE TABLE IF NOT EXISTS favorites (arabic NVARCHAR, english NVARCHAR, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED)');
     });
     return database;
   }
@@ -1672,7 +1675,10 @@ class SQLQueries {
         'INSERT INTO bookmark_folders VALUES (\'default\')'
       );
       await txn.rawInsert(
-        'INSERT INTO bookmarks VALUES (\'default\', \'قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ ۚ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا ۚ إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ ۞\', \'Say, \"O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful.\"\', 75, 53)'
+        'INSERT INTO bookmarks VALUES (\'default\', \'قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ ۚ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا ۚ إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ ۞\', \'Say, \"O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful.\"\', 39, 53)'
+      );
+      await txn.rawInsert(
+        'INSERT INTO favorites VALUES (\'قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ ۚ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا ۚ إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ ۞\', \'Say, \"O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful.\"\', 39, 53)'
       );
     });
   }

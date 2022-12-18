@@ -283,8 +283,8 @@ class _BookmarksState extends State<Bookmarks> {
                                   onTap: () async{
 
                                     await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                        content: Text('folder already exists'),
+                                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                                        content: Text('verse added to ${bookmarkFolders[i]['folder_name']}'),
                                       ));
                                       Navigator.pop(context);
                                     });

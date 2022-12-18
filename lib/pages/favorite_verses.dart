@@ -6,17 +6,17 @@ import 'package:path/path.dart';
 import '../hero_transition_handler/custom_rect_tween.dart';
 import 'new_surah_page.dart';
 
-class BookmarkVerses extends StatefulWidget {
+class FavoriteVerses extends StatefulWidget {
 
-  final String tag, folder_name;
+  final String tag;
 
-  const BookmarkVerses({Key? key, required this.folder_name, required this.tag}) : super(key: key);
+  const FavoriteVerses({Key? key, required this.tag}) : super(key: key);
 
   @override
-  State<BookmarkVerses> createState() => _BookmarkVersesState();
+  State<FavoriteVerses> createState() => _FavoriteVersesState();
 }
 
-class _BookmarkVersesState extends State<BookmarkVerses> {
+class _FavoriteVersesState extends State<FavoriteVerses> {
   late Database database;
   late String path, loadAsset = 'lib/assets/images/search.png', messageUpdate = "\nsearch whatever bothers\nor concerns you";
   int len = 0, flag = 0, load = 0;
@@ -50,17 +50,16 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
 
     // translated_verse = await database.rawQuery('SELECT * FROM bookmarks WHERE folder_name = ?', [widget.folder_name])
     // .whenComplete(() async {
-      verses = await database.rawQuery('SELECT * FROM bookmarks WHERE folder_name = ?', [widget.folder_name]).whenComplete(() async {
-        sujood_surah_indices = await database.rawQuery('SELECT surah_id FROM sujood_verses').whenComplete(() async {
-          sujood_verse_indices = await database.rawQuery('SELECT verse_id FROM sujood_verses');
-          surah_name_translated =
-          await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 2');
-          surah_name_arabic =
-          await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 1');
-          sujood_verse_indices = await database.rawQuery('SELECT verse_id FROM sujood_verses');
-        });
+    verses = await database.rawQuery('SELECT * FROM favorites').whenComplete(() async {
+      sujood_surah_indices = await database.rawQuery('SELECT surah_id FROM sujood_verses').whenComplete(() async {
+        sujood_verse_indices = await database.rawQuery('SELECT verse_id FROM sujood_verses');
+        surah_name_translated =
+        await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 2');
+        surah_name_arabic =
+        await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 1');
+        sujood_verse_indices = await database.rawQuery('SELECT verse_id FROM sujood_verses');
       });
-
+    });
     setState(() {
       value_progress = false;
       if (verses.isEmpty) {
