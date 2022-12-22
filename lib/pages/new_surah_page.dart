@@ -91,10 +91,9 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
           break;
         }
       }
-
-      startFetches();
-
     }
+
+    startFetches();
 
     autoScrollController = AutoScrollController(
         axis: Axis.vertical,
@@ -106,7 +105,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   void startFetches(){
     initiateDB().whenComplete(() async {
       await fetchVersesData(widget.surah_id);
-      await fetchSurahSujoodVerses(int.parse(widget.surah_id));
+      // await fetchSurahSujoodVerses(int.parse(widget.surah_id));
 
     });
   }
@@ -154,7 +153,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   Future<void> fetchSurahSujoodVerses(int surah_id) async {
     widget.sujoodVerses = [];
     for(int i = 0; i < sujood_surah_indices.length; i++) {
-      if( widget.sujoodVerses[i] == surah_id) {
+      if( sujood_verse_indices[i]['verse_id'] == surah_id) {
         widget.sujoodVerses.add(sujood_verse_indices[i]['verse_id']);
       }
     }

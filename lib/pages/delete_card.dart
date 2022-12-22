@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quran/pages/bookmark_folders.dart';
+import 'package:quran/pages/favorite_verses.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -7,9 +8,9 @@ import '../hero_transition_handler/custom_rect_tween.dart';
 
 class DeleteCard extends StatefulWidget {
 
-  final String tag, surah_number, verse_number;
+  final String tag, surah_number, verse_number, what_to_delete;
 
-  const DeleteCard({Key? key, required this.tag, required this.surah_number, required this.verse_number}) : super(key: key);
+  const DeleteCard({Key? key, required this.tag, required this.surah_number, required this.verse_number, required this.what_to_delete}) : super(key: key);
 
   @override
   State<DeleteCard> createState() => _DeleteCardState();
@@ -32,11 +33,21 @@ class _DeleteCardState extends State<DeleteCard> {
     print(database.isOpen);
   }
 
-  deleteFromFavorites() async {
+  deleteFromBookmarks() async {
+    widget.what_to_delete == "bookmarks" ?
+        {
     await initiateDB().whenComplete(() {
-      database.rawDelete('DELETE FROM bookmarks WHERE surah_id = ? AND verse_id = ?', [widget.surah_number, widget.verse_number]);
-      print('deleted');
-    });
+    database.rawDelete('DELETE FROM bookmarks WHERE surah_id = ? AND verse_id = ?', [widget.surah_number, widget.verse_number]);
+    print('deleted');
+    })
+        } :
+    {
+      await initiateDB().whenComplete(() {
+        database.rawDelete('DELETE FROM favorites WHERE surah_id = ? AND verse_id = ?', [widget.surah_number, widget.verse_number]);
+        print('deleted');
+      })
+    };
+
   }
 
   @override
@@ -54,9 +65,15 @@ class _DeleteCardState extends State<DeleteCard> {
           },
           child: GestureDetector(
             onTap: () async {
-              await deleteFromFavorites().whenComplete((){
+              await deleteFromBookmarks().whenComplete((){
+
+                // Navigator.pop(context);
+
+                widget.what_to_delete == "bookmarks" ?
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                  BookmarkFolders(tag: widget.tag,)));
+                  BookmarkFolders(tag: widget.tag,)))
+                : Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                    FavoriteVerses(tag: widget.tag,)));
               });
             },
             child: Container(
