@@ -2,6 +2,7 @@ import 'package:arabic_numbers/arabic_numbers.dart';
 import 'package:flutter/material.dart';
 import 'package:quran/pages/verse_options_card.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:simple_ripple_animation/simple_ripple_animation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -24,6 +25,7 @@ class UpdatedSurahPage extends StatefulWidget {
 class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
 
   late AutoScrollController autoScrollController;
+  bool scrolled_to_destination = false;
   List<int> madani_surah = [
   2,
   3,
@@ -161,6 +163,9 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
 
   Future _scrollToIndex() async {
     await autoScrollController.scrollToIndex(widget.scroll_to, preferPosition: AutoScrollPosition.begin);
+    setState(() {
+      scrolled_to_destination = true;
+    });
   }
 
   @override
@@ -275,6 +280,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                     itemBuilder: (BuildContext context, int index) {
                       print('${isPortraitMode() ? size.height / size.width : size.width / size.height}');
                       return AutoScrollTag(
+                        highlightColor: const Color(0xff1d3f5e),
                         key: ValueKey(index),
                         index: index,
                         controller: autoScrollController,
@@ -292,141 +298,154 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                 ),
                               ));
                             },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: index.isEven
-                                      ? const Color(0xfff4f4ff)
-                                      : Colors.white),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(0, 7, 0, 7),
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: Image.asset(
-                                              'lib/assets/images/surahIndex.png',
-                                              height: isPortraitMode() ? size.width * .10 : size.height * .10,
-                                              width: isPortraitMode() ? size.width * .10 : size.height * .10,
-                                            ),
-                                          ),
-                                          Text.rich(
-                                            textAlign: TextAlign.center,
-                                            TextSpan(
-                                              text: '${index + 1}',
-                                              style: TextStyle(
-                                                color: const Color(0xff1d3f5e),
-                                                fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'varela-round.regular',
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: SingleChildScrollView(
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: index.isEven
+                                          ? const Color(0xfff4f4ff)
+                                          : Colors.white),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(0, 7, 0, 7),
+                                          child: Stack(
+                                            alignment: Alignment.center,
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                                  children: [
-                                                    Text.rich(
-                                                        textDirection: TextDirection.rtl,
-                                                        textAlign: TextAlign.right,
-                                                        textScaleFactor:
-                                                        (isPortraitMode() ? size.height / size.width : size.width / size.height),
-                                                        TextSpan(children: [
-                                                          TextSpan(
-                                                            text: widget.verses.isNotEmpty
-                                                                ? '${widget.verses[index]['text']}  '
-                                                                : '',
-                                                            // 'k',
-                                                            style: const TextStyle(
-                                                              wordSpacing: 2,
-                                                              fontFamily:
-                                                              'Al Majeed Quranic Font_shiped',
-                                                              fontSize: 12,
-                                                            ),
-                                                          ),
-                                                          const TextSpan(
-                                                            text: '﴿  ',
-                                                            style: TextStyle(
-                                                              wordSpacing: 3,
-                                                              fontWeight: FontWeight.bold,
-                                                              fontFamily:
-                                                              'Al Majeed Quranic Font_shiped',
-                                                              fontSize: 07,
-                                                            ),
-                                                          ),
-                                                          TextSpan(
-                                                            text: arabicNumber
-                                                                .convert(index + 1),
-                                                            style: const TextStyle(
-                                                                wordSpacing: 3,
-                                                                fontSize: 07,
-                                                                fontWeight: FontWeight.bold
-                                                            ),
-                                                          ),
-                                                          const TextSpan(
-                                                            text: '  ﴾        ',
-                                                            style: TextStyle(
-                                                                wordSpacing: 3,
-                                                                fontFamily:
-                                                                'Al Majeed Quranic Font_shiped',
-                                                                fontSize: 07,
-                                                                fontWeight: FontWeight.bold),
-                                                          ),
-                                                          widget.sujoodVerses.contains(index + 1) ? WidgetSpan(
-                                                              alignment: PlaceholderAlignment.bottom,
-                                                              child: Image.asset('lib/assets/images/sujoodIcon.png', width: 12, height: 12,)) : WidgetSpan(child: SizedBox())
-                                                        ])),
-                                                    const SizedBox(height: 11,),
-                                                    Text.rich(
-                                                        textAlign: TextAlign.start,
-                                                        TextSpan(
-                                                            children: [
-                                                              TextSpan(
-                                                                text: widget.translated_verse[index]['text'] + ' [${widget.surah_id}:${index + 1}]',
-                                                                style: const TextStyle(
-                                                                    fontFamily: 'varela-round.regular'
-                                                                ),
-                                                              ),
-                                                              widget.sujoodVerses.contains(index + 1) ?
-                                                              const TextSpan(
-                                                                  text: '\n\nverse of prostration ***',
-                                                                  style: TextStyle(
-                                                                      color: Color(0xff518050),
-                                                                      fontWeight: FontWeight.bold,
-                                                                      fontFamily: 'varela-round.regular',
-                                                                      fontSize: 15
-                                                                  )
-                                                              ): const TextSpan()
-                                                            ]
-                                                        ))
-                                                  ],
+                                                padding: const EdgeInsets.all(1.0),
+                                                child: Image.asset(
+                                                  'lib/assets/images/surahIndex.png',
+                                                  height: isPortraitMode() ? size.width * .10 : size.height * .10,
+                                                  width: isPortraitMode() ? size.width * .10 : size.height * .10,
+                                                ),
+                                              ),
+                                              Text.rich(
+                                                textAlign: TextAlign.center,
+                                                TextSpan(
+                                                  text: '${index + 1}',
+                                                  style: TextStyle(
+                                                    color: const Color(0xff1d3f5e),
+                                                    fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'varela-round.regular',
+                                                  ),
                                                 ),
                                               )
                                             ],
                                           ),
                                         ),
-                                      ),
+                                        Expanded(
+                                          child: SingleChildScrollView(
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      children: [
+                                                        Text.rich(
+                                                            textDirection: TextDirection.rtl,
+                                                            textAlign: TextAlign.right,
+                                                            textScaleFactor:
+                                                            (isPortraitMode() ? size.height / size.width : size.width / size.height),
+                                                            TextSpan(children: [
+                                                              TextSpan(
+                                                                text: widget.verses.isNotEmpty
+                                                                    ? '${widget.verses[index]['text']}  '
+                                                                    : '',
+                                                                // 'k',
+                                                                style: const TextStyle(
+                                                                  wordSpacing: 2,
+                                                                  fontFamily:
+                                                                  'Al Majeed Quranic Font_shiped',
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                              const TextSpan(
+                                                                text: '﴿  ',
+                                                                style: TextStyle(
+                                                                  wordSpacing: 3,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontFamily:
+                                                                  'Al Majeed Quranic Font_shiped',
+                                                                  fontSize: 07,
+                                                                ),
+                                                              ),
+                                                              TextSpan(
+                                                                text: arabicNumber
+                                                                    .convert(index + 1),
+                                                                style: const TextStyle(
+                                                                    wordSpacing: 3,
+                                                                    fontSize: 07,
+                                                                    fontWeight: FontWeight.bold
+                                                                ),
+                                                              ),
+                                                              const TextSpan(
+                                                                text: '  ﴾        ',
+                                                                style: TextStyle(
+                                                                    wordSpacing: 3,
+                                                                    fontFamily:
+                                                                    'Al Majeed Quranic Font_shiped',
+                                                                    fontSize: 07,
+                                                                    fontWeight: FontWeight.bold),
+                                                              ),
+                                                              widget.sujoodVerses.contains(index + 1) ? WidgetSpan(
+                                                                  alignment: PlaceholderAlignment.bottom,
+                                                                  child: Image.asset('lib/assets/images/sujoodIcon.png', width: 12, height: 12,)) : WidgetSpan(child: SizedBox())
+                                                            ])),
+                                                        const SizedBox(height: 11,),
+                                                        Text.rich(
+                                                            textAlign: TextAlign.start,
+                                                            TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: widget.translated_verse[index]['text'] + ' [${widget.surah_id}:${index + 1}]',
+                                                                    style: const TextStyle(
+                                                                        fontFamily: 'varela-round.regular'
+                                                                    ),
+                                                                  ),
+                                                                  widget.sujoodVerses.contains(index + 1) ?
+                                                                  const TextSpan(
+                                                                      text: '\n\nverse of prostration ***',
+                                                                      style: TextStyle(
+                                                                          color: Color(0xff518050),
+                                                                          fontWeight: FontWeight.bold,
+                                                                          fontFamily: 'varela-round.regular',
+                                                                          fontSize: 15
+                                                                      )
+                                                                  ): const TextSpan()
+                                                                ]
+                                                            ))
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                if (scrolled_to_destination && widget.scroll_to > 0 && index == widget.scroll_to) Center(
+                                  child: RippleAnimation(
+                                      color: const Color(0xff1d3f5e),
+                                      repeat: false,
+                                      ripplesCount: 11,
+                                      minRadius: size.width * .5,
+                                      duration: const Duration(milliseconds: 1500),
+                                      child: const Center(child: SizedBox())),
+                                )
+                              ],
                             ),
                           ),
                         ),

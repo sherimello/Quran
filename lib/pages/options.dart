@@ -16,6 +16,10 @@ class Options extends StatefulWidget {
 }
 
 class _OptionsState extends State<Options> {
+
+  bool value_snackbar = false;
+  double snack_text_size = 0, snack_text_padding = 0;
+
   @override
   Widget build(BuildContext context) {
 
@@ -33,7 +37,9 @@ class _OptionsState extends State<Options> {
             createRectTween: (begin, end) {
               return CustomRectTween(begin: begin!, end: end!);
             },
-            child: Container(
+            child: AnimatedContainer(
+              curve: Curves.easeOut,
+              duration: const Duration(milliseconds: 250),
               width: size.width - 38,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(31),
@@ -104,7 +110,7 @@ class _OptionsState extends State<Options> {
                             onTap: () {
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.transparent,
-                                builder: (context) => BookmarkFolders(tag: widget.tag),
+                                builder: (context) => BookmarkFolders(tag: widget.tag, from_where: "surah list"),
                               ));
                             },
                             child: const Text.rich(
@@ -133,7 +139,7 @@ class _OptionsState extends State<Options> {
                             onTap: () {
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.white.withOpacity(0.85),
-                                builder: (context) => Center(child: FavoriteVerses(tag: widget.tag,)),
+                                builder: (context) => Center(child: FavoriteVerses(tag: widget.tag, from_where: "surah list",)),
                               ));
                             },
                             child: const Text.rich(
@@ -160,9 +166,22 @@ class _OptionsState extends State<Options> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text('under development...'),
-                              ));
+
+                              setState(() {
+                                snack_text_size = 13;
+                                snack_text_padding = 39;
+                              });
+
+                              Future.delayed(const Duration(seconds: 3), () {
+                                setState(() {
+                                  snack_text_size = 0;
+                                  snack_text_padding = 0;
+                                });
+                              });
+
+                              // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              //   content: Text('under development...'),
+                              // ));
                             },
                             child: const Text.rich(
                                 TextSpan(
@@ -183,9 +202,47 @@ class _OptionsState extends State<Options> {
                                 )
                             ),
                           ),
-                          const SizedBox(height: 11,),
                           const SizedBox(
-                            height: 21,
+                            height: 32,
+                          ),
+                          AnimatedContainer(
+                            curve: Curves.easeOut,
+                            duration: const Duration(milliseconds: 250),
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(11), topRight: Radius.circular(11),
+                              bottomLeft: Radius.circular(21), bottomRight: Radius.circular(21)),
+                              color: Colors.white,
+                            ),
+                            width: size.width - 60,
+                            height: snack_text_padding,
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 1000),
+                                style: TextStyle(
+                                    height: 1,
+                                    color: const Color(0xff1d3f5e),
+                                    fontFamily: 'varela-round.regular',
+                                    fontSize: snack_text_size,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              child: Center(
+                                child: Text(
+                                  'under development...',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      height: 1,
+                                      color: const Color(0xff1d3f5e),
+                                      fontFamily: 'varela-round.regular',
+                                      fontSize: snack_text_size,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                              )
+
+                            ),
+                          ),
+                          // const SizedBox(height: 11,),
+                          SizedBox(
+                            height: snack_text_size > 0 ? snack_text_size - 2 : snack_text_size,
                           ),
                         ],
                       ),

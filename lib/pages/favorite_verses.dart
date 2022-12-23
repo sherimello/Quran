@@ -11,9 +11,9 @@ import 'new_surah_page.dart';
 
 class FavoriteVerses extends StatefulWidget {
 
-  final String tag;
+  final String tag, from_where;
 
-  const FavoriteVerses({Key? key, required this.tag}) : super(key: key);
+  const FavoriteVerses({Key? key, required this.tag, required this.from_where}) : super(key: key);
 
   @override
   State<FavoriteVerses> createState() => _FavoriteVersesState();
@@ -43,7 +43,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
 
     database = await openDatabase(path);
 
-    print(database.isOpen);
+    // print(database.isOpen);
   }
 
   fetchVersesData() async{
@@ -189,7 +189,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                             onTap: () {
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.white.withOpacity(0.85),
-                                builder: (context) => Center(child: DeleteCard(tag: widget.tag, surah_number: verses[index]['surah_id'].toString(), verse_number: verses[index]['verse_id'].toString(), what_to_delete: "favorites",)),
+                                builder: (context) => Center(child: DeleteCard(tag: widget.tag, surah_number: verses[index]['surah_id'].toString(), verse_number: verses[index]['verse_id'].toString(), what_to_delete: "favorites", from_where:  widget.from_where,)),
                               ));
                             },
                             child: Container(
@@ -314,62 +314,64 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                           ): const TextSpan()
                                                         ]
                                                     )),
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                Stack(
                                                   children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(bottom: 11.0, top: 22),
-                                                      child: GestureDetector(
-                                                        onTap: () async {
-                                                          print((verses[index]['surah_id']).toString());
-                                                          // await fetchSurahSujoodVerses(index + 1);
-                                                          Navigator.of(this.context)
-                                                              .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1,)));
-                                                        },
-                                                        child: Container(
-                                                          // width: size.width,
-                                                          // height: AppBar().preferredSize.height * .67,
-                                                            decoration: BoxDecoration(
-                                                              color: const Color(0xff1d3f5e),
-                                                              borderRadius: BorderRadius.circular(1000),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: const Color(0xff1d3f5e).withOpacity(0.15),
-                                                                  spreadRadius: 3,
-                                                                  blurRadius: 19,
-                                                                  offset: const Offset(0,0), // changes position of shadow
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            child: const Center(
-                                                              child: Padding(
-                                                                padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 7),
-                                                                child: Center(
-                                                                  child: Text.rich(
-                                                                    // textAlign: TextAlign.center,
-                                                                    TextSpan(
-                                                                        children: [
-                                                                          TextSpan(
-                                                                              text: "show in surah",
-                                                                              style: TextStyle(
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                  fontFamily: 'varela-round.regular',
-                                                                                  fontSize: 12,
-                                                                                  color: Colors.white
-                                                                              )
-                                                                          ),
-                                                                          WidgetSpan(
-                                                                              alignment: PlaceholderAlignment.middle,
-                                                                              child: Padding(
-                                                                                padding: EdgeInsets.only(left: 7.0),
-                                                                                child: Icon(Icons.open_in_new, color: Colors.white, size: 19,),
-                                                                              ))
-                                                                        ]
+                                                    SingleChildScrollView(
+                                                      scrollDirection: Axis.horizontal,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.only(bottom: 11.0, top: 22),
+                                                        child: GestureDetector(
+                                                          onTap: () async {
+                                                            print((verses[index]['surah_id']).toString());
+                                                            // await fetchSurahSujoodVerses(index + 1);
+                                                            Navigator.of(this.context)
+                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1,)));
+                                                          },
+                                                          child: Container(
+                                                            // width: size.width,
+                                                            // height: AppBar().preferredSize.height * .67,
+                                                              decoration: BoxDecoration(
+                                                                color: const Color(0xff1d3f5e),
+                                                                borderRadius: BorderRadius.circular(1000),
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                    color: const Color(0xff1d3f5e).withOpacity(0.15),
+                                                                    spreadRadius: 3,
+                                                                    blurRadius: 19,
+                                                                    offset: const Offset(0,0), // changes position of shadow
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              child: const Center(
+                                                                child: Padding(
+                                                                  padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 7),
+                                                                  child: Center(
+                                                                    child: Text.rich(
+                                                                      // textAlign: TextAlign.center,
+                                                                      TextSpan(
+                                                                          children: [
+                                                                            TextSpan(
+                                                                                text: "show in surah",
+                                                                                style: TextStyle(
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontFamily: 'varela-round.regular',
+                                                                                    fontSize: 12,
+                                                                                    color: Colors.white
+                                                                                )
+                                                                            ),
+                                                                            WidgetSpan(
+                                                                                alignment: PlaceholderAlignment.middle,
+                                                                                child: Padding(
+                                                                                  padding: EdgeInsets.only(left: 7.0),
+                                                                                  child: Icon(Icons.open_in_new, color: Colors.white, size: 19,),
+                                                                                ))
+                                                                          ]
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                            )
+                                                              )
+                                                          ),
                                                         ),
                                                       ),
                                                     ),

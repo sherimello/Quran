@@ -275,7 +275,7 @@ class _MenuState extends State<Menu> {
                     onTap: (){
                       Navigator.of(context).push(HeroDialogRoute(
                         bgColor: Colors.white.withOpacity(0.85),
-                        builder: (context) => const Center(child: BookmarkFolders(tag: "animate")),
+                        builder: (context) => const Center(child: BookmarkFolders(tag: "animate", from_where: "menu")),
                       ));
                     },
                     child: Container(
@@ -331,7 +331,7 @@ class _MenuState extends State<Menu> {
                     onTap: (){
                       Navigator.of(context).push(HeroDialogRoute(
                         bgColor: Colors.white.withOpacity(0.85),
-                        builder: (context) => const Center(child: FavoriteVerses(tag: "animate",)),
+                        builder: (context) => const Center(child: FavoriteVerses(tag: "animate", from_where: "menu",)),
                       ));
                     },
                     child: Container(

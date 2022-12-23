@@ -12,9 +12,9 @@ import 'new_surah_page.dart';
 
 class BookmarkVerses extends StatefulWidget {
 
-  final String tag, folder_name;
+  final String tag, folder_name, from_where;
 
-  const BookmarkVerses({Key? key, required this.folder_name, required this.tag}) : super(key: key);
+  const BookmarkVerses({Key? key, required this.folder_name, required this.tag, required this.from_where}) : super(key: key);
 
   @override
   State<BookmarkVerses> createState() => _BookmarkVersesState();
@@ -135,7 +135,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
     Future <bool> goToFoldersList() async{
       return await Navigator.of(context).push(HeroDialogRoute(
         bgColor: Colors.white.withOpacity(0.85),
-        builder: (context) => Center(child: BookmarkFolders(tag: widget.tag)),
+        builder: (context) => Center(child: BookmarkFolders(tag: widget.tag, from_where: widget.from_where)),
       )) ?? false;
     }
 
@@ -197,7 +197,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                             onTap: (){
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.white.withOpacity(0.85),
-                                builder: (context) => Center(child: DeleteCard(tag: widget.tag, surah_number: verses[index]['surah_id'].toString(), verse_number: verses[index]['verse_id'].toString(), what_to_delete: "bookmarks",)),
+                                builder: (context) => Center(child: DeleteCard(tag: widget.tag, surah_number: verses[index]['surah_id'].toString(), verse_number: verses[index]['verse_id'].toString(), what_to_delete: "bookmarks", from_where: widget.from_where,)),
                               ));
                             },
                             child: Container(

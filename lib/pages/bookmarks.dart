@@ -17,9 +17,10 @@ class Bookmarks extends StatefulWidget {
 class _BookmarksState extends State<Bookmarks> {
 
   late Database database1;
-  late String path;
+  late String path, message = "";
   late List<Map> bookmarkFolders;
   int bookmarkFolderSize = 0;
+  double snack_text_size = 0, snack_text_padding = 0;
 
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
@@ -107,231 +108,307 @@ class _BookmarksState extends State<Bookmarks> {
           createRectTween: (begin, end) {
             return CustomRectTween(begin: begin!, end: end!);
           },
-          child: Container(
-            height: size.height * .71,
-            width: size.width - 38,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(31),
-                color: Colors.white
-                // color: const Color(0xff1d3f5e)
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(11.0),
-              child: Material(
-                color: Colors.transparent,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(
-                        height: 21,
-                      ),
-                      Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: size.width * .087),
-                            child: const Text('create a folder:',
-                            style: TextStyle(
-                              fontFamily: 'varela-round.regular',
-                              fontWeight: FontWeight.bold
-                            ),
-                            ),
-                          )),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: size.width * .087),
-                        child: Stack(
-                          alignment: Alignment.centerRight,
-                          children: [
-                            Container(
-                              width: size.width * 1,
-                              // width: size.width * .65,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(1000),
-                                  color: const Color(0xff1d3f5e)
-                              ),
+          child: Stack(
+            children: [
+              Container(
+                height: size.height * .71,
+                width: size.width - 38,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(31),
+                    color: Colors.white
+                    // color: const Color(0xff1d3f5e)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(11.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                            height: 21,
+                          ),
+                          Align(
+                              alignment: Alignment.topLeft,
                               child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 19.0),
-                                  child: searchBar
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 7,
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                folderController.text.isNotEmpty ? !alreadyExists() ?
-                                {
-                                await addBookmarkFolder(folderController.text),
-                                await fetchBookmarkFolders(),
-                                } :
-                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                content: Text('folder already exists'),
-                                )) : ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                  content: Text('empty name not allowed'),
-                                ));
-                              },
-
-                              child: Container(
-                                height: 13 * 4.1,
-                                // height: 13 * 3.5,
-                                width: 13*4.1,
-                                // width: size.width * .35 - 29,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(1000),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xff1d3f5e).withOpacity(0.1),
-                                      spreadRadius: 7,
-                                      blurRadius: 11,
-                                      offset: const Offset(0, 0), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Icon(Icons.add_task_sharp, color: Color(0xff1d3f5e),),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: size.width * .087),
-                        child: const Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '***create folder(s) and/or click on one to add your bookmark. the "',
+                                padding: EdgeInsets.only(left: size.width * .087),
+                                child: const Text('create a folder:',
                                 style: TextStyle(
-                                    fontSize: 13,
-                                    fontFamily: 'varela-round.regular',
-                                    color: Color(0xff1d3f5e),
-                                    fontStyle: FontStyle.italic
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'default',
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    fontFamily: 'varela-round.regular',
-                                    color: Color(0xff000000),
-                                    fontStyle: FontStyle.italic,
+                                  fontFamily: 'varela-round.regular',
                                   fontWeight: FontWeight.bold
                                 ),
-                              ),
-                              TextSpan(
-                                text: '" bookmark folder has been made for you.\n',
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    fontFamily: 'varela-round.regular',
-                                    color: Color(0xff1d3f5e),
-                                    fontStyle: FontStyle.italic
                                 ),
-                              )
-                            ]
+                              )),
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 7.0, horizontal: size.width * .087),
+                            child: Stack(
+                              alignment: Alignment.centerRight,
+                              children: [
+                                Container(
+                                  width: size.width * 1,
+                                  // width: size.width * .65,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(1000),
+                                      color: const Color(0xff1d3f5e)
+                                  ),
+                                  child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 19.0),
+                                      child: searchBar
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 7,
+                                ),
+                                InkWell(
+                                  onTap: () async {
+                                    folderController.text.isNotEmpty ? !alreadyExists() ?
+                                    {
+                                    await addBookmarkFolder(folderController.text),
+                                    await fetchBookmarkFolders(),
+                                    } :
+                                        {
+                                          message = "folder already exists",
+                                          setState(() {
+                                            snack_text_size = 13;
+                                            snack_text_padding = 39;
+                                          }),
+                                          Future.delayed(const Duration(seconds: 3), () {
+                                            setState(() {
+                                              snack_text_size = 0;
+                                              snack_text_padding = 0;
+                                            });
+                                          }),
+                                        } : {
+                                      message = "folder name empty",
+                                      setState(() {
+                                        snack_text_size = 13;
+                                        snack_text_padding = 41;
+                                      }),
+                                      Future.delayed(const Duration(seconds: 3), () {
+                                        setState(() {
+                                          snack_text_size = 0;
+                                          snack_text_padding = 0;
+                                        });
+                                      }),
+                                    };
+                                  },
+
+                                  child: Container(
+                                    height: 13 * 4.1,
+                                    // height: 13 * 3.5,
+                                    width: 13*4.1,
+                                    // width: size.width * .35 - 29,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(1000),
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xff1d3f5e).withOpacity(0.1),
+                                          spreadRadius: 7,
+                                          blurRadius: 11,
+                                          offset: const Offset(0, 0), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Center(
+                                      child: Icon(Icons.add_task_sharp, color: Color(0xff1d3f5e),),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: size.width * .087, top: 11),
-                            child: Text.rich(
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: size.width * .087),
+                            child: const Text.rich(
                               TextSpan(
                                 children: [
-                                  // WidgetSpan(
-                                  //     alignment: PlaceholderAlignment.middle,
-                                  //     child: Icon(Icons.folder_special_rounded, color: Color(0xff1d3f5e),)),
-                                  const TextSpan(
-                                    text: ' bookmark folder ',
-                                      style: TextStyle(
-                                          fontFamily: 'varela-round.regular',
-                                          fontWeight: FontWeight.bold
-                                      )
+                                  TextSpan(
+                                    text: '***create folder(s) and/or click on one to add your bookmark. the "',
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontFamily: 'varela-round.regular',
+                                        color: Color(0xff1d3f5e),
+                                        fontStyle: FontStyle.italic
+                                    ),
                                   ),
                                   TextSpan(
-                                      text: '(${bookmarkFolderSize.toString()})',
-                                      style: const TextStyle(
-                                          fontFamily: 'varela-round.regular',
-                                          fontSize: 13
-                                      )
-                                  ),
-                                  const TextSpan(
-                                      text: ' :',
-                                      style: TextStyle(
-                                          fontFamily: 'varela-round.regular',
-                                          fontWeight: FontWeight.bold
-                                      )
-                                  ),
-                                ]
-                              )
-                              ,
-                            ),
-                          )),
-                      const SizedBox(
-                        height: 11,
-                      ),
-                      Column(
-                        children: [
-
-                            for(int i = 0; i<bookmarkFolderSize; i++)
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
-                                child: GestureDetector(
-                                  onTap: () async{
-
-                                    await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
-                                      ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                                        content: Text('verse added to ${bookmarkFolders[i]['folder_name']}'),
-                                      ));
-                                      Navigator.pop(context);
-                                    });
-
-                                  },
-                                  child: Container(
-                                    width: size.width,
-                                    decoration: BoxDecoration(
-                                        color: const Color(0xff1d3f5e).withOpacity(.11),
-                                        borderRadius: BorderRadius.circular(11)
+                                    text: 'default',
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontFamily: 'varela-round.regular',
+                                        color: Color(0xff000000),
+                                        fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.bold
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(11.0),
-                                      child: Text.rich(
-                                          TextSpan(
-                                              children: [
-                                                const WidgetSpan(
-                                                    alignment: PlaceholderAlignment.middle,
-                                                    child: Icon(
-                                                        Icons.bookmark
-                                                    )),
-                                                TextSpan(
-                                                    text: '  ${bookmarkFolders[i]['folder_name']} ',
-
-                                                    style: const TextStyle(
-                                                        fontFamily: 'varela-round.regular',
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 17
-                                                    )
-                                                ),
-                                              ]
+                                  ),
+                                  TextSpan(
+                                    text: '" bookmark folder has been made for you.\n',
+                                    style: TextStyle(
+                                        fontSize: 13,
+                                        fontFamily: 'varela-round.regular',
+                                        color: Color(0xff1d3f5e),
+                                        fontStyle: FontStyle.italic
+                                    ),
+                                  )
+                                ]
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: size.width * .087, top: 11),
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      // WidgetSpan(
+                                      //     alignment: PlaceholderAlignment.middle,
+                                      //     child: Icon(Icons.folder_special_rounded, color: Color(0xff1d3f5e),)),
+                                      const TextSpan(
+                                        text: ' bookmark folder ',
+                                          style: TextStyle(
+                                              fontFamily: 'varela-round.regular',
+                                              fontWeight: FontWeight.bold
                                           )
+                                      ),
+                                      TextSpan(
+                                          text: '(${bookmarkFolderSize.toString()})',
+                                          style: const TextStyle(
+                                              fontFamily: 'varela-round.regular',
+                                              fontSize: 13
+                                          )
+                                      ),
+                                      const TextSpan(
+                                          text: ' :',
+                                          style: TextStyle(
+                                              fontFamily: 'varela-round.regular',
+                                              fontWeight: FontWeight.bold
+                                          )
+                                      ),
+                                    ]
+                                  )
+                                  ,
+                                ),
+                              )),
+                          const SizedBox(
+                            height: 11,
+                          ),
+                          Column(
+                            children: [
+
+                                for(int i = 0; i<bookmarkFolderSize; i++)
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
+                                    child: GestureDetector(
+                                      onTap: () async{
+
+                                        await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
+                                          setState(() {
+                                            message = 'verse added to "${bookmarkFolders[i]['folder_name']}"';
+                                              snack_text_size = 13;
+                                              snack_text_padding = 41;
+
+                                          });
+                                          Future.delayed(const Duration(seconds: 3), () {
+                                            setState(() {
+                                              snack_text_size = 0;
+                                              snack_text_padding = 0;
+                                            });
+                                          });
+                                          // ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                                          //   content: Text('verse added to ${bookmarkFolders[i]['folder_name']}'),
+                                          // ));
+                                          // Navigator.pop(context);
+                                        });
+
+                                      },
+                                      child: Container(
+                                        width: size.width,
+                                        decoration: BoxDecoration(
+                                            color: const Color(0xff1d3f5e).withOpacity(.11),
+                                            borderRadius: BorderRadius.circular(11)
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(11.0),
+                                          child: Text.rich(
+                                              TextSpan(
+                                                  children: [
+                                                    const WidgetSpan(
+                                                        alignment: PlaceholderAlignment.middle,
+                                                        child: Icon(
+                                                            Icons.bookmark
+                                                        )),
+                                                    TextSpan(
+                                                        text: '  ${bookmarkFolders[i]['folder_name']} ',
+
+                                                        style: const TextStyle(
+                                                            fontFamily: 'varela-round.regular',
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 17
+                                                        )
+                                                    ),
+                                                  ]
+                                              )
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 21,
+                          ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 21,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: AnimatedContainer(
+                  curve: Curves.easeOut,
+                  duration: const Duration(milliseconds: 250),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(11), topRight: Radius.circular(11),
+                        bottomLeft: Radius.circular(31), bottomRight: Radius.circular(31)),
+                    color: Color(0xff1d3f5e),
+                  ),
+                  width: size.width - 60,
+                  height: snack_text_padding,
+                  child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 1000),
+                      style: TextStyle(
+                          height: 1,
+                          color: const Color(0xffffffff),
+                          fontFamily: 'varela-round.regular',
+                          fontSize: snack_text_size,
+                          fontWeight: FontWeight.bold
+                      ),
+                      child: Center(
+                        child: Text(
+                          message,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              height: 1,
+                              color: const Color(0xffffffff),
+                              fontFamily: 'varela-round.regular',
+                              fontSize: snack_text_size,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      )
+
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
