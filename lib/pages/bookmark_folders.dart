@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quran/pages/bookmark_verses.dart';
+import 'package:quran/pages/delete_card.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -58,12 +59,15 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
   @override
   Widget build(BuildContext context) {
 
-
     Future <bool> goToMenu() async{
-      return await Navigator.of(context).push(HeroDialogRoute(
-        bgColor: Colors.white.withOpacity(0.0),
-        builder: (context) => const Center(child: Menu()),
-      )) ?? false;
+      if(widget.from_where == "menu") {
+        return await Navigator.of(context).push(HeroDialogRoute(
+          bgColor: Colors.white.withOpacity(0.0),
+          builder: (context) => const Center(child: Menu()),
+        )) ?? false;
+      }
+      Navigator.pop(context);
+      return false;
     }
 
     var size = MediaQuery.of(context).size;
@@ -145,6 +149,10 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
                                 Padding(
                                   padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
                                   child: GestureDetector(
+                                    onLongPress: () {
+                                      Navigator.of(context).push(HeroDialogRoute(builder: (context) =>
+                                      DeleteCard(tag: widget.tag, what_to_delete: "folder", from_where: widget.from_where, folder_name: bookmarkFolders[i]["folder_name"],)));
+                                    },
                                     onTap: () async{
                                       Navigator.of(context).push(HeroDialogRoute(
                                         builder: (context) => Center(

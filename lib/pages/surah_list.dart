@@ -392,54 +392,64 @@ class _SurahListState extends State<SurahList> {
                 color: const Color(0xff1d3f5e),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 11.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  child: Stack(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 11.0),
-                        child: Container(
-                            width: appBar.preferredSize.height -
-                                appBar.preferredSize.height * .35,
-                            height: appBar.preferredSize.height -
-                                appBar.preferredSize.height * .35,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(1000),
-                                color: Colors.white.withOpacity(.5)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Image.asset('lib/assets/images/quran icon.png'),
-                            )),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Qur\'an',
-                            style: TextStyle(
-                                fontFamily: 'Bismillah Script',
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.5,
-                                color: Colors.white,
-                                fontSize: 21),
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: Center(
+                          child: Text.rich(
+                            TextSpan(
+                                children: [
+                                  WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 11.0),
+                                      child: Container(
+                                          width: appBar.preferredSize.height -
+                                              appBar.preferredSize.height * .35,
+                                          height: appBar.preferredSize.height -
+                                              appBar.preferredSize.height * .35,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(1000),
+                                              color: Colors.white.withOpacity(.5)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Image.asset('lib/assets/images/quran icon.png'),
+                                          )),
+                                    ),),
+
+                                  const TextSpan(
+                                    text: 'Qur\'an',
+                                    style: TextStyle(
+                                        fontFamily: 'Bismillah Script',
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.5,
+                                        color: Colors.white,
+                                        fontSize: 21),
+                                  ),
+                                ]
+                            ),
                           ),
-                        ],
+                        )
                       ),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(HeroDialogRoute(
-                                  bgColor: Colors.white.withOpacity(0.85),
-                                  builder: (context) => const Options(tag: "options"),
-                                ));
-                              },
-                              child: const Icon(Icons.more_vert, color: Colors.white,)),
-                        ),
+                      Positioned(
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(HeroDialogRoute(
+                                bgColor: Colors.white.withOpacity(0.85),
+                                builder: (context) => const Options(tag: "options"),
+                              ));
+                            },
+                            child: const Icon(Icons.more_vert, color: Colors.white,)),
                       )
-                    ],
-                  ),
+                      ]
+                      )
+
                 ),
               ),
             ),

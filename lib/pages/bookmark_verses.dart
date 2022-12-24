@@ -22,6 +22,7 @@ class BookmarkVerses extends StatefulWidget {
 
 class _BookmarkVersesState extends State<BookmarkVerses> {
   late Database database;
+  double snack_text_size = 0, snack_text_padding = 0;
   late String path, loadAsset = 'lib/assets/images/search.png', messageUpdate = "\nsearch whatever bothers\nor concerns you";
   int len = 0, flag = 0, load = 0;
   bool loadVisibility = true, value_progress = true, value_nothing_found = false;
@@ -64,10 +65,25 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
           sujood_verse_indices = await database.rawQuery('SELECT verse_id FROM sujood_verses');
         });
       });
-
+    Future.delayed(const Duration(seconds: 1), () {
+      setState((){
+        value_progress = false;
+      });
+    });
     setState(() {
-      value_progress = false;
+
+      // value_progress = false;
       if (verses.isEmpty) {
+        setState(() {
+          snack_text_size = 13;
+          snack_text_padding = 45;
+        });
+      Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+      snack_text_size = 0;
+      snack_text_padding = 0;
+      });
+      });
         loadAsset = 'lib/assets/images/nothing_found.gif';
         loadVisibility = true;
         messageUpdate = "no matches were found!";
@@ -133,10 +149,14 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
   Widget build(BuildContext context) {
 
     Future <bool> goToFoldersList() async{
-      return await Navigator.of(context).push(HeroDialogRoute(
-        bgColor: Colors.white.withOpacity(0.85),
-        builder: (context) => Center(child: BookmarkFolders(tag: widget.tag, from_where: widget.from_where)),
-      )) ?? false;
+      if(widget.from_where == "menu") {
+        return await Navigator.of(context).push(HeroDialogRoute(
+          bgColor: Colors.white.withOpacity(0.85),
+          builder: (context) => Center(child: BookmarkFolders(tag: widget.tag, from_where: widget.from_where)),
+        )) ?? false;
+      }
+      Navigator.pop(context);
+      return false;
     }
 
     var size = MediaQuery.of(context).size;
@@ -153,22 +173,6 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
       onWillPop: goToFoldersList,
       child: Stack(
         children: [
-          Center(
-            child:
-            Visibility(
-              visible: value_nothing_found,
-                child: Image.asset('lib/assets/images/nothing_found.gif',
-                    width: size.width * .41, height: size.width * .41)
-            ),
-          ),
-          Center(
-            child: Visibility(
-              visible: value_progress,
-              child: const CircularProgressIndicator(
-                color: Color(0xff1d3f5e),
-              ),
-            ),
-          ),
           SafeArea(
             child: Hero(
               tag: widget.tag,
@@ -197,7 +201,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                             onTap: (){
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.white.withOpacity(0.85),
-                                builder: (context) => Center(child: DeleteCard(tag: widget.tag, surah_number: verses[index]['surah_id'].toString(), verse_number: verses[index]['verse_id'].toString(), what_to_delete: "bookmarks", from_where: widget.from_where,)),
+                                builder: (context) => Center(child: DeleteCard(tag: widget.tag, surah_number: verses[index]['surah_id'].toString(), verse_number: verses[index]['verse_id'].toString(), what_to_delete: "bookmarks", from_where: widget.from_where, folder_name: widget.folder_name,)),
                               ));
                             },
                             child: Container(
@@ -333,7 +337,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                                             print((verses[index]['surah_id']).toString());
                                                             await fetchSurahSujoodVerses(index + 1);
                                                             Navigator.of(this.context)
-                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1,)));
+                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1, should_animate: true,)));
                                                           },
                                                           child: Container(
                                                               decoration: BoxDecoration(
@@ -398,6 +402,62 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                     ),
                   ),
                 ),
+              ),
+            ),
+          ),
+          Center(
+            child:
+            Visibility(
+                visible: value_nothing_found,
+                child: Image.asset('lib/assets/images/nothing_found.gif',
+                    color: Color(0x751d3f5e),
+                    width: size.width * .67, height: size.width * .67)
+            ),
+          ),
+          Center(
+            child: Visibility(
+              visible: value_progress,
+              child: const CircularProgressIndicator(
+                color: Color(0xff1d3f5e),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: AnimatedContainer(
+              curve: Curves.easeOut,
+              duration: const Duration(milliseconds: 250),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(21), topRight: Radius.circular(21),),
+                color: Color(0xff1d3f5e),
+              ),
+              width: size.width - 60,
+              height: snack_text_padding,
+              child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 1000),
+                  style: TextStyle(
+                      height: 1,
+                      color: const Color(0xffffffff),
+                      fontFamily: 'varela-round.regular',
+                      fontSize: snack_text_size,
+                      fontWeight: FontWeight.bold
+                  ),
+                  child: Center(
+                    child: Text(
+                      "nothing added to \"${widget.folder_name}\" yet",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          height: 1,
+                          color: const Color(0xffffffff),
+                          fontFamily: 'varela-round.regular',
+                          fontSize: snack_text_size,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  )
+
               ),
             ),
           ),

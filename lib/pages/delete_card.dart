@@ -7,12 +7,14 @@ import 'package:path/path.dart';
 
 import '../hero_transition_handler/custom_rect_tween.dart';
 import '../hero_transition_handler/hero_dialog_route.dart';
+import 'menu.dart';
 
 class DeleteCard extends StatefulWidget {
 
-  final String tag, surah_number, verse_number, what_to_delete, from_where;
+  final String tag, what_to_delete, from_where;
+  String folder_name, surah_number, verse_number;
 
-  const DeleteCard({Key? key, required this.tag, required this.surah_number, required this.verse_number, required this.what_to_delete, required this.from_where}) : super(key: key);
+  DeleteCard({Key? key, required this.tag, this.surah_number = "", this.verse_number = "", required this.what_to_delete, required this.from_where, this.folder_name = ""}) : super(key: key);
 
   @override
   State<DeleteCard> createState() => _DeleteCardState();
@@ -35,21 +37,32 @@ class _DeleteCardState extends State<DeleteCard> {
     print(database.isOpen);
   }
 
-  deleteFromBookmarks() async {
-    widget.what_to_delete == "bookmarks" ?
-        {
-    await initiateDB().whenComplete(() {
-    database.rawDelete('DELETE FROM bookmarks WHERE surah_id = ? AND verse_id = ?', [widget.surah_number, widget.verse_number]);
-    print('deleted');
-    })
-        } :
-    {
-      await initiateDB().whenComplete(() {
-        database.rawDelete('DELETE FROM favorites WHERE surah_id = ? AND verse_id = ?', [widget.surah_number, widget.verse_number]);
-        print('deleted');
-      })
-    };
+  startDeletion() async {
 
+    if(widget.what_to_delete == "folder") {
+      await initiateDB().whenComplete(() {
+        database.rawDelete('DELETE FROM bookmark_folders WHERE folder_name = ?', [widget.folder_name])
+        .whenComplete(() {
+          database.rawDelete('DELETE FROM bookmarks WHERE folder_name = ?', [widget.folder_name]);
+        });
+        print('deleted');
+      });
+    }
+    else {
+      widget.what_to_delete == "bookmarks" ?
+      {
+        await initiateDB().whenComplete(() {
+          database.rawDelete('DELETE FROM bookmarks WHERE folder_name = ? AND surah_id = ? AND verse_id = ?', [widget.folder_name, widget.surah_number, widget.verse_number]);
+          print('deleted');
+        })
+      } :
+      {
+        await initiateDB().whenComplete(() {
+          database.rawDelete('DELETE FROM favorites WHERE surah_id = ? AND verse_id = ?', [widget.surah_number, widget.verse_number]);
+          print('deleted');
+        })
+      };
+    }
   }
 
   @override
@@ -67,28 +80,41 @@ class _DeleteCardState extends State<DeleteCard> {
           },
           child: GestureDetector(
             onTap: () async {
-              await deleteFromBookmarks().whenComplete((){
+              await startDeletion().whenComplete((){
 
                 // Navigator.pop(context);
 
-                widget.what_to_delete == "bookmarks" ?
-                    widget.from_where == "menu" ?
-                Navigator.of(context).push(HeroDialogRoute(
-                  bgColor: Colors.white.withOpacity(0.85),
-                  builder: (context) => Center(child: BookmarkFolders(tag: widget.tag, from_where: widget.from_where,)),
-                )):
-                    Navigator.of(context).push(HeroDialogRoute(
-                      bgColor: Colors.white.withOpacity(0.85),
-                      builder: (context) => const SurahList(),
-                    ))
-                // Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                //   BookmarkFolders(tag: widget.tag,)))
-                : widget.from_where == "menu" ?
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                    FavoriteVerses(tag: widget.tag, from_where: widget.from_where,)))
-                :
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                    const SurahList()));
+                if(widget.what_to_delete == "folder") {
+                  widget.from_where == "menu" ?
+                  Navigator.of(context).push(HeroDialogRoute(
+                    bgColor: Colors.white.withOpacity(0.85),
+                    builder: (context) => const Menu(),
+                  )) :
+                  Navigator.of(context).push(HeroDialogRoute(
+                    bgColor: Colors.white.withOpacity(0.85),
+                    builder: (context) => const SurahList(),
+                  ));
+                }
+                else {
+                  widget.what_to_delete == "bookmarks" ?
+                  widget.from_where == "menu" ?
+                  Navigator.of(context).push(HeroDialogRoute(
+                    bgColor: Colors.white.withOpacity(0.85),
+                    builder: (context) => Center(child: BookmarkFolders(tag: widget.tag, from_where: widget.from_where,)),
+                  )):
+                  Navigator.of(context).push(HeroDialogRoute(
+                    bgColor: Colors.white.withOpacity(0.85),
+                    builder: (context) => const SurahList(),
+                  ))
+                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                  //   BookmarkFolders(tag: widget.tag,)))
+                      : widget.from_where == "menu" ?
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                      FavoriteVerses(tag: widget.tag, from_where: widget.from_where,)))
+                      :
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                  const SurahList()));
+                }
               });
             },
             child: Container(

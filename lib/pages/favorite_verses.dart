@@ -143,10 +143,14 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
     }
 
     Future <bool> goToMenu() async{
-      return await Navigator.of(context).push(HeroDialogRoute(
-        bgColor: Colors.white.withOpacity(0.0),
-        builder: (context) => const Center(child: Menu()),
-      )) ?? false;
+      if(widget.from_where == "menu") {
+        return await Navigator.of(context).push(HeroDialogRoute(
+          bgColor: Colors.white.withOpacity(0.0),
+          builder: (context) => const Center(child: Menu()),
+        )) ?? false;
+      }
+      Navigator.pop(context);
+      return false;
     }
 
     return WillPopScope(
@@ -325,7 +329,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                             print((verses[index]['surah_id']).toString());
                                                             // await fetchSurahSujoodVerses(index + 1);
                                                             Navigator.of(this.context)
-                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1,)));
+                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1, should_animate: true,)));
                                                           },
                                                           child: Container(
                                                             // width: size.width,

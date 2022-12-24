@@ -14,7 +14,11 @@ class VersesSearch extends StatefulWidget {
   State<VersesSearch> createState() => _VersesSearchState();
 }
 
-
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+  }
+}
 
 class _VersesSearchState extends State<VersesSearch> {
 
@@ -35,13 +39,13 @@ class _VersesSearchState extends State<VersesSearch> {
 
   late Database database;
   late String path, loadAsset = 'lib/assets/images/search.png', messageUpdate = "\nsearch whatever bothers\nor concerns you";
-  int len = 0, flag = 0, load = 0;
+  int len = 0, flag = 0, load = 0, searched_word_index_in_surah = 0;
   bool loadVisibility = true;
 
   List<Map> verses = [], v = [], translated_verse = [], tv = [];
   late List<Map> surah_indices = [], verse_indices = [];
   final TextEditingController searchController = TextEditingController();
-  String word = "";
+  String word = "", string1 = "",string2 = "", string3 = "", translated_v = "";
   late int sujood_index;
   List<int> selected_surah_sujood_verses = [];
   late List<Map> sujood_surah_indices = [],
@@ -277,8 +281,23 @@ class _VersesSearchState extends State<VersesSearch> {
                   scrollDirection: Axis.vertical,
                   controller: autoScrollController,
                     physics: const BouncingScrollPhysics(),
-                    itemCount: verses.isNotEmpty ? verses.length : 0,
+                    itemCount: translated_verse.isNotEmpty ? translated_verse.length : 0,
                     itemBuilder: (BuildContext context, int index) {
+
+                      translated_v = translated_verse[index]['text'].toString();
+                      searched_word_index_in_surah = translated_v.toLowerCase().indexOf(word.trim().toLowerCase());
+
+                    // if(translated_v.indexOf(word) > 0) {
+                      print(translated_v.indexOf(word));
+                      string1 = translated_v.substring(0, searched_word_index_in_surah);
+                      string2 = translated_v.substring(searched_word_index_in_surah, searched_word_index_in_surah + word.length);
+                      string3 = translated_v.substring(searched_word_index_in_surah + word.length);
+                    // }
+                    // else {
+                    //   string1 = translated_v.substring(searched_word_index_in_surah) + 1, word.length);
+                    //   string2 = translated_v.substring(word.length);
+                    //   string3 = '$string2 [${translated_verse[index]['surah_id']}:${translated_verse[index]['verse_id']}';
+                    // }
                       print('${isPortraitMode() ? size.height / size.width : size.width / size.height}');
                       return Container(
                         decoration: BoxDecoration(
@@ -385,9 +404,33 @@ class _VersesSearchState extends State<VersesSearch> {
                                               TextSpan(
                                                   children: [
                                                     TextSpan(
-                                                      text: translated_verse[index]['text'] + ' [${translated_verse[index]['surah_id']}:${translated_verse[index]['verse_id']}]',
+                                                      text: string1,
+                                                      style: const TextStyle(
+                                                          fontFamily: 'varela-round.regular',
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: string2,
+                                                      style: const TextStyle(
+                                                          fontFamily: 'varela-round.regular',
+                                                        color: Colors.red,
+                                                        fontWeight: FontWeight.bold,
+                                                        // fontStyle: FontStyle.italic,
+                                                          fontSize: 19
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: string3,
                                                       style: const TextStyle(
                                                           fontFamily: 'varela-round.regular'
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: ' [${translated_verse[index]['surah_id']}:${translated_verse[index]['verse_id']}]',
+                                                      style: const TextStyle(
+                                                          fontFamily: 'Rounded_Elegance',
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Color(0xff1d3f5e)
                                                       ),
                                                     ),
                                                     isSujoodVerse(translated_verse[index]['surah_id'], translated_verse[index]['verse_id']) ?
@@ -411,7 +454,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                   onTap: () async {
                                                     await fetchSurahSujoodVerses(index + 1);
                                                     Navigator.of(this.context)
-                                                        .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: translated_verse[index]['surah_id'].toString(), scroll_to: translated_verse[index]['verse_id']-1,)));
+                                                        .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: translated_verse[index]['surah_id'].toString(), scroll_to: translated_verse[index]['verse_id']-1, should_animate: true,)));
                                                   },
                                                   child: Container(
                                                     // width: size.width,

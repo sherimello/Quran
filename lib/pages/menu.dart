@@ -389,7 +389,7 @@ class _MenuState extends State<Menu> {
                       onTap: (){
                         Navigator.of(context).push(HeroDialogRoute(
                           bgColor: Colors.white.withOpacity(0.85),
-                          builder: (context) => Center(child: UpdatedSurahPage(surah_id: surah_id, scroll_to: (int.parse(verse_id) - 1),)),
+                          builder: (context) => Center(child: UpdatedSurahPage(surah_id: surah_id, scroll_to: (int.parse(verse_id) - 1), should_animate: true,)),
                         ));
                       },
                       child: Container(
