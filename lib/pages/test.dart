@@ -3,6 +3,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:arabic_numbers/arabic_numbers.dart';
 
+import '../Theme Swtitcher Clipper Bridge/theme_model_inherited_notifier.dart';
+import '../Theme Swtitcher Clipper Bridge/theme_switcher_clipper_bridge.dart';
+
 
 class Test extends StatefulWidget {
   const Test({Key? key}) : super(key: key);
@@ -80,34 +83,64 @@ class _TestState extends State<Test> {
   }
 
 
+  final _globalKey = GlobalKey();
+  Widget child = SafeArea(child: Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: const [
+    Text(
+      'hello world'
+    )
+  ],));
   @override
   Widget build(BuildContext context) {
-    setState((){
-      verses = verses;
-    });
-
-    verses = verses;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: GestureDetector(
-          onTap: () async {
-            await getData("fear");
-          },
-          child: Container(
-            width: 100,
-            height: 100,
-            color: Colors.green,
-            child: Center(
-              child: Text(
-              translated_verse.length > 0 ? translated_verse.length.toString() : ""
+    final model = ThemeModelInheritedNotifier.of(context);
+    // Widget resChild;
+    Widget child;
+    if (model.oldTheme == null || model.oldTheme == model.theme) {
+      child = _getPage(model.theme);
+    } else {
+      late final Widget firstWidget, animWidget;
+      if (model.isReversed) {
+        firstWidget = _getPage(model.theme);
+        animWidget = RawImage(image: model.image);
+      } else {
+        firstWidget = RawImage(image: model.image);
+        animWidget = _getPage(model.theme);
+      }
+      child = Stack(
+        children: [
+          Container(
+            key: ValueKey('ThemeSwitchingAreaFirstChild'),
+            child: firstWidget,
           ),
-            ),
-
+          AnimatedBuilder(
+            key: ValueKey('ThemeSwitchingAreaSecondChild'),
+            animation: model.controller,
+            child: animWidget,
+            builder: (_, child) {
+              return ClipPath(
+                clipper: ThemeSwitcherClipperBridge(
+                  clipper: model.clipper,
+                  offset: model.switcherOffset,
+                  sizeRate: model.controller.value,
+                ),
+                child: child,
+              );
+            },
           ),
-        ),
-      )
+        ],
+      );
+    }
+
+    return Material(child: child);
+  }
+
+  Widget _getPage(ThemeData brandTheme) {
+    return Theme(
+      key: _globalKey,
+      data: brandTheme,
+      child: child,
     );
   }
 }
