@@ -1,5 +1,6 @@
 import 'package:arabic_numbers/arabic_numbers.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -35,6 +36,48 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
       sujood_verse_indices = [], surah_name_translated = [], surah_name_arabic = [];
 
   ArabicNumbers arabicNumber = ArabicNumbers();
+  var bgColor = Colors.white, color_favorite_and_index = const Color(0xff1d3f5e), color_header = const Color(0xff1d3f5e),
+      color_container_dark = const Color(0xfff4f4ff), color_container_light = Colors.white, color_main_text = Colors.black;
+
+
+  assignmentForLightMode() {
+    bgColor = Colors.white;
+    color_favorite_and_index = const Color(0xff1d3f5e);
+    color_header = const Color(0xff1d3f5e);
+    color_container_dark = const Color(0xfff4f4ff);
+    color_container_light = Colors.white;
+    color_main_text = Colors.black;
+  }
+
+  assignmentForDarkMode() {
+    bgColor = Colors.black;
+    color_favorite_and_index = Colors.white;
+    color_header = Colors.black;
+    color_container_dark = Colors.black;
+    color_container_light = const Color(0xff252525);
+    color_main_text = Colors.white;
+  }
+
+  initializeThemeStarters() async {
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if(sharedPreferences.containsKey('theme mode')) {
+      if(sharedPreferences.getString('theme mode') == "light") {
+        assignmentForLightMode();
+      }
+      if(sharedPreferences.getString('theme mode') == "dark") {
+        assignmentForDarkMode();
+      }
+    }
+  }
+
+
+  @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
 
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
@@ -126,6 +169,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    initializeThemeStarters();
     getData();
   }
 
@@ -143,12 +187,12 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
     }
 
     Future <bool> goToMenu() async{
-      if(widget.from_where == "menu") {
-        return await Navigator.of(context).push(HeroDialogRoute(
-          bgColor: Colors.white.withOpacity(0.0),
-          builder: (context) => const Center(child: Menu()),
-        )) ?? false;
-      }
+      // if(widget.from_where == "menu") {
+      //   return await Navigator.of(context).push(HeroDialogRoute(
+      //     bgColor: Colors.white.withOpacity(0.0),
+      //     builder: (context) => const Center(child: Menu()),
+      //   )) ?? false;
+      // }
       Navigator.pop(context);
       return false;
     }
@@ -177,10 +221,10 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                   height: size.height,
                   width: size.width,
                   color:
-                  verses.isEmpty ? const Color(0xfff4f4ff) :
+                  verses.isEmpty ? bgColor :
                   verses.length.isOdd
-                      ? const Color(0xfff4f4ff)
-                      : const Color(0xfffaf7f7),
+                      ? color_container_dark
+                      : color_container_light,
                   child: Visibility(
                     visible: !loadVisibility,
                     child: ListView.builder(
@@ -192,15 +236,15 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                           return GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(HeroDialogRoute(
-                                bgColor: Colors.white.withOpacity(0.85),
+                                bgColor: bgColor.withOpacity(0.85),
                                 builder: (context) => Center(child: DeleteCard(tag: widget.tag, surah_number: verses[index]['surah_id'].toString(), verse_number: verses[index]['verse_id'].toString(), what_to_delete: "favorites", from_where:  widget.from_where,)),
-                              ));
+                              )).then((value) => fetchVersesData());
                             },
                             child: Container(
                               decoration: BoxDecoration(
                                   color: index.isEven
-                                      ? const Color(0xfff4f4ff)
-                                      : Colors.white),
+                                      ? color_container_dark
+                                      : color_container_light),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
@@ -217,6 +261,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                               'lib/assets/images/surahIndex.png',
                                               height: isPortraitMode() ? size.width * .10 : size.height * .10,
                                               width: isPortraitMode() ? size.width * .10 : size.height * .10,
+                                              color: color_favorite_and_index,
                                             ),
                                           ),
                                           Text.rich(
@@ -224,7 +269,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                             TextSpan(
                                               text: '${index + 1}',
                                               style: TextStyle(
-                                                color: const Color(0xff1d3f5e),
+                                                color: color_favorite_and_index,
                                                 fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
                                                 fontWeight: FontWeight.bold,
                                                 fontFamily: 'varela-round.regular',
@@ -255,16 +300,18 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                             ? '${verses[index]['arabic']}  '
                                                             : '',
                                                         // 'k',
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
+                                                          color: color_main_text,
                                                           wordSpacing: 2,
                                                           fontFamily:
                                                           'Al Majeed Quranic Font_shiped',
                                                           fontSize: 12,
                                                         ),
                                                       ),
-                                                      const TextSpan(
+                                                      TextSpan(
                                                         text: '﴿  ',
                                                         style: TextStyle(
+                                                          color: color_main_text,
                                                           wordSpacing: 3,
                                                           fontWeight: FontWeight.bold,
                                                           fontFamily:
@@ -273,25 +320,27 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                         ),
                                                       ),
                                                       TextSpan(
-                                                        text: "${arabicNumber
+                                                        text: verses.isNotEmpty ? "${arabicNumber
                                                             .convert(verses[index]['verse_id'])}:${arabicNumber
-                                                            .convert(verses[index]['surah_id'])}",
-                                                        style: const TextStyle(
+                                                            .convert(verses[index]['surah_id'])}" : "",
+                                                        style: TextStyle(
+                                                          color: color_main_text,
                                                             wordSpacing: 3,
                                                             fontSize: 07,
                                                             fontWeight: FontWeight.bold
                                                         ),
                                                       ),
-                                                      const TextSpan(
+                                                      TextSpan(
                                                         text: '  ﴾        ',
                                                         style: TextStyle(
+                                                          color: color_main_text,
                                                             wordSpacing: 3,
                                                             fontFamily:
                                                             'Al Majeed Quranic Font_shiped',
                                                             fontSize: 07,
                                                             fontWeight: FontWeight.bold),
                                                       ),
-                                                      isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ? WidgetSpan(
+                                                      verses.isNotEmpty && isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ? WidgetSpan(
                                                           alignment: PlaceholderAlignment.bottom,
                                                           child: Image.asset('lib/assets/images/sujoodIcon.png', width: 12, height: 12,)) : const WidgetSpan(child: SizedBox())
                                                     ])),
@@ -301,12 +350,13 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                     TextSpan(
                                                         children: [
                                                           TextSpan(
-                                                            text: verses[index]['english'] + ' [${verses[index]['surah_id']}:${verses[index]['verse_id']}]',
-                                                            style: const TextStyle(
-                                                                fontFamily: 'varela-round.regular'
+                                                            text: verses.isNotEmpty ? verses[index]['english'] + ' [${verses[index]['surah_id']}:${verses[index]['verse_id']}]' : "",
+                                                            style: TextStyle(
+                                                                fontFamily: 'varela-round.regular',
+                                                              color: color_main_text
                                                             ),
                                                           ),
-                                                          isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ?
+                                                          verses.isNotEmpty && isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ?
                                                           const TextSpan(
                                                               text: '\n\nverse of prostration ***',
                                                               style: TextStyle(
@@ -326,7 +376,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                         padding: const EdgeInsets.only(bottom: 11.0, top: 22),
                                                         child: GestureDetector(
                                                           onTap: () async {
-                                                            print((verses[index]['surah_id']).toString());
+                                                            // print((verses[index]['surah_id']).toString());
                                                             // await fetchSurahSujoodVerses(index + 1);
                                                             Navigator.of(this.context)
                                                                 .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1, should_animate: true,)));

@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 import 'package:quran/pages/menu.dart';
 import 'package:quran/pages/surah_DB_initializer.dart';
 import 'package:quran/pages/surah_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'home.dart';
@@ -19,6 +20,20 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   late Database database;
   late String path;
+  var bgColor = Colors.white;
+
+  initializeThemeStarters() async {
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if(sharedPreferences.containsKey('theme mode')) {
+      if(sharedPreferences.getString('theme mode') == "light") {
+        bgColor = Colors.white;
+      }
+      if(sharedPreferences.getString('theme mode') == "dark") {
+        bgColor = Colors.black;
+      }
+    }
+  }
 
   whereToRedirect() async {
     var databasesPath = await getDatabasesPath();
@@ -40,6 +55,7 @@ class _SplashState extends State<Splash> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    initializeThemeStarters();
     whereToRedirect();
   }
 
@@ -48,15 +64,12 @@ class _SplashState extends State<Splash> {
     var size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgColor,
       body: Center(
-        child: Container(
+        child: Image.asset(
+          'lib/assets/images/quran icon.png',
           width: size.width * .51,
           height: size.width * .51,
-          color: Colors.white,
-          child: Image.asset(
-            'lib/assets/images/quran icon.png',
-          ),
         ),
       ),
     );

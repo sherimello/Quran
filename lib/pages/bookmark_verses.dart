@@ -2,6 +2,7 @@ import 'package:arabic_numbers/arabic_numbers.dart';
 import 'package:flutter/material.dart';
 import 'package:quran/pages/bookmark_folders.dart';
 import 'package:quran/pages/delete_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -35,8 +36,50 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
   List<int> selected_surah_sujood_verses = [];
   late List<Map> sujood_surah_indices = [],
       sujood_verse_indices = [], surah_name_translated = [], surah_name_arabic = [];
+  var bgColor = Colors.white, color_favorite_and_index = const Color(0xff1d3f5e), color_header = const Color(0xff1d3f5e),
+      color_container_dark = const Color(0xfff4f4ff), color_container_light = Colors.white, color_main_text = Colors.black;
+
+
+  assignmentForLightMode() {
+    bgColor = Colors.white;
+    color_favorite_and_index = const Color(0xff1d3f5e);
+    color_header = const Color(0xff1d3f5e);
+    color_container_dark = const Color(0xfff4f4ff);
+    color_container_light = Colors.white;
+    color_main_text = Colors.black;
+  }
+
+  assignmentForDarkMode() {
+    bgColor = Colors.black;
+    color_favorite_and_index = Colors.white;
+    color_header = Colors.black;
+    color_container_dark = Colors.black;
+    color_container_light = const Color(0xff252525);
+    color_main_text = Colors.white;
+  }
+
+  initializeThemeStarters() async {
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if(sharedPreferences.containsKey('theme mode')) {
+      if(sharedPreferences.getString('theme mode') == "light") {
+        assignmentForLightMode();
+      }
+      if(sharedPreferences.getString('theme mode') == "dark") {
+        assignmentForDarkMode();
+      }
+    }
+  }
 
   ArabicNumbers arabicNumber = ArabicNumbers();
+
+
+  @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
 
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
@@ -142,6 +185,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    initializeThemeStarters();
     getData();
   }
 
@@ -149,12 +193,12 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
   Widget build(BuildContext context) {
 
     Future <bool> goToFoldersList() async{
-      if(widget.from_where == "menu") {
-        return await Navigator.of(context).push(HeroDialogRoute(
-          bgColor: Colors.white.withOpacity(0.85),
-          builder: (context) => Center(child: BookmarkFolders(tag: widget.tag, from_where: widget.from_where)),
-        )) ?? false;
-      }
+      // if(widget.from_where == "menu") {
+      //   return await Navigator.of(context).push(HeroDialogRoute(
+      //     bgColor: bgColor.withOpacity(0.85),
+      //     builder: (context) => Center(child: BookmarkFolders(tag: widget.tag, from_where: widget.from_where)),
+      //   )) ?? false;
+      // }
       Navigator.pop(context);
       return false;
     }
@@ -180,15 +224,15 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                 return CustomRectTween(begin: begin!, end: end!);
               },
               child: Material(
-                color: Colors.transparent,
+                color: bgColor,
                 child: Container(
                   height: size.height,
                   width: size.width,
                   color:
-                  verses.isEmpty ? const Color(0xfff4f4ff) :
+                  verses.isEmpty ? bgColor :
                   verses.length.isOdd
-                      ? const Color(0xfff4f4ff)
-                      : const Color(0xfffaf7f7),
+                      ? color_container_dark
+                      : color_container_light,
                   child: Visibility(
                     visible: !loadVisibility,
                     child: ListView.builder(
@@ -198,17 +242,17 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                         itemBuilder: (BuildContext context, int index) {
                           // print('${isPortraitMode() ? size.height / size.width : size.width / size.height}');
                           return GestureDetector(
-                            onTap: (){
-                              Navigator.of(context).push(HeroDialogRoute(
-                                bgColor: Colors.white.withOpacity(0.85),
+                            onTap: () async {
+                              await Navigator.of(context).push(HeroDialogRoute(
+                                bgColor: bgColor.withOpacity(0.85),
                                 builder: (context) => Center(child: DeleteCard(tag: widget.tag, surah_number: verses[index]['surah_id'].toString(), verse_number: verses[index]['verse_id'].toString(), what_to_delete: "bookmarks", from_where: widget.from_where, folder_name: widget.folder_name,)),
-                              ));
+                              )).then((value) => fetchVersesData());
                             },
                             child: Container(
                               decoration: BoxDecoration(
                                   color: index.isEven
-                                      ? const Color(0xfff4f4ff)
-                                      : Colors.white),
+                                      ? color_container_dark
+                                      : color_container_light,),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
@@ -225,6 +269,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                               'lib/assets/images/surahIndex.png',
                                               height: isPortraitMode() ? size.width * .10 : size.height * .10,
                                               width: isPortraitMode() ? size.width * .10 : size.height * .10,
+                                              color: color_favorite_and_index,
                                             ),
                                           ),
                                           Text.rich(
@@ -232,7 +277,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                             TextSpan(
                                               text: '${index + 1}',
                                               style: TextStyle(
-                                                color: const Color(0xff1d3f5e),
+                                                color: color_favorite_and_index,
                                                 fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
                                                 fontWeight: FontWeight.bold,
                                                 fontFamily: 'varela-round.regular',
@@ -263,14 +308,15 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                                             ? '${verses[index]['arabic']}  '
                                                             : '',
                                                         // 'k',
-                                                        style: const TextStyle(
+                                                        style: TextStyle(
                                                           wordSpacing: 2,
                                                           fontFamily:
                                                           'Al Majeed Quranic Font_shiped',
                                                           fontSize: 12,
+                                                          color: color_main_text
                                                         ),
                                                       ),
-                                                      const TextSpan(
+                                                      TextSpan(
                                                         text: '﴿  ',
                                                         style: TextStyle(
                                                           wordSpacing: 3,
@@ -278,28 +324,31 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                                           fontFamily:
                                                           'Al Majeed Quranic Font_shiped',
                                                           fontSize: 07,
+                                                          color: color_main_text
                                                         ),
                                                       ),
                                                       TextSpan(
-                                                        text: "${arabicNumber
+                                                        text: verses.isNotEmpty ? "${arabicNumber
                                                             .convert(verses[index]['verse_id'])}:${arabicNumber
-                                                            .convert(verses[index]['surah_id'])}",
-                                                        style: const TextStyle(
+                                                            .convert(verses[index]['surah_id'])}" : "",
+                                                        style: TextStyle(
                                                             wordSpacing: 3,
                                                             fontSize: 07,
-                                                            fontWeight: FontWeight.bold
+                                                            fontWeight: FontWeight.bold,
+                                                          color: color_main_text
                                                         ),
                                                       ),
-                                                      const TextSpan(
+                                                      TextSpan(
                                                         text: '  ﴾        ',
                                                         style: TextStyle(
                                                             wordSpacing: 3,
                                                             fontFamily:
                                                             'Al Majeed Quranic Font_shiped',
                                                             fontSize: 07,
-                                                            fontWeight: FontWeight.bold),
+                                                            fontWeight: FontWeight.bold,
+                                                        color: color_main_text),
                                                       ),
-                                                      isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ? WidgetSpan(
+                                                      verses.isNotEmpty && isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ? WidgetSpan(
                                                           alignment: PlaceholderAlignment.bottom,
                                                           child: Image.asset('lib/assets/images/sujoodIcon.png', width: 12, height: 12,)) : const WidgetSpan(child: SizedBox())
                                                     ])),
@@ -309,12 +358,13 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                                     TextSpan(
                                                         children: [
                                                           TextSpan(
-                                                            text: verses[index]['english'] + ' [${verses[index]['surah_id']}:${verses[index]['verse_id']}]',
-                                                            style: const TextStyle(
-                                                                fontFamily: 'varela-round.regular'
+                                                            text: verses.isNotEmpty ? verses[index]['english'] + ' [${verses[index]['surah_id']}:${verses[index]['verse_id']}]' : "",
+                                                            style: TextStyle(
+                                                                fontFamily: 'varela-round.regular',
+                                                              color: color_main_text
                                                             ),
                                                           ),
-                                                          isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ?
+                                                          verses.isNotEmpty && isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ?
                                                           const TextSpan(
                                                               text: '\n\nverse of prostration ***',
                                                               style: TextStyle(
@@ -334,7 +384,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                                         padding: const EdgeInsets.only(bottom: 11.0, top: 22),
                                                         child: GestureDetector(
                                                           onTap: () async {
-                                                            print((verses[index]['surah_id']).toString());
+                                                            // print((verses[index]['surah_id']).toString());
                                                             await fetchSurahSujoodVerses(index + 1);
                                                             Navigator.of(this.context)
                                                                 .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1, should_animate: true,)));
@@ -410,7 +460,7 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
             Visibility(
                 visible: value_nothing_found,
                 child: Image.asset('lib/assets/images/nothing_found.gif',
-                    color: Color(0x751d3f5e),
+                    color: const Color(0xff1d3f5e),
                     width: size.width * .67, height: size.width * .67)
             ),
           ),

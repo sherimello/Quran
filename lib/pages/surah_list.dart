@@ -230,6 +230,14 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
     fetchSurahName();
   }
 
+  void changeStatusBarColor(int colorCode) {
+    setState(() {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          statusBarColor: Color(colorCode)
+      ));
+    });
+  }
+
   assignmentForLightMode() {
     darktheme = 0;
     color1 = Colors.black;
@@ -259,9 +267,11 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if(sharedPreferences.containsKey('theme mode')) {
       if(sharedPreferences.getString('theme mode') == "light") {
+        changeStatusBarColor(0xff1d3f5e);
         assignmentForLightMode();
       }
       if(sharedPreferences.getString('theme mode') == "dark") {
+        changeStatusBarColor(0xff000000);
         assignmentForDarkMode();
       }
     }
@@ -617,7 +627,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                           child: GestureDetector(
                               onTap: () {
                                 Navigator.of(context).push(HeroDialogRoute(
-                                  bgColor: Colors.white.withOpacity(0.85),
+                                  bgColor: bgColor.withOpacity(0.85),
                                   builder: (context) => const Options(tag: "options"),
                                 ));
                               },
@@ -646,8 +656,8 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                       child: ListView.builder(
                           physics: const BouncingScrollPhysics(),
                           // padding: EdgeInsets.all(11),
-                          itemCount: 114,
-                          cacheExtent: 114,
+                          itemCount: surah_name_translated.isNotEmpty ? 114 : 0,
+                          cacheExtent: surah_name_translated.isNotEmpty ? 114 : 0,
                           itemBuilder: (BuildContext bcontext, int index) {
                             // sujood_surah_indices.clear();
 
@@ -810,7 +820,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                                                                   ),
                                                                 ),
                                                                 TextSpan(
-                                                                  text: "    ${surah_name_translated[
+                                                                  text: surah_name_translated.isNotEmpty ? "    ${surah_name_translated[
                                                                   index]
                                                                   ['translation']
                                                                       .toString()
@@ -822,7 +832,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                                                                       'translation']
                                                                           .toString()
                                                                           .indexOf(
-                                                                          ':'))}",
+                                                                          ':'))}" : "",
                                                                   style: TextStyle(
                                                                       color: animation2.value,
                                                                       fontSize: 15,

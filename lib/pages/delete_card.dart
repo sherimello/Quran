@@ -82,39 +82,34 @@ class _DeleteCardState extends State<DeleteCard> {
             onTap: () async {
               await startDeletion().whenComplete((){
 
-                // Navigator.pop(context);
+                Navigator.pop(context);
 
-                if(widget.what_to_delete == "folder") {
-                  widget.from_where == "menu" ?
-                  Navigator.of(context).push(HeroDialogRoute(
-                    bgColor: Colors.white.withOpacity(0.85),
-                    builder: (context) => const Menu(),
-                  )) :
-                  Navigator.of(context).push(HeroDialogRoute(
-                    bgColor: Colors.white.withOpacity(0.85),
-                    builder: (context) => const SurahList(),
-                  ));
-                }
-                else {
-                  widget.what_to_delete == "bookmarks" ?
-                  widget.from_where == "menu" ?
-                  Navigator.of(context).push(HeroDialogRoute(
-                    bgColor: Colors.white.withOpacity(0.85),
-                    builder: (context) => Center(child: BookmarkFolders(tag: widget.tag, from_where: widget.from_where,)),
-                  )):
-                  Navigator.of(context).push(HeroDialogRoute(
-                    bgColor: Colors.white.withOpacity(0.85),
-                    builder: (context) => const SurahList(),
-                  ))
-                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                  //   BookmarkFolders(tag: widget.tag,)))
-                      : widget.from_where == "menu" ?
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                      FavoriteVerses(tag: widget.tag, from_where: widget.from_where,)))
-                      :
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                  const SurahList()));
-                }
+                // if(widget.what_to_delete == "folder") {
+                //   widget.from_where == "menu" ?
+                //   Navigator.of(context).push(HeroDialogRoute(
+                //     bgColor: Colors.white.withOpacity(0.85),
+                //     builder: (context) => const Menu(),
+                //   )) :
+                //   Navigator.of(context).push(HeroDialogRoute(
+                //     bgColor: Colors.white.withOpacity(0.85),
+                //     builder: (context) => const SurahList(),
+                //   ));
+                // }
+                // else {
+                //   widget.what_to_delete == "bookmarks" ?
+                //   widget.from_where == "menu" ?
+                //   Navigator.of(context).pop():
+                //   Navigator.of(context).push(HeroDialogRoute(
+                //     bgColor: Colors.white.withOpacity(0.85),
+                //     builder: (context) => const SurahList(),
+                //   ))
+                //       : widget.from_where == "menu" ?
+                //   Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                //       FavoriteVerses(tag: widget.tag, from_where: widget.from_where,)))
+                //       :
+                //   Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                //   const SurahList()));
+                // }
               });
             },
             child: Container(
@@ -122,6 +117,7 @@ class _DeleteCardState extends State<DeleteCard> {
               height: size.width * .21,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(17),
+                border: Border.all(color: Colors.white, width: 1.5),
                 color: const Color(0xff1d3f5e),
               ),
               child: Center(

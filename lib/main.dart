@@ -10,12 +10,20 @@ import 'package:quran/pages/surah_page.dart';
 import 'package:quran/pages/test.dart';
 import 'package:quran/pages/verse_image_preset.dart';
 import 'package:quran/pages/verses_search.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Color(0xff1d3f5e)
-  ));
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  if(sharedPreferences.containsKey('theme mode')) {
+    sharedPreferences.getString("theme mode") == "light" ?
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        statusBarColor: Color(0xff1d3f5e)
+    )) : SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+        statusBarColor: Color(0xff000000)
+    ));
+  }
+
   runApp(const MyApp());
 }
 
@@ -34,7 +42,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Qur\'an',
           theme: theme,
-          home: const SurahList(),
+          home: const Splash(),
           builder: (context, child) {
             return MediaQuery(data:
             MediaQuery.of(context).copyWith(textScaleFactor: 1.0), child: child!);

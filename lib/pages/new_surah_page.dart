@@ -1,7 +1,9 @@
 import 'package:arabic_numbers/arabic_numbers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quran/pages/verse_options_card.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_ripple_animation/simple_ripple_animation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -79,8 +81,57 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
         112,
         113
       ];
+  var bgColor = Colors.white, color_favorite_and_index = const Color(0xff1d3f5e), color_header = const Color(0xff1d3f5e),
+      color_container_dark = const Color(0xfff4f4ff), color_container_light = Colors.white, color_main_text = Colors.black;
+
+  late Database database;
+  late String path;
+  List<Map> sujood_surah_indices = [],
+      sujood_verse_indices = [], surah_name_arabic = [], surah_name_translated = [], favorite_verses = [];
+
+
+  assignmentForLightMode() {
+    bgColor = Colors.white;
+    color_favorite_and_index = const Color(0xff1d3f5e);
+    color_header = const Color(0xff1d3f5e);
+    color_container_dark = const Color(0xfff4f4ff);
+    color_container_light = Colors.white;
+    color_main_text = Colors.black;
+  }
+
+  assignmentForDarkMode() {
+    bgColor = Colors.black;
+    color_favorite_and_index = Colors.white;
+    color_header = Colors.black;
+    color_container_dark = Colors.black;
+    color_container_light = const Color(0xff252525);
+    color_main_text = Colors.white;
+  }
+
+  initializeThemeStarters() async {
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if(sharedPreferences.containsKey('theme mode')) {
+      if(sharedPreferences.getString('theme mode') == "light") {
+        changeStatusBarColor(0xff1d3f5e);
+        assignmentForLightMode();
+      }
+      if(sharedPreferences.getString('theme mode') == "dark") {
+        changeStatusBarColor(0xff000000);
+        assignmentForDarkMode();
+      }
+    }
+  }
+
+  void changeStatusBarColor(int colorCode) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Color(colorCode)
+    ));
+  }
+
   @override
   void initState() {
+    initializeThemeStarters();
     // TODO: implement initState
     super.initState();
 
@@ -124,11 +175,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
 
     });
   }
-
-  late Database database;
-  late String path;
-  List<Map> sujood_surah_indices = [],
-      sujood_verse_indices = [], surah_name_arabic = [], surah_name_translated = [], favorite_verses = [];
 
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
@@ -193,7 +239,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     return Scaffold(
         backgroundColor: const Color(0xff1d3f5e),
         appBar: AppBar(
-          backgroundColor: const Color(0xff1d3f5e),
+          backgroundColor: color_header,
           automaticallyImplyLeading: false,
           titleSpacing: 0,
           elevation: 0,
@@ -256,7 +302,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
             children: [
               Container(
                 width: size.width,
-                color: const Color(0xfff4f4ff),
+                color: color_container_dark,
                 height: AppBar().preferredSize.height,
                 padding: const EdgeInsets.all(0),
                 child: Column(
@@ -269,7 +315,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                         // textScaleFactor: ,
                         style: TextStyle(
                             inherit: false,
-                            color: Colors.black,
+                            color: color_main_text,
                             fontFamily: '110_Besmellah',
                             fontStyle: FontStyle.normal,
                             fontSize: 30,
@@ -284,8 +330,8 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                 padding: widget.surah_id == '1' || widget.surah_id == '9'? const EdgeInsets.all(0) : EdgeInsets.only(top: AppBar().preferredSize.height),
                 child: Container(
                   color: widget.verses.length.isOdd
-                      ? const Color(0xfff4f4ff)
-                      : const Color(0xfffaf7f7),
+                      ? color_container_dark
+                      : color_container_light,
                   child: ListView.builder(
                       controller: autoScrollController,
                       scrollDirection: Axis.vertical,
@@ -306,7 +352,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                             child: GestureDetector(
                               onTap: () async {
                                 await Navigator.of(context).push(HeroDialogRoute(
-                                  bgColor: Colors.white.withOpacity(.75),
+                                  bgColor: bgColor.withOpacity(.75),
                                   builder: (context) => Center(
                                     child: VerseOptionsCard(tag: index.toString(), verse_english: widget.translated_verse[index]['text'] + "", verse_arabic: widget.verses[index]['text'], surah_name: widget.surah_name, surah_number: widget.surah_id, verse_number: (index + 1).toString(),),
                                   ),
@@ -326,8 +372,8 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                     Container(
                                       decoration: BoxDecoration(
                                           color: index.isEven
-                                              ? const Color(0xfff4f4ff)
-                                              : Colors.white),
+                                              ? color_container_dark
+                                              : color_container_light),
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Row(
@@ -346,6 +392,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                           'lib/assets/images/surahIndex.png',
                                                           height: isPortraitMode() ? size.width * .10 : size.height * .10,
                                                           width: isPortraitMode() ? size.width * .10 : size.height * .10,
+                                                          color: color_favorite_and_index,
                                                         ),
                                                       ),
                                                       Text.rich(
@@ -353,7 +400,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                         TextSpan(
                                                           text: '${index + 1}',
                                                           style: TextStyle(
-                                                            color: const Color(0xff1d3f5e),
+                                                            color: color_favorite_and_index,
                                                             fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
                                                             fontWeight: FontWeight.bold,
                                                             fontFamily: 'varela-round.regular',
@@ -363,7 +410,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                     ],
                                                   ),
                                                   if(isVerseFavorite(index + 1))
-                                                    const Icon(Icons.stars, color: Color(0xff1d3f5e),)
+                                                    Icon(Icons.stars, color: color_favorite_and_index,)
                                                 ],
                                               ),
                                             ),
@@ -391,14 +438,15 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                         ? '${widget.verses[index]['text']}  '
                                                                         : '',
                                                                     // 'k',
-                                                                    style: const TextStyle(
+                                                                    style: TextStyle(
                                                                       wordSpacing: 2,
                                                                       fontFamily:
                                                                       'Al Majeed Quranic Font_shiped',
                                                                       fontSize: 12,
+                                                                      color: color_main_text,
                                                                     ),
                                                                   ),
-                                                                  const TextSpan(
+                                                                  TextSpan(
                                                                     text: '﴿  ',
                                                                     style: TextStyle(
                                                                       wordSpacing: 3,
@@ -406,6 +454,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                       fontFamily:
                                                                       'Al Majeed Quranic Font_shiped',
                                                                       fontSize: 07,
+                                                                      color: color_main_text,
                                                                     ),
                                                                   ),
                                                                   TextSpan(
@@ -417,13 +466,14 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                         fontWeight: FontWeight.bold
                                                                     ),
                                                                   ),
-                                                                  const TextSpan(
+                                                                  TextSpan(
                                                                     text: '  ﴾        ',
                                                                     style: TextStyle(
                                                                         wordSpacing: 3,
                                                                         fontFamily:
                                                                         'Al Majeed Quranic Font_shiped',
                                                                         fontSize: 07,
+                                                                        color: color_main_text,
                                                                         fontWeight: FontWeight.bold),
                                                                   ),
                                                                   widget.sujoodVerses.contains(index + 1) ? WidgetSpan(
@@ -437,8 +487,9 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                     children: [
                                                                       TextSpan(
                                                                         text: widget.translated_verse[index]['text'] + ' [${widget.surah_id}:${index + 1}]',
-                                                                        style: const TextStyle(
-                                                                            fontFamily: 'varela-round.regular'
+                                                                        style: TextStyle(
+                                                                            fontFamily: 'varela-round.regular',
+                                                                          color: color_main_text,
                                                                         ),
                                                                       ),
                                                                       widget.sujoodVerses.contains(index + 1) ?
@@ -467,7 +518,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                     ),
                                     if (scrolled_to_destination && widget.should_animate && index == widget.scroll_to) Center(
                                       child: RippleAnimation(
-                                          color: const Color(0xff1d3f5e),
+                                          color: color_favorite_and_index,
                                           repeat: false,
                                           ripplesCount: 11,
                                           minRadius: size.width * .5,

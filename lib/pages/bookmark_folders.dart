@@ -22,7 +22,7 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
 
   late Database database1;
   late String path;
-  late List<Map> bookmarkFolders;
+  late List<Map> bookmarkFolders = [];
   int bookmarkFolderSize = 0;
 
   Future<void> initiateDB() async {
@@ -42,11 +42,11 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
     await initiateDB().whenComplete(() async {
       bookmarkFolders = await database1.rawQuery(
           'SELECT folder_name FROM bookmark_folders');
-      setState(() {
-        bookmarkFolders = bookmarkFolders;
-        bookmarkFolderSize = bookmarkFolders.length;
-      });
-    });
+    }).whenComplete(() =>
+        setState(() {
+          bookmarkFolders = bookmarkFolders;
+          bookmarkFolderSize = bookmarkFolders.length;
+        }));
   }
 
   @override
@@ -86,15 +86,15 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
                 createRectTween: (begin, end) {
                   return CustomRectTween(begin: begin!, end: end!);
                 },
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    width: size.width - 38,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(31),
-                        color: const Color(0xff1d3f5e)
-                    ),
-                    child: SingleChildScrollView(
+                child: Container(
+                  width: size.width - 38,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(31),
+                      color: const Color(0xff1d3f5e)
+                  ),
+                  child: SingleChildScrollView(
+                    child: Material(
+                      color: Colors.transparent,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         mainAxisSize: MainAxisSize.min,
@@ -142,21 +142,28 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
                           const SizedBox(
                             height: 11,
                           ),
-                          Column(
-                            children: [
-
-                              for(int i = 0; i<bookmarkFolderSize; i++)
-                                Padding(
+                          ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: bookmarkFolders.isNotEmpty ? bookmarkFolderSize : 0,
+                              shrinkWrap: true,
+                              itemBuilder: (BuildContext context, int index){
+                                return Padding(
                                   padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
                                   child: GestureDetector(
-                                    onLongPress: () {
-                                      Navigator.of(context).push(HeroDialogRoute(builder: (context) =>
-                                      DeleteCard(tag: widget.tag, what_to_delete: "folder", from_where: widget.from_where, folder_name: bookmarkFolders[i]["folder_name"],)));
+                                    onLongPress: () async {
+                                      await Navigator.of(context).push(HeroDialogRoute(builder: (context) =>
+                                          DeleteCard(tag: widget.tag, what_to_delete: "folder", from_where: widget.from_where, folder_name: bookmarkFolders[index]["folder_name"],)));
+
+                                      fetchBookmarkFolders();
+                                      setState(() {
+                                        bookmarkFolderSize-=1;
+                                      });
                                     },
                                     onTap: () async{
                                       Navigator.of(context).push(HeroDialogRoute(
                                         builder: (context) => Center(
-                                          child: BookmarkVerses(tag: widget.tag, folder_name: bookmarkFolders[i]['folder_name'], from_where: widget.from_where),
+                                          child: BookmarkVerses(tag: widget.tag, folder_name: bookmarkFolders[index]['folder_name'], from_where: widget.from_where),
                                         ),
                                       ));
                                       // await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
@@ -181,15 +188,17 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
                                                   const WidgetSpan(
                                                       alignment: PlaceholderAlignment.middle,
                                                       child: Icon(
-                                                          Icons.bookmark
+                                                        Icons.bookmark,
+                                                        color: Colors.black,
                                                       )),
                                                   TextSpan(
-                                                      text: '  ${bookmarkFolders[i]['folder_name']} ',
+                                                      text: bookmarkFolders.isNotEmpty ? '  ${bookmarkFolders[index]['folder_name']} ' : "",
 
                                                       style: const TextStyle(
                                                           fontFamily: 'varela-round.regular',
                                                           fontWeight: FontWeight.bold,
-                                                          fontSize: 17
+                                                          fontSize: 17,
+                                                          color: Colors.black
                                                       )
                                                   ),
                                                 ]
@@ -198,9 +207,71 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
                                       ),
                                     ),
                                   ),
-                                ),
-                            ],
-                          ),
+                                );
+                              }),
+                          // Column(
+                          //   children: [
+                          //
+                          //     for(int i = 0; i<bookmarkFolderSize; i++)
+                          //       Padding(
+                          //         padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
+                          //         child: GestureDetector(
+                          //           onLongPress: () async {
+                          //             await Navigator.of(context).push(HeroDialogRoute(builder: (context) =>
+                          //             DeleteCard(tag: widget.tag, what_to_delete: "folder", from_where: widget.from_where, folder_name: bookmarkFolders[i]["folder_name"],))).then((value) => ((){
+                          //               fetchBookmarkFolders();
+                          //             }));
+                          //           },
+                          //           onTap: () async{
+                          //             Navigator.of(context).push(HeroDialogRoute(
+                          //               builder: (context) => Center(
+                          //                 child: BookmarkVerses(tag: widget.tag, folder_name: bookmarkFolders[i]['folder_name'], from_where: widget.from_where),
+                          //               ),
+                          //             ));
+                          //             // await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
+                          //             //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          //             //     content: Text('folder already exists'),
+                          //             //   ));
+                          //             //   Navigator.pop(context);
+                          //             // });
+                          //
+                          //           },
+                          //           child: Container(
+                          //             width: size.width,
+                          //             decoration: BoxDecoration(
+                          //                 color: const Color(0xffffffff).withOpacity(1),
+                          //                 borderRadius: BorderRadius.circular(11)
+                          //             ),
+                          //             child: Padding(
+                          //               padding: const EdgeInsets.all(11.0),
+                          //               child: Text.rich(
+                          //                   TextSpan(
+                          //                       children: [
+                          //                         const WidgetSpan(
+                          //                             alignment: PlaceholderAlignment.middle,
+                          //                             child: Icon(
+                          //                                 Icons.bookmark,
+                          //                               color: Colors.black,
+                          //                             )),
+                          //                         TextSpan(
+                          //                             text: '  ${bookmarkFolders[i]['folder_name']} ',
+                          //
+                          //                             style: const TextStyle(
+                          //                                 fontFamily: 'varela-round.regular',
+                          //                                 fontWeight: FontWeight.bold,
+                          //                                 fontSize: 17,
+                          //                               color: Colors.black
+                          //                             )
+                          //                         ),
+                          //                       ]
+                          //                   )
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ),
+                          //   ],
+                          // ),
                           const SizedBox(
                             height: 21,
                           ),

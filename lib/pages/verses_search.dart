@@ -3,39 +3,27 @@ import 'package:flutter/material.dart';
 
 import 'package:dictionaryx/dictionary_reduced_sa.dart';
 import 'package:quran/pages/new_surah_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 class VersesSearch extends StatefulWidget {
-  const VersesSearch({Key? key}) : super(key: key);
+
+  final String theme;
+
+  const VersesSearch({Key? key, required this.theme}) : super(key: key);
 
   @override
   State<VersesSearch> createState() => _VersesSearchState();
 }
 
-extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
-  }
-}
 
 class _VersesSearchState extends State<VersesSearch> {
 
   late AutoScrollController autoScrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    autoScrollController = AutoScrollController(
-        axis: Axis.vertical);
-    // scrollController.createScrollPosition(const BouncingScrollPhysics(), context, ScrollPosition())
-    // initiateDB().whenComplete(() => fetchVersesData("fear"));
-  }
-
-  Future _scrollToIndex() async {
-    await autoScrollController.scrollToIndex(6, preferPosition: AutoScrollPosition.begin);
-  }
+  var bgColor = Colors.white, color_favorite_and_index = const Color(0xff1d3f5e), color_header = const Color(0xff1d3f5e),
+      color_container_dark = const Color(0xfff4f4ff), color_container_light = Colors.white, color_main_text = Colors.black;
 
   late Database database;
   late String path, loadAsset = 'lib/assets/images/search.png', messageUpdate = "\nsearch whatever bothers\nor concerns you";
@@ -52,6 +40,54 @@ class _VersesSearchState extends State<VersesSearch> {
       sujood_verse_indices = [], surah_name_translated = [], surah_name_arabic = [];
 
   ArabicNumbers arabicNumber = ArabicNumbers();
+
+
+  assignmentForLightMode() {
+    bgColor = Colors.white;
+    color_favorite_and_index = const Color(0xff1d3f5e);
+    color_header = const Color(0xff1d3f5e);
+    color_container_dark = const Color(0xfff4f4ff);
+    color_container_light = Colors.white;
+    color_main_text = Colors.black;
+  }
+
+  assignmentForDarkMode() {
+    bgColor = Colors.black;
+    color_favorite_and_index = Colors.white;
+    color_header = Colors.black;
+    color_container_dark = Colors.black;
+    color_container_light = const Color(0xff252525);
+    color_main_text = Colors.white;
+  }
+
+  initializeThemeStarters() async {
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if(sharedPreferences.containsKey('theme mode')) {
+      if(sharedPreferences.getString('theme mode') == "light") {
+        assignmentForLightMode();
+      }
+      if(sharedPreferences.getString('theme mode') == "dark") {
+        assignmentForDarkMode();
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    if(widget.theme == "light") {
+      assignmentForLightMode();
+    }
+    else {
+      assignmentForDarkMode();
+    }
+    // initializeThemeStarters();
+    super.initState();
+    autoScrollController = AutoScrollController(
+        axis: Axis.vertical);
+    // scrollController.createScrollPosition(const BouncingScrollPhysics(), context, ScrollPosition())
+    // initiateDB().whenComplete(() => fetchVersesData("fear"));
+  }
 
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
@@ -205,7 +241,7 @@ class _VersesSearchState extends State<VersesSearch> {
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: const Color(0xfff4f4ff),
+          backgroundColor: bgColor,
           appBar: AppBar(
             toolbarHeight: AppBar().preferredSize.height * 1.5,
             automaticallyImplyLeading: false,
@@ -271,10 +307,10 @@ class _VersesSearchState extends State<VersesSearch> {
           body: SafeArea(
             child: Container(
               color:
-              verses.isEmpty ? const Color(0xfff4f4ff) :
+              verses.isEmpty ? bgColor :
               verses.length.isOdd
-                  ? const Color(0xfff4f4ff)
-                  : const Color(0xfffaf7f7),
+                  ? color_container_dark
+                  : color_container_light,
               child: Visibility(
                 visible: !loadVisibility,
                 child: ListView.builder(
@@ -302,8 +338,8 @@ class _VersesSearchState extends State<VersesSearch> {
                       return Container(
                         decoration: BoxDecoration(
                             color: index.isEven
-                                ? const Color(0xfff4f4ff)
-                                : Colors.white),
+                                ? color_container_dark
+                                : color_container_light),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -320,6 +356,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                         'lib/assets/images/surahIndex.png',
                                         height: isPortraitMode() ? size.width * .10 : size.height * .10,
                                         width: isPortraitMode() ? size.width * .10 : size.height * .10,
+                                        color: color_favorite_and_index,
                                       ),
                                     ),
                                     Text.rich(
@@ -327,7 +364,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                       TextSpan(
                                         text: '${index + 1}',
                                         style: TextStyle(
-                                          color: const Color(0xff1d3f5e),
+                                          color: color_favorite_and_index,
                                           fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'varela-round.regular',
@@ -358,14 +395,15 @@ class _VersesSearchState extends State<VersesSearch> {
                                                       ? '${verses[index]['text']}  '
                                                       : '',
                                                   // 'k',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     wordSpacing: 2,
                                                     fontFamily:
                                                     'Al Majeed Quranic Font_shiped',
                                                     fontSize: 12,
+                                                    color: color_main_text,
                                                   ),
                                                 ),
-                                                const TextSpan(
+                                                TextSpan(
                                                   text: '﴿  ',
                                                   style: TextStyle(
                                                     wordSpacing: 3,
@@ -373,26 +411,29 @@ class _VersesSearchState extends State<VersesSearch> {
                                                     fontFamily:
                                                     'Al Majeed Quranic Font_shiped',
                                                     fontSize: 07,
+                                                    color: color_main_text,
                                                   ),
                                                 ),
                                                 TextSpan(
                                                   text: "${arabicNumber
                                                       .convert(translated_verse[index]['verse_id'])}:${arabicNumber
                                                       .convert(translated_verse[index]['surah_id'])}",
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                       wordSpacing: 3,
                                                       fontSize: 07,
-                                                      fontWeight: FontWeight.bold
+                                                      fontWeight: FontWeight.bold,
+                                                    color: color_main_text,
                                                   ),
                                                 ),
-                                                const TextSpan(
+                                                TextSpan(
                                                   text: '  ﴾        ',
                                                   style: TextStyle(
                                                       wordSpacing: 3,
                                                       fontFamily:
                                                       'Al Majeed Quranic Font_shiped',
                                                       fontSize: 07,
-                                                      fontWeight: FontWeight.bold),
+                                                      fontWeight: FontWeight.bold,
+                                                    color: color_main_text,),
                                                 ),
                                                 isSujoodVerse(translated_verse[index]['surah_id'], translated_verse[index]['verse_id']) ? WidgetSpan(
                                                     alignment: PlaceholderAlignment.bottom,
@@ -405,8 +446,9 @@ class _VersesSearchState extends State<VersesSearch> {
                                                   children: [
                                                     TextSpan(
                                                       text: string1,
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                           fontFamily: 'varela-round.regular',
+                                                        color: color_main_text,
                                                       ),
                                                     ),
                                                     TextSpan(
@@ -421,16 +463,17 @@ class _VersesSearchState extends State<VersesSearch> {
                                                     ),
                                                     TextSpan(
                                                       text: string3,
-                                                      style: const TextStyle(
-                                                          fontFamily: 'varela-round.regular'
+                                                      style: TextStyle(
+                                                          fontFamily: 'varela-round.regular',
+                                                        color: color_main_text,
                                                       ),
                                                     ),
                                                     TextSpan(
                                                       text: ' [${translated_verse[index]['surah_id']}:${translated_verse[index]['verse_id']}]',
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                           fontFamily: 'Rounded_Elegance',
                                                         fontWeight: FontWeight.bold,
-                                                        color: Color(0xff1d3f5e)
+                                                        color: color_favorite_and_index
                                                       ),
                                                     ),
                                                     isSujoodVerse(translated_verse[index]['surah_id'], translated_verse[index]['verse_id']) ?
@@ -527,7 +570,7 @@ class _VersesSearchState extends State<VersesSearch> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Opacity(
-                  opacity: 0.51,
+                  opacity: 1,
                   child: Image.asset(loadAsset, width: size.width * .41, height: size.width * .31, fit: BoxFit.contain, color: const Color(0xff1d3f5e),)),
                AnimatedDefaultTextStyle(
                    textAlign: TextAlign.center,
@@ -536,7 +579,7 @@ class _VersesSearchState extends State<VersesSearch> {
                 fontWeight: FontWeight.bold,
                 // fontStyle: FontStyle.italic,
                 fontFamily: 'varela-round.regular',
-                color: const Color(0xff1d3f5e).withOpacity(.51)
+                color: const Color(0xff1d3f5e).withOpacity(1)
               ), duration: const Duration(milliseconds: 350), child: Text(
                 messageUpdate
               ))
