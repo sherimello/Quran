@@ -12,8 +12,9 @@ import '../hero_transition_handler/hero_dialog_route.dart';
 class VerseOptionsCard extends StatefulWidget {
 
   final String tag, verse_english, verse_arabic, surah_name, verse_number, surah_number;
+  final Color theme;
 
-  const VerseOptionsCard({Key? key, required this.tag, required this.verse_english, required this.verse_arabic, required this.surah_name, required this.verse_number, required this.surah_number}) : super(key: key);
+  const VerseOptionsCard({Key? key, required this.tag, required this.verse_english, required this.verse_arabic, required this.surah_name, required this.verse_number, required this.surah_number, required this.theme}) : super(key: key);
 
   @override
   State<VerseOptionsCard> createState() => _VerseOptionsCardState();
@@ -199,8 +200,9 @@ class _VerseOptionsCardState extends State<VerseOptionsCard> {
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(HeroDialogRoute(
+                            // bgColor: Colors.transparent,
                             builder: (context) => Center(
-                              child: Bookmarks(tag: widget.tag, verse_arabic: widget.verse_arabic, verse_english: widget.verse_english, verse_id: widget.verse_number, surah_id: widget.surah_number,),
+                              child: Bookmarks(tag: widget.tag, verse_arabic: widget.verse_arabic, verse_english: widget.verse_english, verse_id: widget.verse_number, surah_id: widget.surah_number, theme : widget.theme),
                             ),
                           ));
                         },

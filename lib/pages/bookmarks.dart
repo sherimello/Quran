@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -7,8 +8,9 @@ import '../hero_transition_handler/custom_rect_tween.dart';
 class Bookmarks extends StatefulWidget {
 
   final String tag, verse_arabic, verse_english, surah_id, verse_id;
+  final Color theme;
 
-  const Bookmarks({Key? key, required this.tag, required this.verse_arabic, required this.verse_english, required this.surah_id, required this.verse_id}) : super(key: key);
+  const Bookmarks({Key? key, required this.tag, required this.verse_arabic, required this.verse_english, required this.surah_id, required this.verse_id, required this.theme}) : super(key: key);
 
   @override
   State<Bookmarks> createState() => _BookmarksState();
@@ -21,6 +23,30 @@ class _BookmarksState extends State<Bookmarks> {
   late List<Map> bookmarkFolders;
   int bookmarkFolderSize = 0;
   double snack_text_size = 0, snack_text_padding = 0;
+  var bgColor = Colors.white, color_favorite_and_index = const Color(0xff1d3f5e), color_main_text = Colors.black;
+
+
+  assignmentForLightMode() {
+    bgColor = Colors.white;
+    color_favorite_and_index = const Color(0xff1d3f5e);
+    color_main_text = Colors.black;
+  }
+
+  assignmentForDarkMode() {
+    bgColor = Colors.black;
+    color_favorite_and_index = Colors.white;
+    color_main_text = Colors.white;
+  }
+
+  initializeThemeStarters() async {
+
+    if(widget.theme == Colors.white) {
+      assignmentForLightMode();
+    }
+    else {
+      assignmentForDarkMode();
+    }
+  }
 
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
@@ -65,6 +91,7 @@ class _BookmarksState extends State<Bookmarks> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    initializeThemeStarters();
     fetchBookmarkFolders();
   }
   final TextEditingController folderController = TextEditingController();
@@ -115,7 +142,8 @@ class _BookmarksState extends State<Bookmarks> {
                 width: size.width - 38,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(31),
-                    color: Colors.white
+                    color: bgColor,
+                    border: Border.all(color: bgColor == Colors.black ? Colors.blueGrey : Colors.transparent, width: 1.5)
                     // color: const Color(0xff1d3f5e)
                 ),
                 child: Padding(
@@ -133,10 +161,11 @@ class _BookmarksState extends State<Bookmarks> {
                               alignment: Alignment.topLeft,
                               child: Padding(
                                 padding: EdgeInsets.only(left: size.width * .087),
-                                child: const Text('create a folder:',
+                                child: Text('create a folder:',
                                 style: TextStyle(
                                   fontFamily: 'varela-round.regular',
-                                  fontWeight: FontWeight.bold
+                                  fontWeight: FontWeight.bold,
+                                  color: color_main_text
                                 ),
                                 ),
                               )),
@@ -150,7 +179,8 @@ class _BookmarksState extends State<Bookmarks> {
                                   // width: size.width * .65,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(1000),
-                                      color: const Color(0xff1d3f5e)
+                                      color: const Color(0xff1d3f5e),
+                                      border: Border.all(color: bgColor == Colors.black ? Colors.blueGrey : Colors.transparent, width: 1.5)
                                   ),
                                   child: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 19.0),
@@ -221,7 +251,7 @@ class _BookmarksState extends State<Bookmarks> {
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: size.width * .087),
-                            child: const Text.rich(
+                            child: Text.rich(
                               TextSpan(
                                 children: [
                                   TextSpan(
@@ -229,7 +259,7 @@ class _BookmarksState extends State<Bookmarks> {
                                     style: TextStyle(
                                         fontSize: 13,
                                         fontFamily: 'varela-round.regular',
-                                        color: Color(0xff1d3f5e),
+                                        color: color_favorite_and_index,
                                         fontStyle: FontStyle.italic
                                     ),
                                   ),
@@ -238,7 +268,7 @@ class _BookmarksState extends State<Bookmarks> {
                                     style: TextStyle(
                                         fontSize: 13,
                                         fontFamily: 'varela-round.regular',
-                                        color: Color(0xff000000),
+                                        color: color_main_text,
                                         fontStyle: FontStyle.italic,
                                       fontWeight: FontWeight.bold
                                     ),
@@ -248,7 +278,7 @@ class _BookmarksState extends State<Bookmarks> {
                                     style: TextStyle(
                                         fontSize: 13,
                                         fontFamily: 'varela-round.regular',
-                                        color: Color(0xff1d3f5e),
+                                        color: color_favorite_and_index,
                                         fontStyle: FontStyle.italic
                                     ),
                                   )
@@ -267,25 +297,28 @@ class _BookmarksState extends State<Bookmarks> {
                                       // WidgetSpan(
                                       //     alignment: PlaceholderAlignment.middle,
                                       //     child: Icon(Icons.folder_special_rounded, color: Color(0xff1d3f5e),)),
-                                      const TextSpan(
+                                      TextSpan(
                                         text: ' bookmark folder ',
                                           style: TextStyle(
                                               fontFamily: 'varela-round.regular',
-                                              fontWeight: FontWeight.bold
+                                              fontWeight: FontWeight.bold,
+                                            color: color_main_text
                                           )
                                       ),
                                       TextSpan(
                                           text: '(${bookmarkFolderSize.toString()})',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                               fontFamily: 'varela-round.regular',
-                                              fontSize: 13
+                                              fontSize: 13,
+                                            color: color_main_text
                                           )
                                       ),
-                                      const TextSpan(
+                                      TextSpan(
                                           text: ' :',
                                           style: TextStyle(
                                               fontFamily: 'varela-round.regular',
-                                              fontWeight: FontWeight.bold
+                                              fontWeight: FontWeight.bold,
+                                            color: color_main_text
                                           )
                                       ),
                                     ]
@@ -296,69 +329,133 @@ class _BookmarksState extends State<Bookmarks> {
                           const SizedBox(
                             height: 11,
                           ),
-                          Column(
-                            children: [
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: bookmarkFolderSize,
+                              itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
+                              child: GestureDetector(
+                                onTap: () async{
 
-                                for(int i = 0; i<bookmarkFolderSize; i++)
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
-                                    child: GestureDetector(
-                                      onTap: () async{
+                                  await addToBookmark(bookmarkFolders[index]['folder_name']).whenComplete(() {
+                                    setState(() {
+                                      message = 'verse added to "${bookmarkFolders[index]['folder_name']}"';
+                                      snack_text_size = 13;
+                                      snack_text_padding = 41;
 
-                                        await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
-                                          setState(() {
-                                            message = 'verse added to "${bookmarkFolders[i]['folder_name']}"';
-                                              snack_text_size = 13;
-                                              snack_text_padding = 41;
+                                    });
+                                    Future.delayed(const Duration(seconds: 3), () {
+                                      setState(() {
+                                        snack_text_size = 0;
+                                        snack_text_padding = 0;
+                                      });
+                                    });
+                                    // ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                                    //   content: Text('verse added to ${bookmarkFolders[i]['folder_name']}'),
+                                    // ));
+                                    // Navigator.pop(context);
+                                  });
 
-                                          });
-                                          Future.delayed(const Duration(seconds: 3), () {
-                                            setState(() {
-                                              snack_text_size = 0;
-                                              snack_text_padding = 0;
-                                            });
-                                          });
-                                          // ScaffoldMessenger.of(context).showSnackBar( SnackBar(
-                                          //   content: Text('verse added to ${bookmarkFolders[i]['folder_name']}'),
-                                          // ));
-                                          // Navigator.pop(context);
-                                        });
-
-                                      },
-                                      child: Container(
-                                        width: size.width,
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xff1d3f5e).withOpacity(.11),
-                                            borderRadius: BorderRadius.circular(11)
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(11.0),
-                                          child: Text.rich(
+                                },
+                                child: Container(
+                                  width: size.width,
+                                  decoration: BoxDecoration(
+                                      color: color_main_text.withOpacity(.21),
+                                      borderRadius: BorderRadius.circular(11)
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(11.0),
+                                    child: Text.rich(
+                                        TextSpan(
+                                            children: [
+                                              WidgetSpan(
+                                                  alignment: PlaceholderAlignment.middle,
+                                                  child: Icon(
+                                                      Icons.bookmark,
+                                                    color: color_main_text,
+                                                  )),
                                               TextSpan(
-                                                  children: [
-                                                    const WidgetSpan(
-                                                        alignment: PlaceholderAlignment.middle,
-                                                        child: Icon(
-                                                            Icons.bookmark
-                                                        )),
-                                                    TextSpan(
-                                                        text: '  ${bookmarkFolders[i]['folder_name']} ',
+                                                  text: '  ${bookmarkFolders[index]['folder_name']} ',
 
-                                                        style: const TextStyle(
-                                                            fontFamily: 'varela-round.regular',
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 17
-                                                        )
-                                                    ),
-                                                  ]
-                                              )
-                                          ),
-                                        ),
-                                      ),
+                                                  style: TextStyle(
+                                                      fontFamily: 'varela-round.regular',
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 17,
+                                                    color: color_main_text
+                                                  )
+                                              ),
+                                            ]
+                                        )
                                     ),
                                   ),
-                            ],
-                          ),
+                                ),
+                              ),
+                            );
+                          }),
+                          // Column(
+                          //   children: [
+                          //
+                          //       for(int i = 0; i<bookmarkFolderSize; i++)
+                          //         Padding(
+                          //           padding: EdgeInsets.symmetric(horizontal: size.width * .087, vertical: 3.5),
+                          //           child: GestureDetector(
+                          //             onTap: () async{
+                          //
+                          //               await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
+                          //                 setState(() {
+                          //                   message = 'verse added to "${bookmarkFolders[i]['folder_name']}"';
+                          //                     snack_text_size = 13;
+                          //                     snack_text_padding = 41;
+                          //
+                          //                 });
+                          //                 Future.delayed(const Duration(seconds: 3), () {
+                          //                   setState(() {
+                          //                     snack_text_size = 0;
+                          //                     snack_text_padding = 0;
+                          //                   });
+                          //                 });
+                          //                 // ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+                          //                 //   content: Text('verse added to ${bookmarkFolders[i]['folder_name']}'),
+                          //                 // ));
+                          //                 // Navigator.pop(context);
+                          //               });
+                          //
+                          //             },
+                          //             child: Container(
+                          //               width: size.width,
+                          //               decoration: BoxDecoration(
+                          //                   color: const Color(0xff1d3f5e).withOpacity(.11),
+                          //                   borderRadius: BorderRadius.circular(11)
+                          //               ),
+                          //               child: Padding(
+                          //                 padding: const EdgeInsets.all(11.0),
+                          //                 child: Text.rich(
+                          //                     TextSpan(
+                          //                         children: [
+                          //                           const WidgetSpan(
+                          //                               alignment: PlaceholderAlignment.middle,
+                          //                               child: Icon(
+                          //                                   Icons.bookmark
+                          //                               )),
+                          //                           TextSpan(
+                          //                               text: '  ${bookmarkFolders[i]['folder_name']} ',
+                          //
+                          //                               style: const TextStyle(
+                          //                                   fontFamily: 'varela-round.regular',
+                          //                                   fontWeight: FontWeight.bold,
+                          //                                   fontSize: 17
+                          //                               )
+                          //                           ),
+                          //                         ]
+                          //                     )
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //   ],
+                          // ),
                           const SizedBox(
                             height: 21,
                           ),

@@ -317,7 +317,7 @@ class _MenuState extends State<Menu> {
                       onTap: (){
                         Navigator.of(context).push(HeroDialogRoute(
                           bgColor: bgColor.withOpacity(0.85),
-                          builder: (context) => Center(child: BookmarkFolders(tag: "animate", from_where: "menu",)),
+                          builder: (context) => const Center(child: BookmarkFolders(tag: "animate", from_where: "menu",)),
                         ));
                       },
                       child: Container(
@@ -372,7 +372,7 @@ class _MenuState extends State<Menu> {
                     child: GestureDetector(
                       onTap: (){
                         Navigator.of(context).push(HeroDialogRoute(
-                          bgColor: Colors.white.withOpacity(0.85),
+                          bgColor: bgColor.withOpacity(0.85),
                           builder: (context) => const Center(child: FavoriteVerses(tag: "animate", from_where: "menu",)),
                         ));
                       },
@@ -430,7 +430,7 @@ class _MenuState extends State<Menu> {
                       child: GestureDetector(
                         onTap: (){
                           Navigator.of(context).push(HeroDialogRoute(
-                            bgColor: Colors.white.withOpacity(0.85),
+                            bgColor: bgColor.withOpacity(0.85),
                             builder: (context) => Center(child: UpdatedSurahPage(surah_id: surah_id, scroll_to: (int.parse(verse_id) - 1), should_animate: true,)),
                           ));
                         },

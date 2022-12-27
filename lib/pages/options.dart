@@ -21,6 +21,14 @@ class _OptionsState extends State<Options> {
   bool value_snackbar = false;
   double snack_text_size = 0, snack_text_padding = 0;
 
+
+  @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -168,19 +176,19 @@ class _OptionsState extends State<Options> {
                           GestureDetector(
                             onTap: () {
 
-                              Navigator.of(context).push(HeroDialogRoute(builder: (context)=> SettingsCard(tag: widget.tag), bgColor: Colors.transparent));
+                              // Navigator.of(context).push(HeroDialogRoute(builder: (context)=> SettingsCard(tag: widget.tag), bgColor: Colors.transparent));
 
-                              // setState(() {
-                              //   snack_text_size = 13;
-                              //   snack_text_padding = 39;
-                              // });
-                              //
-                              // Future.delayed(const Duration(seconds: 3), () {
-                              //   setState(() {
-                              //     snack_text_size = 0;
-                              //     snack_text_padding = 0;
-                              //   });
-                              // });
+                              setState(() {
+                                snack_text_size = 13;
+                                snack_text_padding = 39;
+                              });
+
+                              Future.delayed(const Duration(seconds: 3), () {
+                                setState(() {
+                                  snack_text_size = 0;
+                                  snack_text_padding = 0;
+                                });
+                              });
 
                               // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                               //   content: Text('under development...'),

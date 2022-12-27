@@ -354,7 +354,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                 await Navigator.of(context).push(HeroDialogRoute(
                                   bgColor: bgColor.withOpacity(.75),
                                   builder: (context) => Center(
-                                    child: VerseOptionsCard(tag: index.toString(), verse_english: widget.translated_verse[index]['text'] + "", verse_arabic: widget.verses[index]['text'], surah_name: widget.surah_name, surah_number: widget.surah_id, verse_number: (index + 1).toString(),),
+                                    child: VerseOptionsCard(tag: index.toString(), verse_english: widget.translated_verse[index]['text'] + "", verse_arabic: widget.verses[index]['text'], surah_name: widget.surah_name, surah_number: widget.surah_id, verse_number: (index + 1).toString(), theme: bgColor,),
                                   ),
                                 )).then((_){
                                   // Here you will get callback after coming back from NextPage()
@@ -460,10 +460,11 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                   TextSpan(
                                                                     text: arabicNumber
                                                                         .convert(index + 1),
-                                                                    style: const TextStyle(
+                                                                    style: TextStyle(
                                                                         wordSpacing: 3,
                                                                         fontSize: 07,
-                                                                        fontWeight: FontWeight.bold
+                                                                        fontWeight: FontWeight.bold,
+                                                                      color: color_main_text,
                                                                     ),
                                                                   ),
                                                                   TextSpan(
