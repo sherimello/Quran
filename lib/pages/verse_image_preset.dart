@@ -13,8 +13,9 @@ import '../hero_transition_handler/custom_rect_tween.dart';
 class VerseImagePreset extends StatefulWidget {
 
   final String tag, verse_english, verse_arabic, verse_number, surah_number, surah_name;
+  final Color theme;
 
-  const VerseImagePreset({Key? key, required this.verse_english, required this.verse_arabic, required this.verse_number, required this.surah_number, required this.surah_name, required this.tag}) : super(key: key);
+  const VerseImagePreset({Key? key, required this.verse_english, required this.verse_arabic, required this.verse_number, required this.surah_number, required this.surah_name, required this.tag, required this.theme}) : super(key: key);
 
   @override
   State<VerseImagePreset> createState() => _VerseImagePresetState();
@@ -26,6 +27,40 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
   bool value_arabic_text = true, value_english_tag = true, value_reference_tag = true;
   WidgetsToImageController controller = WidgetsToImageController();
   late Uint8List bytes;
+  var bgColor = Colors.white, color_favorite_and_index = const Color(0xff1d3f5e), color_main_text = Colors.black,
+  color_check_color = Colors.white;
+
+
+  assignmentForLightMode() {
+    bgColor = Colors.white;
+    color_favorite_and_index = const Color(0xff1d3f5e);
+    color_main_text = Colors.black;
+    color_check_color = Colors.white;
+  }
+
+  assignmentForDarkMode() {
+    bgColor = Colors.black;
+    color_favorite_and_index = Colors.white;
+    color_main_text = Colors.white;
+    color_check_color = Colors.black;
+  }
+
+  void initializeThemeStarters() {
+    if(widget.theme == Colors.white) {
+      assignmentForLightMode();
+    }
+    else {
+      assignmentForDarkMode();
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initializeThemeStarters();
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -42,7 +77,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                 height: size.width - 38,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(31),
-                  color: Colors.white,
+                  color: bgColor,
                   border: Border.all(color: const Color(0xff1d3f5e), width: 3),
                   boxShadow: [
                     BoxShadow(
@@ -79,7 +114,8 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                               style: TextStyle(
                                   fontFamily: 'varela-round.regular',
                                   fontWeight: FontWeight.bold,
-                                  fontSize: top_heading_size
+                                  fontSize: top_heading_size,
+                                color: color_main_text
                               ),
                             ),
                             value_arabic_text ? const SizedBox(
@@ -96,6 +132,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                                 fontFamily:
                                 'Al Majeed Quranic Font_shiped',
                                 fontSize: arabic_size,
+                                color: color_main_text
                               ),
                             ) : const SizedBox(),
                             value_english_tag ? const SizedBox(
@@ -108,8 +145,8 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                               style: TextStyle(
                                   fontFamily: 'varela-round.regular',
                                   fontWeight: FontWeight.bold,
-                                  color: const Color(0xff1d3f5e),
-                                  fontSize: english_size
+                                  color: color_favorite_and_index,
+                                  fontSize: english_size,
                               ),
                             ) : const SizedBox(),
                             value_reference_tag ? const SizedBox(
@@ -120,7 +157,8 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                               style: TextStyle(
                                   fontFamily: 'Rounded_Elegance',
                                   fontWeight: FontWeight.bold,
-                                  fontSize: surah_tag
+                                  fontSize: surah_tag,
+                                color: color_main_text
                               ),
                             ) : const SizedBox(),
                             const SizedBox(
@@ -161,7 +199,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
       }
     }
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgColor,
       floatingActionButton: FloatingActionButton(
         onPressed: () async{
           final bytes = await controller.capture();
@@ -173,7 +211,8 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
         },
         backgroundColor: const Color(0xff1d3f5e),
         child: const Icon(
-          Icons.save_alt
+          Icons.save_alt,
+          color: Colors.white,
         ),
       ),
       body: SafeArea(
@@ -195,8 +234,8 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.all(19.0),
+                    Padding(
+                      padding: const EdgeInsets.all(19.0),
                       child: Text(
                         '***adjust text size(s) with the help of the "+"/"-" button. otherwise it\'s very likely that you won\'t get all the information in your picture.' ,
                         textAlign: TextAlign.center,
@@ -204,7 +243,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'varela-round.regular',
-                            color: Colors.red,
+                            color: color_main_text,
                             // color: Color(0xff1d3f5e),
                             fontStyle: FontStyle.italic
                         ),),
@@ -273,11 +312,11 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                       height: 19,
                     ),
                     Text.rich(
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontFamily:
                             'varela-round.regular',
                             fontSize: 21,
-                            color: Colors.black,
+                            color: color_main_text,
                             fontWeight:
                             FontWeight.bold),
                         TextSpan(
@@ -287,10 +326,10 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                                 borderRadius: BorderRadius.circular(5.0),
                               ),
                                 side: MaterialStateBorderSide.resolveWith(
-                                      (states) => const BorderSide(width: 2.0, color: Color(0xff1d3f5e)),
+                                      (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
                                 ),
-                                checkColor: Colors.white,  // color of tick Mark
-                                activeColor: const Color(0xff1d3f5e),
+                                checkColor: color_check_color,  // color of tick Mark
+                                activeColor: color_favorite_and_index,
                                 value: value_arabic_text, onChanged: (bool? value) {
                                   setState(() {
                                     value_arabic_text = value!;
@@ -317,27 +356,32 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                                 borderRadius: BorderRadius.circular(5.0),
                               ),
                                 side: MaterialStateBorderSide.resolveWith(
-                                      (states) => const BorderSide(width: 2.0, color: Color(0xff1d3f5e)),
+                                      (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
                                 ),
-                                checkColor: Colors.white,  // color of tick Mark
-                                activeColor: const Color(0xff1d3f5e),
+                                checkColor: color_check_color,  // color of tick Mark
+                                activeColor: color_favorite_and_index,
                                 value: value_english_tag, onChanged: (bool? value) {
                                   setState(() {
                                     value_english_tag = value!;
                                   });
                                 },)),
-                              const TextSpan(
-                                  text: 'add english text'
+                              TextSpan(
+                                  text: 'add english text',
+                                  style: TextStyle(
+                                    color: color_main_text,
+                                    fontFamily:
+                                    'varela-round.regular',
+                                  )
                               ),
                             ]
                         )
                     ),
                     Text.rich(
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontFamily:
                             'varela-round.regular',
                             fontSize: 21,
-                            color: Colors.black,
+                            color: color_main_text,
                             fontWeight:
                             FontWeight.bold),
                         TextSpan(
@@ -347,17 +391,22 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                                 borderRadius: BorderRadius.circular(5.0),
                               ),
                                 side: MaterialStateBorderSide.resolveWith(
-                                      (states) => const BorderSide(width: 2.0, color: Color(0xff1d3f5e)),
+                                      (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
                                 ),
-                                checkColor: Colors.white,  // color of tick Mark
-                                activeColor: const Color(0xff1d3f5e),
+                                checkColor: color_check_color,  // color of tick Mark
+                                activeColor: color_favorite_and_index,
                                 value: value_reference_tag, onChanged: (bool? value) {
                                   setState(() {
                                     value_reference_tag = value!;
                                   });
                                 },)),
-                              const TextSpan(
-                                  text: 'add reference tag'
+                              TextSpan(
+                                  text: 'add reference tag',
+                                style: TextStyle(
+                                  color: color_main_text,
+                                  fontFamily:
+                                  'varela-round.regular',
+                                )
                               ),
                             ]
                         )

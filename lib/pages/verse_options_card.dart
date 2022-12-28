@@ -150,7 +150,7 @@ class _VerseOptionsCardState extends State<VerseOptionsCard> {
                               onTap: () async{
                                 Navigator.of(context).push(HeroDialogRoute(
                                   builder: (context) => Center(
-                                    child: VerseImagePreset(tag: widget.tag, verse_english: widget.verse_english, verse_arabic: widget.verse_arabic, verse_number: widget.verse_number, surah_name: widget.surah_name, surah_number: widget.surah_number,),
+                                    child: VerseImagePreset(tag: widget.tag, verse_english: widget.verse_english, verse_arabic: widget.verse_arabic, verse_number: widget.verse_number, surah_name: widget.surah_name, surah_number: widget.surah_number, theme: widget.theme,),
                                   ),
                                 ));
                                 // await Clipboard.setData(const ClipboardData(text: "your text"));

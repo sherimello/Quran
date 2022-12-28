@@ -491,6 +491,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                         style: TextStyle(
                                                                             fontFamily: 'varela-round.regular',
                                                                           color: color_main_text,
+                                                                          fontSize: 15
                                                                         ),
                                                                       ),
                                                                       widget.sujoodVerses.contains(index + 1) ?

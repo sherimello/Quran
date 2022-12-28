@@ -11,8 +11,9 @@ import 'menu.dart';
 class BookmarkFolders extends StatefulWidget {
 
   final String tag, from_where;
+  final Color theme;
 
-  const BookmarkFolders({Key? key, required this.tag, required this.from_where}) : super(key: key);
+  const BookmarkFolders({Key? key, required this.tag, required this.from_where, required this.theme}) : super(key: key);
 
   @override
   State<BookmarkFolders> createState() => _BookmarkFoldersState();
@@ -163,7 +164,7 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
                                     onTap: () async{
                                       Navigator.of(context).push(HeroDialogRoute(
                                         builder: (context) => Center(
-                                          child: BookmarkVerses(tag: widget.tag, folder_name: bookmarkFolders[index]['folder_name'], from_where: widget.from_where),
+                                          child: BookmarkVerses(tag: widget.tag, folder_name: bookmarkFolders[index]['folder_name'], from_where: widget.from_where, theme: widget.theme,),
                                         ),
                                       ));
                                       // await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {

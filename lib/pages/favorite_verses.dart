@@ -13,8 +13,9 @@ import 'new_surah_page.dart';
 class FavoriteVerses extends StatefulWidget {
 
   final String tag, from_where;
+  final Color theme;
 
-  const FavoriteVerses({Key? key, required this.tag, required this.from_where}) : super(key: key);
+  const FavoriteVerses({Key? key, required this.tag, required this.from_where, required this.theme}) : super(key: key);
 
   @override
   State<FavoriteVerses> createState() => _FavoriteVersesState();
@@ -60,15 +61,22 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
 
   initializeThemeStarters() async {
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if(sharedPreferences.containsKey('theme mode')) {
-      if(sharedPreferences.getString('theme mode') == "light") {
-        assignmentForLightMode();
-      }
-      if(sharedPreferences.getString('theme mode') == "dark") {
-        assignmentForDarkMode();
-      }
+    if(widget.theme == Colors.white) {
+      assignmentForLightMode();
     }
+    else {
+      assignmentForDarkMode();
+    }
+
+    // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    // if(sharedPreferences.containsKey('theme mode')) {
+    //   if(sharedPreferences.getString('theme mode') == "light") {
+    //     assignmentForLightMode();
+    //   }
+    //   if(sharedPreferences.getString('theme mode') == "dark") {
+    //     assignmentForDarkMode();
+    //   }
+    // }
   }
 
 

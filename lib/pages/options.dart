@@ -9,8 +9,9 @@ import 'favorite_verses.dart';
 class Options extends StatefulWidget {
 
   final String tag;
+  final Color theme;
 
-  const Options({Key? key, required this.tag}) : super(key: key);
+  const Options({Key? key, required this.tag, required this.theme}) : super(key: key);
 
   @override
   State<Options> createState() => _OptionsState();
@@ -119,7 +120,7 @@ class _OptionsState extends State<Options> {
                             onTap: () {
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.transparent,
-                                builder: (context) => BookmarkFolders(tag: widget.tag, from_where: "surah list"),
+                                builder: (context) => BookmarkFolders(tag: widget.tag, from_where: "surah list", theme: widget.theme,),
                               ));
                             },
                             child: const Text.rich(
@@ -148,7 +149,7 @@ class _OptionsState extends State<Options> {
                             onTap: () {
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.white.withOpacity(0.85),
-                                builder: (context) => Center(child: FavoriteVerses(tag: widget.tag, from_where: "surah list",)),
+                                builder: (context) => Center(child: FavoriteVerses(tag: widget.tag, from_where: "surah list", theme: widget.theme,)),
                               ));
                             },
                             child: const Text.rich(
@@ -176,19 +177,19 @@ class _OptionsState extends State<Options> {
                           GestureDetector(
                             onTap: () {
 
-                              // Navigator.of(context).push(HeroDialogRoute(builder: (context)=> SettingsCard(tag: widget.tag), bgColor: Colors.transparent));
+                              Navigator.of(context).push(HeroDialogRoute(builder: (context)=> SettingsCard(tag: widget.tag, fontsize_english: 14, fontsize_arab: 14,), bgColor: Colors.transparent));
 
-                              setState(() {
-                                snack_text_size = 13;
-                                snack_text_padding = 39;
-                              });
-
-                              Future.delayed(const Duration(seconds: 3), () {
-                                setState(() {
-                                  snack_text_size = 0;
-                                  snack_text_padding = 0;
-                                });
-                              });
+                              // setState(() {
+                              //   snack_text_size = 13;
+                              //   snack_text_padding = 39;
+                              // });
+                              //
+                              // Future.delayed(const Duration(seconds: 3), () {
+                              //   setState(() {
+                              //     snack_text_size = 0;
+                              //     snack_text_padding = 0;
+                              //   });
+                              // });
 
                               // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                               //   content: Text('under development...'),

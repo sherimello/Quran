@@ -628,7 +628,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                               onTap: () {
                                 Navigator.of(context).push(HeroDialogRoute(
                                   bgColor: bgColor.withOpacity(0.85),
-                                  builder: (context) => const Options(tag: "options"),
+                                  builder: (context) => Options(tag: "options", theme: bgColor,),
                                 ));
                               },
                               child: const Icon(Icons.more_vert, color: Colors.white,)),
