@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -21,10 +22,13 @@ class _SplashState extends State<Splash> {
   late Database database;
   late String path;
   var bgColor = Colors.white;
+  double eng = 14, ar = 14;
 
-  initializeThemeStarters() async {
+  initializeThemeStartersAndSizes() async {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    eng = sharedPreferences.getDouble("english_font_size")!;
+    ar = sharedPreferences.getDouble("arabic_font_size")!;
     if(sharedPreferences.containsKey('theme mode')) {
       if(sharedPreferences.getString('theme mode') == "light") {
         bgColor = Colors.white;
@@ -43,7 +47,7 @@ class _SplashState extends State<Splash> {
     databaseExists == true
         ? Timer(const Duration(seconds: 1), () {
             Navigator.of(this.context).push(
-                MaterialPageRoute(builder: (context) => const Menu()));
+                MaterialPageRoute(builder: (context) => Menu(eng: eng, ar: ar,)));
           })
         : Timer(const Duration(seconds: 1), () {
             Navigator.of(this.context)
@@ -55,7 +59,7 @@ class _SplashState extends State<Splash> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    initializeThemeStarters();
+    initializeThemeStartersAndSizes();
     whereToRedirect();
   }
 

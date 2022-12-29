@@ -11,7 +11,10 @@ import '../hero_transition_handler/hero_dialog_route.dart';
 import 'favorite_verses.dart';
 
 class Menu extends StatefulWidget {
-  const Menu({Key? key}) : super(key: key);
+
+  final double eng, ar;
+
+  const Menu({Key? key, required this.eng, required this.ar}) : super(key: key);
 
   @override
   State<Menu> createState() => _MenuState();
@@ -209,7 +212,7 @@ class _MenuState extends State<Menu> {
                     padding: EdgeInsets.symmetric(horizontal: size.width * .13),
                     child: GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const SurahList()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => SurahList(eng: widget.eng, ar: widget.ar,)));
                       },
                       child: Container(
                         width: size.width,
@@ -262,7 +265,7 @@ class _MenuState extends State<Menu> {
                     padding: EdgeInsets.symmetric(horizontal: size.width * .13, vertical: 7),
                     child: GestureDetector(
                       onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => VersesSearch(theme: theme,)));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => VersesSearch(theme: theme, eng: widget.eng, ar: widget.ar,)));
                       },
                       child: Container(
                         width: size.width,
@@ -317,7 +320,7 @@ class _MenuState extends State<Menu> {
                       onTap: (){
                         Navigator.of(context).push(HeroDialogRoute(
                           bgColor: bgColor.withOpacity(0.85),
-                          builder: (context) => Center(child: BookmarkFolders(tag: "animate", from_where: "menu", theme: bgColor,)),
+                          builder: (context) => Center(child: BookmarkFolders(tag: "animate", from_where: "menu", theme: bgColor, eng: widget.eng, ar: widget.ar,)),
                         ));
                       },
                       child: Container(
@@ -373,7 +376,7 @@ class _MenuState extends State<Menu> {
                       onTap: (){
                         Navigator.of(context).push(HeroDialogRoute(
                           bgColor: bgColor.withOpacity(0.85),
-                          builder: (context) => Center(child: FavoriteVerses(tag: "animate", from_where: "menu", theme: bgColor,)),
+                          builder: (context) => Center(child: FavoriteVerses(tag: "animate", from_where: "menu", theme: bgColor, eng: widget.eng, ar: widget.ar,)),
                         ));
                       },
                       child: Container(
@@ -431,7 +434,7 @@ class _MenuState extends State<Menu> {
                         onTap: (){
                           Navigator.of(context).push(HeroDialogRoute(
                             bgColor: bgColor.withOpacity(0.85),
-                            builder: (context) => Center(child: UpdatedSurahPage(surah_id: surah_id, scroll_to: (int.parse(verse_id) - 1), should_animate: true,)),
+                            builder: (context) => Center(child: UpdatedSurahPage(surah_id: surah_id, scroll_to: (int.parse(verse_id) - 1), should_animate: true, eng: widget.eng, ar: widget.ar,)),
                           ));
                         },
                         child: Container(

@@ -5,7 +5,10 @@ import 'package:quran/pages/surah_list.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+
+  final double eng, ar;
+
+  const Home({Key? key, required this.eng, required this.ar}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -174,7 +177,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SurahList()));
+                              builder: (context) => SurahList(eng: widget.eng, ar: widget.ar,)));
                     },
                     child: Container(
                       decoration: BoxDecoration(

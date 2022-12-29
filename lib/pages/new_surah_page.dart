@@ -17,9 +17,10 @@ class UpdatedSurahPage extends StatefulWidget {
   int scroll_to;
   List<int> sujoodVerses;
   List<Map> verses, translated_verse;
+  final double eng, ar;
 
   // const UpdatedSurahPage({Key? key, required this.surah_id, required this.image, required this.surah_name, required this.arabic_name, required this.sujood_index, required this.verse_numbers, required this.verses, required this.translated_verse}) : super(key: key);
-  UpdatedSurahPage({Key? key, required this.surah_id, this.image = "", this.surah_name = "", this.arabic_name = "", this.verse_numbers = "", this.verses = const [], this.translated_verse = const [], this.scroll_to = 0, this.sujoodVerses = const [], this.should_animate = false}) : super(key: key);
+  UpdatedSurahPage({Key? key, required this.surah_id, this.image = "", this.surah_name = "", this.arabic_name = "", this.verse_numbers = "", this.verses = const [], this.translated_verse = const [], this.scroll_to = 0, this.sujoodVerses = const [], this.should_animate = false, required this.eng, required this.ar}) : super(key: key);
 
   @override
   State<UpdatedSurahPage> createState() => _UpdatedSurahPageState();
@@ -442,7 +443,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                       wordSpacing: 2,
                                                                       fontFamily:
                                                                       'Al Majeed Quranic Font_shiped',
-                                                                      fontSize: 12,
+                                                                      fontSize: widget.ar,
                                                                       color: color_main_text,
                                                                     ),
                                                                   ),
@@ -453,7 +454,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                       fontWeight: FontWeight.bold,
                                                                       fontFamily:
                                                                       'Al Majeed Quranic Font_shiped',
-                                                                      fontSize: 07,
+                                                                      fontSize: widget.ar - 5,
                                                                       color: color_main_text,
                                                                     ),
                                                                   ),
@@ -462,7 +463,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                         .convert(index + 1),
                                                                     style: TextStyle(
                                                                         wordSpacing: 3,
-                                                                        fontSize: 07,
+                                                                        fontSize: widget.ar - 5,
                                                                         fontWeight: FontWeight.bold,
                                                                       color: color_main_text,
                                                                     ),
@@ -473,7 +474,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                         wordSpacing: 3,
                                                                         fontFamily:
                                                                         'Al Majeed Quranic Font_shiped',
-                                                                        fontSize: 07,
+                                                                        fontSize: widget.ar - 5,
                                                                         color: color_main_text,
                                                                         fontWeight: FontWeight.bold),
                                                                   ),
@@ -491,17 +492,17 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                         style: TextStyle(
                                                                             fontFamily: 'varela-round.regular',
                                                                           color: color_main_text,
-                                                                          fontSize: 15
+                                                                          fontSize: widget.eng
                                                                         ),
                                                                       ),
                                                                       widget.sujoodVerses.contains(index + 1) ?
-                                                                      const TextSpan(
+                                                                      TextSpan(
                                                                           text: '\n\nverse of prostration ***',
                                                                           style: TextStyle(
                                                                               color: Color(0xff518050),
                                                                               fontWeight: FontWeight.bold,
                                                                               fontFamily: 'varela-round.regular',
-                                                                              fontSize: 15
+                                                                              fontSize: widget.eng
                                                                           )
                                                                       ): const TextSpan()
                                                                     ]

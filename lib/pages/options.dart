@@ -10,8 +10,9 @@ class Options extends StatefulWidget {
 
   final String tag;
   final Color theme;
+  final double eng, ar;
 
-  const Options({Key? key, required this.tag, required this.theme}) : super(key: key);
+  const Options({Key? key, required this.tag, required this.theme, required this.eng, required this.ar}) : super(key: key);
 
   @override
   State<Options> createState() => _OptionsState();
@@ -120,7 +121,7 @@ class _OptionsState extends State<Options> {
                             onTap: () {
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.transparent,
-                                builder: (context) => BookmarkFolders(tag: widget.tag, from_where: "surah list", theme: widget.theme,),
+                                builder: (context) => BookmarkFolders(tag: widget.tag, from_where: "surah list", theme: widget.theme, eng: widget.eng, ar: widget.ar,),
                               ));
                             },
                             child: const Text.rich(
@@ -149,7 +150,7 @@ class _OptionsState extends State<Options> {
                             onTap: () {
                               Navigator.of(context).push(HeroDialogRoute(
                                 bgColor: Colors.white.withOpacity(0.85),
-                                builder: (context) => Center(child: FavoriteVerses(tag: widget.tag, from_where: "surah list", theme: widget.theme,)),
+                                builder: (context) => Center(child: FavoriteVerses(tag: widget.tag, from_where: "surah list", theme: widget.theme, eng: widget.eng, ar: widget.ar,)),
                               ));
                             },
                             child: const Text.rich(
@@ -177,7 +178,7 @@ class _OptionsState extends State<Options> {
                           GestureDetector(
                             onTap: () {
 
-                              Navigator.of(context).push(HeroDialogRoute(builder: (context)=> SettingsCard(tag: widget.tag, fontsize_english: 14, fontsize_arab: 14,), bgColor: Colors.transparent));
+                              Navigator.of(context).push(HeroDialogRoute(builder: (context)=> SettingsCard(tag: widget.tag, fontsize_english: widget.eng, fontsize_arab: widget.ar,), bgColor: Colors.transparent));
 
                               // setState(() {
                               //   snack_text_size = 13;

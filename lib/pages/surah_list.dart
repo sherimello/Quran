@@ -16,7 +16,10 @@ import '../hero_transition_handler/hero_dialog_route.dart';
 
 
 class SurahList extends StatefulWidget {
-  const SurahList({Key? key}) : super(key: key);
+
+  double eng, ar;
+
+  SurahList({Key? key, required this.eng, required this.ar}) : super(key: key);
 
   @override
   State<SurahList> createState() => _SurahListState();
@@ -211,6 +214,12 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
   color3 = const Color(0xff1d3f5e), toColor3 = Colors.black, defTextColor = Colors.black;
   int darktheme = 0, clicked = 0, shouldReverse = 0;
   late final Duration halfDuration;
+
+  getFontSizes() async{
+   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+   widget.eng = sharedPreferences.getDouble("english_font_size")!;
+   widget.ar = sharedPreferences.getDouble("arabic_font_size")!;
+  }
 
   @override
   void initState() {
@@ -479,7 +488,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
     }
 
     Future<bool> backToMenu() async{
-      return await Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu())) ?? false;
+      return await Navigator.push(context, MaterialPageRoute(builder: (context)=>Menu(eng: widget.eng, ar: widget.ar,))) ?? false;
     }
 
     saveThemeState(String theme) async {
@@ -625,17 +634,18 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                           bottom: 0,
                           right: 0,
                           child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(HeroDialogRoute(
-                                  bgColor: bgColor.withOpacity(0.85),
-                                  builder: (context) => Options(tag: "options", theme: bgColor,),
-                                ));
+                              onTap: () async {
+                                await getFontSizes().whenComplete((){
+                                  Navigator.of(context).push(HeroDialogRoute(
+                                    bgColor: bgColor.withOpacity(0.85),
+                                    builder: (context) => Options(tag: "options", theme: bgColor, eng: widget.eng, ar: widget.ar,),
+                                  ));
+                                });
                               },
                               child: const Icon(Icons.more_vert, color: Colors.white,)),
                         )
                         ]
                         )
-
                   ),
                 ),
               ),
@@ -679,6 +689,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                               onTap: () async {
                                 sujood_index = getSujoodSurahIndex(index + 1);
                                 await fetchSurahSujoodVerses(index + 1);
+                                await getFontSizes();
                                 fetchVersesData('${index + 1}').whenComplete(() {
                                   print("index: $index");
                                   print("\nvnums: ${verse_numbers[index]}");
@@ -707,7 +718,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                                             // sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
                                             verse_numbers: verse_numbers[index].toString(),
                                             verses: verses,
-                                            translated_verse: translated_verse,
+                                            translated_verse: translated_verse, eng: widget.eng, ar: widget.ar,
                                           )
                                       )
                                   );

@@ -14,8 +14,9 @@ class FavoriteVerses extends StatefulWidget {
 
   final String tag, from_where;
   final Color theme;
+  final double eng, ar;
 
-  const FavoriteVerses({Key? key, required this.tag, required this.from_where, required this.theme}) : super(key: key);
+  const FavoriteVerses({Key? key, required this.tag, required this.from_where, required this.theme, required this.eng, required this.ar}) : super(key: key);
 
   @override
   State<FavoriteVerses> createState() => _FavoriteVersesState();
@@ -313,7 +314,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                           wordSpacing: 2,
                                                           fontFamily:
                                                           'Al Majeed Quranic Font_shiped',
-                                                          fontSize: 12,
+                                                          fontSize: widget.ar,
                                                         ),
                                                       ),
                                                       TextSpan(
@@ -324,7 +325,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                           fontWeight: FontWeight.bold,
                                                           fontFamily:
                                                           'Al Majeed Quranic Font_shiped',
-                                                          fontSize: 07,
+                                                          fontSize: widget.ar - 5,
                                                         ),
                                                       ),
                                                       TextSpan(
@@ -334,7 +335,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                         style: TextStyle(
                                                           color: color_main_text,
                                                             wordSpacing: 3,
-                                                            fontSize: 07,
+                                                            fontSize: widget.ar - 5,
                                                             fontWeight: FontWeight.bold
                                                         ),
                                                       ),
@@ -345,7 +346,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                             wordSpacing: 3,
                                                             fontFamily:
                                                             'Al Majeed Quranic Font_shiped',
-                                                            fontSize: 07,
+                                                            fontSize: widget.ar - 5,
                                                             fontWeight: FontWeight.bold),
                                                       ),
                                                       verses.isNotEmpty && isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ? WidgetSpan(
@@ -361,17 +362,18 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                             text: verses.isNotEmpty ? verses[index]['english'] + ' [${verses[index]['surah_id']}:${verses[index]['verse_id']}]' : "",
                                                             style: TextStyle(
                                                                 fontFamily: 'varela-round.regular',
-                                                              color: color_main_text
+                                                              color: color_main_text,
+                                                              fontSize: widget.eng
                                                             ),
                                                           ),
                                                           verses.isNotEmpty && isSujoodVerse(verses[index]['surah_id'], verses[index]['verse_id']) ?
-                                                          const TextSpan(
+                                                          TextSpan(
                                                               text: '\n\nverse of prostration ***',
                                                               style: TextStyle(
                                                                   color: Color(0xff518050),
                                                                   fontWeight: FontWeight.bold,
                                                                   fontFamily: 'varela-round.regular',
-                                                                  fontSize: 15
+                                                                  fontSize: widget.eng
                                                               )
                                                           ): const TextSpan()
                                                         ]
@@ -387,7 +389,7 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                             // print((verses[index]['surah_id']).toString());
                                                             // await fetchSurahSujoodVerses(index + 1);
                                                             Navigator.of(this.context)
-                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1, should_animate: true,)));
+                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1, should_animate: true, eng: widget.eng, ar: widget.ar,)));
                                                           },
                                                           child: Container(
                                                             // width: size.width,

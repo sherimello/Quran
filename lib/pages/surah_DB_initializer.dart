@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quran/classes/sql_queries.dart';
 import 'package:quran/pages/surah_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'home.dart';
@@ -20,7 +21,8 @@ class _SurahDBInitializerState extends State<SurahDBInitializer> {
   SQLQueries sqlQueries = SQLQueries();
 
   prepareDB() async {
-    await sqlQueries.crazy1(await sqlQueries.crazy0()).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu())));
+    await saveFontSizes();
+    await sqlQueries.crazy1(await sqlQueries.crazy0()).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu(eng: 14.0, ar: 12.0))));
     // sqlQueries.test1(await sqlQueries.test0()).whenComplete(() async => sqlQueries.test11(await sqlQueries.test00()).whenComplete(() async => sqlQueries.test111(await sqlQueries.test000())));
     // sqlQueries.test11(await sqlQueries.test00());
     // sqlQueries.test111(await sqlQueries.test000());
@@ -29,6 +31,14 @@ class _SurahDBInitializerState extends State<SurahDBInitializer> {
     // sqlQueries.insertSurahNameData();
     // sqlQueries.insertLanguageData().whenComplete(() => sqlQueries.insertSurahNameData()).whenComplete(() => sqlQueries.insertVersesData());
     // sqlQueries.insertSurahNameData();
+  }
+
+
+  saveFontSizes() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setDouble("english_font_size", 15);
+    sharedPreferences.setDouble("arabic_font_size", 12);
+
   }
 
   @override

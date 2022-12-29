@@ -11,8 +11,9 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 class VersesSearch extends StatefulWidget {
 
   final String theme;
+  final double eng, ar;
 
-  const VersesSearch({Key? key, required this.theme}) : super(key: key);
+  const VersesSearch({Key? key, required this.theme, required this.eng, required this.ar}) : super(key: key);
 
   @override
   State<VersesSearch> createState() => _VersesSearchState();
@@ -497,7 +498,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                   onTap: () async {
                                                     await fetchSurahSujoodVerses(index + 1);
                                                     Navigator.of(this.context)
-                                                        .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: translated_verse[index]['surah_id'].toString(), scroll_to: translated_verse[index]['verse_id']-1, should_animate: true,)));
+                                                        .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: translated_verse[index]['surah_id'].toString(), scroll_to: translated_verse[index]['verse_id']-1, should_animate: true, eng: widget.eng, ar: widget.ar,)));
                                                   },
                                                   child: Container(
                                                     // width: size.width,

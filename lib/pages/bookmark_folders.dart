@@ -12,8 +12,9 @@ class BookmarkFolders extends StatefulWidget {
 
   final String tag, from_where;
   final Color theme;
+  final double eng, ar;
 
-  const BookmarkFolders({Key? key, required this.tag, required this.from_where, required this.theme}) : super(key: key);
+  const BookmarkFolders({Key? key, required this.tag, required this.from_where, required this.theme, required this.eng, required this.ar}) : super(key: key);
 
   @override
   State<BookmarkFolders> createState() => _BookmarkFoldersState();
@@ -64,7 +65,7 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
       if(widget.from_where == "menu") {
         return await Navigator.of(context).push(HeroDialogRoute(
           bgColor: Colors.white.withOpacity(0.0),
-          builder: (context) => const Center(child: Menu()),
+          builder: (context) => Center(child: Menu(eng: widget.eng, ar: widget.ar,)),
         )) ?? false;
       }
       Navigator.pop(context);
@@ -164,7 +165,7 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
                                     onTap: () async{
                                       Navigator.of(context).push(HeroDialogRoute(
                                         builder: (context) => Center(
-                                          child: BookmarkVerses(tag: widget.tag, folder_name: bookmarkFolders[index]['folder_name'], from_where: widget.from_where, theme: widget.theme,),
+                                          child: BookmarkVerses(tag: widget.tag, folder_name: bookmarkFolders[index]['folder_name'], from_where: widget.from_where, theme: widget.theme, eng: widget.eng, ar: widget.ar,),
                                         ),
                                       ));
                                       // await addToBookmark(bookmarkFolders[i]['folder_name']).whenComplete(() {
