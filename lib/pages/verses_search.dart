@@ -400,7 +400,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                     wordSpacing: 2,
                                                     fontFamily:
                                                     'Al Majeed Quranic Font_shiped',
-                                                    fontSize: 12,
+                                                    fontSize: widget.ar,
                                                     color: color_main_text,
                                                   ),
                                                 ),
@@ -411,7 +411,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                     fontWeight: FontWeight.bold,
                                                     fontFamily:
                                                     'Al Majeed Quranic Font_shiped',
-                                                    fontSize: 07,
+                                                    fontSize: widget.ar - 5,
                                                     color: color_main_text,
                                                   ),
                                                 ),
@@ -421,7 +421,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                       .convert(translated_verse[index]['surah_id'])}",
                                                   style: TextStyle(
                                                       wordSpacing: 3,
-                                                      fontSize: 07,
+                                                    fontSize: widget.ar - 5,
                                                       fontWeight: FontWeight.bold,
                                                     color: color_main_text,
                                                   ),
@@ -432,7 +432,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                       wordSpacing: 3,
                                                       fontFamily:
                                                       'Al Majeed Quranic Font_shiped',
-                                                      fontSize: 07,
+                                                    fontSize: widget.ar - 5,
                                                       fontWeight: FontWeight.bold,
                                                     color: color_main_text,),
                                                 ),
@@ -450,16 +450,17 @@ class _VersesSearchState extends State<VersesSearch> {
                                                       style: TextStyle(
                                                           fontFamily: 'varela-round.regular',
                                                         color: color_main_text,
+                                                        fontSize: widget.eng
                                                       ),
                                                     ),
                                                     TextSpan(
                                                       text: string2,
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                           fontFamily: 'varela-round.regular',
                                                         color: Colors.red,
                                                         fontWeight: FontWeight.bold,
                                                         // fontStyle: FontStyle.italic,
-                                                          fontSize: 19
+                                                          fontSize: widget.eng
                                                       ),
                                                     ),
                                                     TextSpan(
@@ -467,6 +468,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                       style: TextStyle(
                                                           fontFamily: 'varela-round.regular',
                                                         color: color_main_text,
+                                                        fontSize: widget.eng
                                                       ),
                                                     ),
                                                     TextSpan(
@@ -474,17 +476,18 @@ class _VersesSearchState extends State<VersesSearch> {
                                                       style: TextStyle(
                                                           fontFamily: 'Rounded_Elegance',
                                                         fontWeight: FontWeight.bold,
-                                                        color: color_favorite_and_index
+                                                        color: color_favorite_and_index,
+                                                        fontSize: widget.eng
                                                       ),
                                                     ),
                                                     isSujoodVerse(translated_verse[index]['surah_id'], translated_verse[index]['verse_id']) ?
-                                                    const TextSpan(
+                                                    TextSpan(
                                                         text: '\n\nverse of prostration ***',
                                                         style: TextStyle(
-                                                            color: Color(0xff518050),
+                                                            color: const Color(0xff518050),
                                                             fontWeight: FontWeight.bold,
                                                             fontFamily: 'varela-round.regular',
-                                                            fontSize: 15
+                                                            fontSize: widget.eng
                                                         )
                                                     ): const TextSpan()
                                                   ]

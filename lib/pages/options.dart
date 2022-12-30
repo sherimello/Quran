@@ -144,7 +144,7 @@ class _OptionsState extends State<Options> {
                             ),
                           ),
                           const SizedBox(
-                            height: 11,
+                            height: 17,
                           ),
                           GestureDetector(
                             onTap: () {
@@ -173,12 +173,12 @@ class _OptionsState extends State<Options> {
                             ),
                           ),
                           const SizedBox(
-                            height: 11,
+                            height: 17,
                           ),
                           GestureDetector(
                             onTap: () {
 
-                              Navigator.of(context).push(HeroDialogRoute(builder: (context)=> SettingsCard(tag: widget.tag, fontsize_english: widget.eng, fontsize_arab: widget.ar,), bgColor: Colors.transparent));
+                              Navigator.of(context).push(HeroDialogRoute(builder: (context)=> SettingsCard(tag: widget.tag, fontsize_english: widget.eng, fontsize_arab: widget.ar, theme: widget.theme,), bgColor: Colors.transparent,));
 
                               // setState(() {
                               //   snack_text_size = 13;
@@ -216,7 +216,7 @@ class _OptionsState extends State<Options> {
                             ),
                           ),
                           const SizedBox(
-                            height: 32,
+                            height: 19,
                           ),
                           AnimatedContainer(
                             curve: Curves.easeOut,

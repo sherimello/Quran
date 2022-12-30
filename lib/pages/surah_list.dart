@@ -639,7 +639,21 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                                   Navigator.of(context).push(HeroDialogRoute(
                                     bgColor: bgColor.withOpacity(0.85),
                                     builder: (context) => Options(tag: "options", theme: bgColor, eng: widget.eng, ar: widget.ar,),
-                                  ));
+                                  )).then((value) async {
+                                    await themeLogics().whenComplete(() {
+                                      darktheme == 0?
+                                      ThemeSwitcher.of(context).changeTheme(
+                                        theme: ThemeData(
+                                          brightness: Brightness.light,
+                                        ),
+                                      ) :
+                                      ThemeSwitcher.of(context).changeTheme(
+                                        theme: ThemeData(
+                                          brightness: Brightness.dark,
+                                        ),
+                                      );
+                                    });
+                                  });
                                 });
                               },
                               child: const Icon(Icons.more_vert, color: Colors.white,)),
