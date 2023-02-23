@@ -38,7 +38,6 @@ class _SurahDBInitializerState extends State<SurahDBInitializer> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setDouble("english_font_size", 15);
     sharedPreferences.setDouble("arabic_font_size", 12);
-
   }
 
   @override

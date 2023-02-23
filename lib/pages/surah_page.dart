@@ -191,15 +191,18 @@ class _SurahPageState extends State<SurahPage> {
                                         width: isPortraitMode() ? size.width * .10 : size.height * .10,
                                       ),
                                     ),
-                                    Text.rich(
-                                      textAlign: TextAlign.center,
-                                      TextSpan(
-                                        text: '${index + 1}',
-                                        style: TextStyle(
-                                          color: const Color(0xff1d3f5e),
-                                          fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'varela-round.regular',
+                                    Material(
+                                      color: Colors.transparent,
+                                      child: Text.rich(
+                                        textAlign: TextAlign.center,
+                                        TextSpan(
+                                          text: '${index + 1}',
+                                          style: TextStyle(
+                                            color: const Color(0xff1d3f5e),
+                                            fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'varela-round.regular',
+                                          ),
                                         ),
                                       ),
                                     )

@@ -25,15 +25,19 @@ class _SplashState extends State<Splash> {
   double eng = 14, ar = 14;
 
   initializeThemeStartersAndSizes() async {
-
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    eng = sharedPreferences.getDouble("english_font_size")!;
-    ar = sharedPreferences.getDouble("arabic_font_size")!;
-    if(sharedPreferences.containsKey('theme mode')) {
-      if(sharedPreferences.getString('theme mode') == "light") {
+    if (sharedPreferences.containsKey('english_font_size')) {
+      eng = sharedPreferences.getDouble("english_font_size")!;
+    }
+    if (sharedPreferences.containsKey('arabic_font_size')) {
+      ar = sharedPreferences.getDouble("arabic_font_size")!;
+    }
+
+    if (sharedPreferences.containsKey('theme mode')) {
+      if (sharedPreferences.getString('theme mode') == "light") {
         bgColor = Colors.white;
       }
-      if(sharedPreferences.getString('theme mode') == "dark") {
+      if (sharedPreferences.getString('theme mode') == "dark") {
         bgColor = Colors.black;
       }
     }
@@ -46,12 +50,15 @@ class _SplashState extends State<Splash> {
     bool databaseExists = await databaseFactory.databaseExists(path);
     databaseExists == true
         ? Timer(const Duration(seconds: 1), () {
-            Navigator.of(this.context).push(
-                MaterialPageRoute(builder: (context) => Menu(eng: eng, ar: ar,)));
+            Navigator.of(this.context).push(MaterialPageRoute(
+                builder: (context) => Menu(
+                      eng: eng,
+                      ar: ar,
+                    )));
           })
         : Timer(const Duration(seconds: 1), () {
-            Navigator.of(this.context)
-                .push(MaterialPageRoute(builder: (context) => const SurahDBInitializer()));
+            Navigator.of(this.context).push(MaterialPageRoute(
+                builder: (context) => const SurahDBInitializer()));
           });
   }
 

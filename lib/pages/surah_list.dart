@@ -1,6 +1,9 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path/path.dart';
 import 'package:quran/pages/menu.dart';
@@ -13,6 +16,7 @@ import 'dart:math' as math;
 
 import '../hero_transition_handler/custom_rect_tween.dart';
 import '../hero_transition_handler/hero_dialog_route.dart';
+import '../widgets/update_prompt.dart';
 
 
 class SurahList extends StatefulWidget {
@@ -223,6 +227,8 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
 
   @override
   void initState() {
+    Firebase.initializeApp();
+    checkForUpdates();
     themeLogics();
     super.initState();
     animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 200),);
@@ -333,6 +339,40 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
     database = await openDatabase(path);
 
     print(database.isOpen);
+  }
+
+
+  checkForUpdates() async {
+    // if (await MySharedPreferences().containsKey("disable update auto prompt") ==
+    //     false) {
+    var snapshot = await FirebaseDatabase.instance
+        .ref('current version')
+        .child("version code")
+        .get();
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String version = packageInfo.version;
+    print(version);
+
+    if (snapshot.value.toString() != version) {
+      snapshot = await FirebaseDatabase.instance
+          .ref('current version')
+          .child("url")
+          .get()
+          .whenComplete(() {
+        Navigator.of(this.context).push(HeroDialogRoute(
+          builder: (context) => Center(
+            child: UpdatePrompt(
+              url: snapshot.value.toString(),
+              title: 'NEW UPDATE FOUND',
+              content: 'wanna stay up to date?',
+              negativeButtonText: 'cancel',
+            ),
+          ),
+        ));
+      });
+    }
+    // }
   }
 
   Future<void> fetchVersesData(String surah_id) async {
@@ -529,10 +569,11 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
 
                   darktheme == 0 ?
                   {
+                  bgColor = Colors.black,
                     // assignmentForDarkMode(),
-                    setState(() {
-                      bgColor = Colors.black;
-                    }),
+                    // setState(() {
+                    //   bgColor = Colors.black;
+                    // }),
                     ThemeSwitcher.of(context).changeTheme(
                       theme: ThemeData(
                         brightness: Brightness.dark,
@@ -549,10 +590,11 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                   }
                       :
                   {
+                    bgColor = Colors.white,
                     // assignmentForLightMode(),
-                    setState(() {
-                      bgColor = Colors.white;
-                    }),
+                    // setState(() {
+                    //   bgColor = Colors.white;
+                    // }),
                     ThemeSwitcher.of(context).changeTheme(
                         isReversed: true,
                         theme: ThemeData(
