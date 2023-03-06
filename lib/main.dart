@@ -2,16 +2,8 @@ import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:quran/pages/home.dart';
-import 'package:quran/pages/settings_card.dart';
+import 'package:quran/pages/add_duas.dart';
 import 'package:quran/pages/splash.dart';
-import 'package:quran/pages/surah_DB_initializer.dart';
-import 'package:quran/pages/surah_list.dart';
-import 'package:quran/pages/surah_page.dart';
-import 'package:quran/pages/test.dart';
-import 'package:quran/pages/test/ttest.dart';
-import 'package:quran/pages/verse_image_preset.dart';
-import 'package:quran/pages/verses_search.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -45,7 +37,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Qur\'an',
             theme: theme,
-            home: const Splash(),
+            home: const AddDuas(),
             builder: (context, child) {
               return MediaQuery(
                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
