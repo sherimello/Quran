@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:quran/pages/bookmark_folders.dart';
 import 'package:quran/pages/new_surah_page.dart';
 import 'package:quran/pages/surah_list.dart';
@@ -24,6 +28,8 @@ class _MenuState extends State<Menu> {
   bool value_last_read_exists = false;
   String verse_id = "", surah_id = "", theme = "light";
   var bgColor = Colors.white, textColor = Colors.black;
+  int flag = 0;
+  AudioPlayer audioPlayer = AudioPlayer();
 
   assignmentForLightMode() {
     setState(() {
@@ -86,8 +92,6 @@ class _MenuState extends State<Menu> {
 
     Future<bool> showExitPopup() async {
       return await showDialog(
-            //show confirm dialogue
-            //the return value will be from "Yes" or "No" options
             context: context,
             builder: (context) => AlertDialog(
               shape: RoundedRectangleBorder(
@@ -112,7 +116,6 @@ class _MenuState extends State<Menu> {
                       ),
                     ),
                     onPressed: () => Navigator.of(context).pop(false),
-                    //return false when click on "NO"
                     child: const Text(
                       'No',
                       style: TextStyle(fontFamily: 'varela-round.regular'),
@@ -123,7 +126,6 @@ class _MenuState extends State<Menu> {
                   padding: const EdgeInsets.only(right: 11.0, bottom: 11),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: const Color(0xff1d3f5e),
                       elevation: 7,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(31), // <-- Radius
@@ -538,12 +540,24 @@ class _MenuState extends State<Menu> {
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * .13, vertical: 0),
                     child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(HeroDialogRoute(
-                          bgColor: bgColor.withOpacity(0.85),
-                          builder: (context) => Center(
-                              child: DuaList(eng: widget.eng, ar: widget.ar,)),
-                        ));
+                      onTap: () async {
+                        setState(() {
+                          if (flag == 1) {
+                            flag = 0;
+                          } else {
+                            flag = 1;
+                          }
+                        });
+                        if (flag == 0) {
+                          audioPlayer.pause();
+                          return;
+                        }
+                        final Directory? appDocDir =
+                            await getExternalStorageDirectory();
+                        var appDocPath = appDocDir?.path;
+                        var file = File("${appDocPath!}/2.mp3");
+                        await file.exists() ? print("yes") : print("no");
+                        audioPlayer.play(DeviceFileSource(file.path));
                       },
                       child: Container(
                           width: size.width,

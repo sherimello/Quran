@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quran/pages/add_duas.dart';
+import 'package:quran/pages/add_search_DB_data.dart';
 import 'package:quran/pages/splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Qur\'an',
             theme: theme,
-            home: const AddDuas(),
+            home: const Splash(),
             builder: (context, child) {
               return MediaQuery(
                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
