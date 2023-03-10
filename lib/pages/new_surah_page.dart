@@ -123,7 +123,11 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
       favorite_verses = [];
 
   var yt = YoutubeExplode();
-  bool audioExists = false, playingAudio = false;
+  bool audioExists = false, playingAudio = false, stopClicked = false;
+  String audioLength = "00:00:00", currentTime = "00:00:00";
+  AudioPlayer audioPlayer = AudioPlayer();
+
+  IconData play_pause_icon = Icons.pause_circle_filled_rounded;
 
   assignmentForLightMode() {
     bgColor = Colors.white;
@@ -160,6 +164,91 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   void changeStatusBarColor(int colorCode) {
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Color(colorCode)));
+  }
+
+  playAudio() async {
+    final Directory? appDocDir = await getExternalStorageDirectory();
+    var appDocPath = appDocDir?.path;
+
+    var file = File("${appDocPath!}/${widget.surah_id}.mp3");
+    audioPlayer.play(DeviceFileSource(file.path));
+
+    audioPlayer.onPlayerStateChanged.listen((status) {
+      if (status == PlayerState.playing) {
+        setState(() {
+          play_pause_icon = Icons.pause_circle_filled_rounded;
+        });
+      }
+      if (status == PlayerState.paused) {
+        setState(() {
+          play_pause_icon = Icons.play_circle_fill_rounded;
+        });
+      }
+    });
+
+    audioPlayer.onPositionChanged.listen((event) {
+      if (event.inSeconds != 0) {
+        // var duration = event.inMilliseconds; //get the duration of audio
+        // progress = (event.inMilliseconds / duration)*100; // get the current position in percent
+
+        int secs = event.inSeconds;
+        print(secs);
+        int hours = secs ~/ 3600;
+        int temp = secs ~/ 60;
+        if (temp >= 60) {
+          temp -= 60;
+          hours += 1;
+        }
+        int minutes = temp;
+
+        secs -= (hours * 3600) + (minutes * 60);
+
+        String h = "", m = "", s = "";
+
+        hours.toString().length == 1 ? h = "0$hours" : h = "$hours";
+        minutes.toString().length == 1 ? m = "0$minutes" : m = "$minutes";
+        secs.toString().length == 1 ? s = "0$secs" : s = "$secs";
+        // Now that we have the duration, stop the player.
+        setState(() {
+          // print(secs);
+          // print("$hours:$minutes:$secs");
+          // playingAudio = true;
+          currentTime = "$h:$m:$s";
+          if (currentTime == audioLength) {
+            play_pause_icon = Icons.play_circle_fill_rounded;
+          }
+          // audioLength = double.parse(audioPlayer.getDuration());
+        });
+      }
+    });
+
+    audioPlayer.onDurationChanged.listen((Duration duration) {
+      int secs = duration.inSeconds;
+      print(secs);
+      int hours = secs ~/ 3600;
+      int temp = secs ~/ 60;
+      if (temp >= 60) {
+        temp -= 60;
+        hours += 1;
+      }
+      int minutes = temp;
+
+      secs -= (hours * 3600) + (minutes * 60);
+
+      String h = "", m = "", s = "";
+
+      hours.toString().length == 1 ? h = "0$hours" : "$hours";
+      minutes.toString().length == 1 ? m = "0$minutes" : "$minutes";
+      secs.toString().length == 1 ? s = "0$secs" : "$secs";
+      // Now that we have the duration, stop the player.
+      setState(() {
+        print(secs);
+        print("$hours:$minutes:$secs");
+        playingAudio = true;
+        audioLength = "$h:$m:$s";
+        // audioLength = double.parse(audioPlayer.getDuration());
+      });
+    });
   }
 
   checkIfAudioExists() async {
@@ -293,6 +382,9 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     if (downloadTapped && progress != 100.0) {
       file.deleteSync();
     }
+    if (playingAudio) {
+      audioPlayer.stop();
+    }
   }
 
   @override
@@ -341,6 +433,8 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
             setState(() {
               progress = ((count / len.toDouble()) * 100).ceil().toDouble();
               if (progress == 100.0) {
+                playAudio();
+                playingAudio = true;
                 checkIfAudioExists();
               }
             });
@@ -357,8 +451,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
           await fileStream.close().whenComplete(() {
             var fileStream = file.openRead();
             //...
-            AudioPlayer audioPlayer = AudioPlayer();
-            audioPlayer.setSourceUrl(file.path);
+            playAudio();
             // audioPlayer.setSource(AssetSource("$appDocPath/2.mp3"));
             // audioPlayer.play("$appDocPath/2.mp3");
           });
@@ -414,7 +507,9 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                   width: size.width,
                   color: color_container_dark == Colors.black
                       ? Colors.black
-                      : playingAudio ? color_container_dark : const Color(0xff1d3f5e),
+                      : playingAudio
+                          ? color_container_dark
+                          : const Color(0xff1d3f5e),
                   child: Row(
                     children: [
                       Opacity(
@@ -483,12 +578,14 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(
-                      top: playingAudio
-                          ? AppBar().preferredSize.height * 2 +
-                              AppBar().preferredSize.height * .29 * .5
-                          : AppBar().preferredSize.height),
+                AnimatedPositioned(
+                  left: 0,
+                  right: 0,
+                  top: playingAudio
+                      ? AppBar().preferredSize.height * 2 +
+                      AppBar().preferredSize.height * .29 * .5
+                      : AppBar().preferredSize.height,
+                  duration: const Duration(milliseconds: 355),
                   child: Container(
                     width: size.width,
                     color: color_container_dark,
@@ -504,7 +601,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                             // textScaleFactor: ,
                             style: TextStyle(
                                 inherit: false,
-                                color: color_main_text,
+                                color: widget.surah_id == '1' || widget.surah_id == '9' ? Colors.transparent : color_main_text,
                                 fontFamily: '110_Besmellah',
                                 fontStyle: FontStyle.normal,
                                 fontSize: 30,
@@ -517,11 +614,32 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: widget.surah_id == '1' || widget.surah_id == '9'
-                      ? EdgeInsets.only(top: AppBar().preferredSize.height)
-                      : EdgeInsets.only(top: playingAudio ? AppBar().preferredSize.height * 3 + AppBar().preferredSize.height * .29 * .5 : AppBar().preferredSize.height * 2),
+                AnimatedPositioned(
+                  right: 0,
+                  left: 0,
+                  top: widget.surah_id == '1' || widget.surah_id == '9'
+                      ? playingAudio
+                          ? AppBar().preferredSize.height * 2 +
+                              AppBar().preferredSize.height * .29 * .5
+                          : AppBar().preferredSize.height
+                      : playingAudio
+                          ? AppBar().preferredSize.height * 3 +
+                              AppBar().preferredSize.height * .29 * .5
+                          : AppBar().preferredSize.height * 2,
+                  duration: const Duration(milliseconds: 355),
                   child: Container(
+                    width: size.width,
+                    height: widget.surah_id == '1' || widget.surah_id == '9'
+                        ? playingAudio
+                            ? size.height -
+                                (AppBar().preferredSize.height * 2 +
+                                    AppBar().preferredSize.height * .29 * .5) - MediaQuery.of(context).padding.top
+                            : size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top
+                        : playingAudio
+                            ? size.height -
+                                (AppBar().preferredSize.height * 3 +
+                                    AppBar().preferredSize.height * .29 * .5) - MediaQuery.of(context).padding.top
+                            : size.height - AppBar().preferredSize.height * 2 - MediaQuery.of(context).padding.top,
                     color: widget.verses.length.isOdd
                         ? color_container_dark
                         : color_container_light,
@@ -819,9 +937,16 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                               : downloadTapped = true;
                           downloadSurahMP3();
                         } else {
-                          playingAudio = true;
+                          if (audioPlayer.state != PlayerState.paused &&
+                              audioPlayer.state != PlayerState.playing &&
+                              audioPlayer.state != PlayerState.completed) {
+                            playingAudio = true;
+                            playingAudio = true;
+                            playAudio();
+                          }
                         }
                       });
+                      // if (playingAudio) playAudio();
                     },
                     child: Stack(
                       alignment: Alignment.center,
@@ -843,29 +968,205 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                               ? AppBar().preferredSize.height * .71
                               : AppBar().preferredSize.height * 2,
                           decoration: BoxDecoration(
-                             boxShadow: [
-                               BoxShadow(
-                                 color: Colors.black.withOpacity(.55),
-                               ),
-                               BoxShadow(
-                                 color: Colors.black.withOpacity(.55),
-                               ),
-                             ],
-                              color: const Color(0xffffffff),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: color_container_dark == Colors.black
+                                      ? Colors.white.withOpacity(.35)
+                                      : Colors.black.withOpacity(.15),
+                                  spreadRadius: 7,
+                                  blurRadius: 19,
+                                  offset: const Offset(
+                                      7, 7), // changes position of shadow
+                                ),
+                                BoxShadow(
+                                  color: color_container_dark == Colors.black
+                                      ? Colors.white.withOpacity(.35)
+                                      : Colors.black.withOpacity(.15),
+                                  spreadRadius: 7,
+                                  blurRadius: 19,
+                                  offset: const Offset(
+                                      -7, -7), // changes position of shadow
+                                ),
+                              ],
+                              color: Colors.white,
                               borderRadius: playingAudio == false
                                   ? BorderRadius.circular(1000)
                                   : BorderRadius.circular(size.width * .105)),
-                          child: Opacity(
-                            opacity:
-                                downloadTapped == true || playingAudio == true
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Opacity(
+                                opacity: downloadTapped == true ||
+                                        playingAudio == true
                                     ? 0
                                     : 1,
-                            child: Icon(
-                              audioExists
-                                  ? Icons.play_arrow_rounded
-                                  : Icons.headphones,
-                              color: const Color(0xff1d3f5e),
-                            ),
+                                child: Icon(
+                                  audioExists
+                                      ? Icons.play_arrow_rounded
+                                      : Icons.headphones,
+                                  color: const Color(0xff1d3f5e),
+                                ),
+                              ),
+                              Visibility(
+                                visible: playingAudio,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        width: size.width,
+                                        height: AppBar().preferredSize.height,
+                                        child: Center(
+                                          child: Text.rich(
+                                            textAlign: TextAlign.center,
+                                            TextSpan(children: [
+                                              WidgetSpan(
+                                                  alignment:
+                                                      PlaceholderAlignment
+                                                          .middle,
+                                                  child: Image.asset(
+                                                    widget.image,
+                                                    color: Colors.black,
+                                                    height: 13,
+                                                    width: 13,
+                                                  )),
+                                              TextSpan(
+                                                  text:
+                                                      '   ${widget.surah_name}  ',
+                                                  style: TextStyle(
+                                                      height: 0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily:
+                                                          'varela-round.regular',
+                                                      color: Colors.black,
+                                                      fontSize: AppBar()
+                                                              .preferredSize
+                                                              .height *
+                                                          .21)),
+                                              TextSpan(
+                                                text: widget.arabic_name,
+                                                style: TextStyle(
+                                                    height: 0,
+                                                    color: Colors.black,
+                                                    fontSize: AppBar()
+                                                            .preferredSize
+                                                            .height *
+                                                        .21,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'Diwanltr'),
+                                              ),
+                                              TextSpan(
+                                                text:
+                                                    "\n$currentTime / $audioLength   ",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: AppBar()
+                                                            .preferredSize
+                                                            .height *
+                                                        .21,
+                                                    fontFamily:
+                                                        "varela-round.regular",
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ]),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: size.width,
+                                        height: AppBar().preferredSize.height,
+                                        child: Center(
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    audioPlayer.stop();
+                                                    setState(() {
+                                                      playingAudio = false;
+                                                      currentTime = "00:00:00";
+                                                    });
+                                                  },
+                                                  child: Icon(
+                                                    Icons.cancel,
+                                                    size: AppBar()
+                                                            .preferredSize
+                                                            .height *
+                                                        .55,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    audioPlayer.stop();
+                                                    setState(() {
+                                                      stopClicked = true;
+                                                      play_pause_icon = Icons
+                                                          .play_circle_fill_rounded;
+                                                      currentTime = "00:00:00";
+                                                    });
+                                                  },
+                                                  child: Icon(
+                                                    Icons.stop_circle,
+                                                    color: Colors.black,
+                                                    size: AppBar()
+                                                            .preferredSize
+                                                            .height *
+                                                        .55,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 5,
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (play_pause_icon ==
+                                                          Icons
+                                                              .pause_circle_filled_rounded) {
+                                                        audioPlayer.pause();
+                                                      } else {
+                                                        stopClicked
+                                                            ? playAudio()
+                                                            : audioPlayer
+                                                                .resume();
+                                                        // setState(() {
+                                                        //   play_pause_icon = Icons.pause_circle_filled_rounded;
+                                                        // });
+                                                      }
+                                                    });
+                                                  },
+                                                  child: Icon(
+                                                    color: Colors.black,
+                                                    play_pause_icon,
+                                                    size: AppBar()
+                                                            .preferredSize
+                                                            .height *
+                                                        .55,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
                         Visibility(

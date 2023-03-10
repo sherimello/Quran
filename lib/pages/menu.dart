@@ -536,76 +536,79 @@ class _MenuState extends State<Menu> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: size.width * .13, vertical: 0),
-                    child: GestureDetector(
-                      onTap: () async {
-                        setState(() {
-                          if (flag == 1) {
-                            flag = 0;
-                          } else {
-                            flag = 1;
+                  Visibility(
+                    visible: false,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: size.width * .13, vertical: 0),
+                      child: GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            if (flag == 1) {
+                              flag = 0;
+                            } else {
+                              flag = 1;
+                            }
+                          });
+                          if (flag == 0) {
+                            audioPlayer.pause();
+                            return;
                           }
-                        });
-                        if (flag == 0) {
-                          audioPlayer.pause();
-                          return;
-                        }
-                        final Directory? appDocDir =
-                            await getExternalStorageDirectory();
-                        var appDocPath = appDocDir?.path;
-                        var file = File("${appDocPath!}/2.mp3");
-                        await file.exists() ? print("yes") : print("no");
-                        audioPlayer.play(DeviceFileSource(file.path));
-                      },
-                      child: Container(
-                          width: size.width,
-                          // height: AppBar().preferredSize.height * .67,
-                          decoration: BoxDecoration(
-                            color: const Color(0xff1d3f5e),
-                            borderRadius: BorderRadius.circular(13),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    const Color(0xff1d3f5e).withOpacity(0.15),
-                                spreadRadius: 3,
-                                blurRadius: 19,
-                                offset: const Offset(
-                                    0, 0), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 11.0, vertical: 11),
-                              child: Center(
-                                child: Text.rich(
-                                  textAlign: TextAlign.center,
-                                  TextSpan(children: [
-                                    WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(right: 7.0),
-                                          child: Icon(
-                                            Icons.mosque,
-                                            color: Colors.white,
-                                            size: 19,
-                                          ),
-                                        )),
-                                    TextSpan(
-                                        text: "  du'as (supplications)",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'varela-round.regular',
-                                            fontSize: 13,
-                                            color: Colors.white)),
-                                  ]),
+                          final Directory? appDocDir =
+                              await getExternalStorageDirectory();
+                          var appDocPath = appDocDir?.path;
+                          var file = File("${appDocPath!}/2.mp3");
+                          await file.exists() ? print("yes") : print("no");
+                          audioPlayer.play(DeviceFileSource(file.path));
+                        },
+                        child: Container(
+                            width: size.width,
+                            // height: AppBar().preferredSize.height * .67,
+                            decoration: BoxDecoration(
+                              color: const Color(0xff1d3f5e),
+                              borderRadius: BorderRadius.circular(13),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      const Color(0xff1d3f5e).withOpacity(0.15),
+                                  spreadRadius: 3,
+                                  blurRadius: 19,
+                                  offset: const Offset(
+                                      0, 0), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 11.0, vertical: 11),
+                                child: Center(
+                                  child: Text.rich(
+                                    textAlign: TextAlign.center,
+                                    TextSpan(children: [
+                                      WidgetSpan(
+                                          alignment: PlaceholderAlignment.middle,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(right: 7.0),
+                                            child: Icon(
+                                              Icons.mosque,
+                                              color: Colors.white,
+                                              size: 19,
+                                            ),
+                                          )),
+                                      TextSpan(
+                                          text: "  du'as (supplications)",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'varela-round.regular',
+                                              fontSize: 13,
+                                              color: Colors.white)),
+                                    ]),
+                                  ),
                                 ),
                               ),
-                            ),
-                          )),
+                            )),
+                      ),
                     ),
                   ),
                 ],
