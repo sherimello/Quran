@@ -1,22 +1,55 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:quran/classes/Dua.dart';
 
 class Duas extends StatefulWidget {
   final String title;
   final double eng, ar;
 
-  const Duas({Key? key, required this.title, required this.eng, required this.ar}) : super(key: key);
+  const Duas(
+      {Key? key, required this.title, required this.eng, required this.ar})
+      : super(key: key);
 
   @override
   State<Duas> createState() => _DuasState();
 }
 
 class _DuasState extends State<Duas> {
+  List<String> arabic = [];
+  List<String> english = [];
+  List<String> pronunciation = [];
+  List<String> recommendation = [];
+  List<String> surah_num = [];
+  List<String> verse_num = [];
+
+  fetchDuasFromCloud() async {
+    final snapshot = await FirebaseDatabase.instance.ref("quranic duas").get();
+    final Map<dynamic, dynamic> map = snapshot.value as Map<dynamic, dynamic>;
+
+    map.forEach((key, value) {
+      final dua = Dua.fromMap(value);
+      arabic.add(dua.arabic);
+      english.add(dua.english);
+      pronunciation.add(dua.pronunciation);
+      recommendation.add(dua.recommendation);
+      surah_num.add(dua.surah);
+      verse_num.add(dua.verse);
+    });
+    setState(() {
+      arabic = arabic;
+      english = english;
+      pronunciation = pronunciation;
+      recommendation = recommendation;
+      surah_num = surah_num;
+      verse_num = verse_num;
+    });
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    fetchDuasFromCloud();
   }
 
   @override
@@ -73,7 +106,7 @@ class _DuasState extends State<Duas> {
               padding: EdgeInsets.only(top: appBar.preferredSize.height),
               child: ListView.builder(
                   physics: const BouncingScrollPhysics(),
-                  itemCount: 3,
+                  itemCount: verse_num.isEmpty ? 0 : verse_num.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Container(
                       decoration: BoxDecoration(
@@ -98,13 +131,10 @@ class _DuasState extends State<Duas> {
                                             Text(
                                               "اللّٰهُ أَكْبَر",
                                               // 'k',
-                                              textDirection:
-                                              TextDirection
-                                                  .rtl,
-                                              textAlign:
-                                              TextAlign
-                                                  .center,
-                                              textScaleFactor: size.height / size.width,
+                                              textDirection: TextDirection.rtl,
+                                              textAlign: TextAlign.center,
+                                              textScaleFactor:
+                                                  size.height / size.width,
                                               style: TextStyle(
                                                 // wordSpacing: 2,
                                                 fontFamily:
@@ -121,8 +151,7 @@ class _DuasState extends State<Duas> {
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         fontFamily: 'varela-round.regular',
-                                    fontSize: widget.eng
-                                    ),
+                                        fontSize: widget.eng),
                                   ),
                                   const SizedBox(
                                     height: 8,

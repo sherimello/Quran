@@ -38,7 +38,8 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Qur\'an',
             theme: theme,
-            home: const Splash(),
+            home: const AddDuas(),
+            // home: const Splash(),
             builder: (context, child) {
               return MediaQuery(
                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),

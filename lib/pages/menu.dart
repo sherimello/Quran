@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quran/pages/bookmark_folders.dart';
+import 'package:quran/pages/duas.dart';
 import 'package:quran/pages/new_surah_page.dart';
 import 'package:quran/pages/surah_list.dart';
 import 'package:quran/pages/verses_search.dart';
@@ -467,8 +468,7 @@ class _MenuState extends State<Menu> {
                   Visibility(
                     visible: value_last_read_exists ? true : false,
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: size.width * .13, vertical: 0),
+                      padding: EdgeInsets.fromLTRB(size.width * .13, 0, size.width * .13, 7),
                       child: GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(HeroDialogRoute(
@@ -537,29 +537,34 @@ class _MenuState extends State<Menu> {
                     ),
                   ),
                   Visibility(
-                    visible: false,
+                    visible: true,
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                           horizontal: size.width * .13, vertical: 0),
                       child: GestureDetector(
                         onTap: () async {
-                          setState(() {
-                            if (flag == 1) {
-                              flag = 0;
-                            } else {
-                              flag = 1;
-                            }
-                          });
-                          if (flag == 0) {
-                            audioPlayer.pause();
-                            return;
-                          }
-                          final Directory? appDocDir =
-                              await getExternalStorageDirectory();
-                          var appDocPath = appDocDir?.path;
-                          var file = File("${appDocPath!}/2.mp3");
-                          await file.exists() ? print("yes") : print("no");
-                          audioPlayer.play(DeviceFileSource(file.path));
+                          Navigator.of(context).push(HeroDialogRoute(
+                            bgColor: bgColor.withOpacity(0.85),
+                            builder: (context) => Center(
+                                child: Duas(title: "test", eng: widget.eng, ar: widget.ar,)),
+                          ));
+                          // setState(() {
+                          //   if (flag == 1) {
+                          //     flag = 0;
+                          //   } else {
+                          //     flag = 1;
+                          //   }
+                          // });
+                          // if (flag == 0) {
+                          //   audioPlayer.pause();
+                          //   return;
+                          // }
+                          // final Directory? appDocDir =
+                          //     await getExternalStorageDirectory();
+                          // var appDocPath = appDocDir?.path;
+                          // var file = File("${appDocPath!}/2.mp3");
+                          // await file.exists() ? print("yes") : print("no");
+                          // audioPlayer.play(DeviceFileSource(file.path));
                         },
                         child: Container(
                             width: size.width,

@@ -193,17 +193,17 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
 
         int secs = event.inSeconds;
         print(secs);
-        int hours = secs ~/ 3600;
-        int temp = secs ~/ 60;
-        if (temp >= 60) {
-          temp -= 60;
-          hours += 1;
-        }
-        int minutes = temp;
+        int hours = (secs / 3600).floor();
+        secs = secs - hours * 3600;
+        int minutes = (secs / 60).floor();
 
-        secs -= (hours * 3600) + (minutes * 60);
+        secs = secs - minutes * 60;
+
+        // secs -= (hours * 3600) + (minutes * 60);
 
         String h = "", m = "", s = "";
+
+        print("$hours:$minutes:$secs");
 
         hours.toString().length == 1 ? h = "0$hours" : h = "$hours";
         minutes.toString().length == 1 ? m = "0$minutes" : m = "$minutes";
@@ -225,21 +225,17 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     audioPlayer.onDurationChanged.listen((Duration duration) {
       int secs = duration.inSeconds;
       print(secs);
-      int hours = secs ~/ 3600;
-      int temp = secs ~/ 60;
-      if (temp >= 60) {
-        temp -= 60;
-        hours += 1;
-      }
-      int minutes = temp;
+      int hours = (secs / 3600).floor();
+      secs = secs - hours * 3600;
+      int minutes = (secs / 60).floor();
 
-      secs -= (hours * 3600) + (minutes * 60);
+      secs = secs - minutes * 60;
 
       String h = "", m = "", s = "";
 
-      hours.toString().length == 1 ? h = "0$hours" : "$hours";
-      minutes.toString().length == 1 ? m = "0$minutes" : "$minutes";
-      secs.toString().length == 1 ? s = "0$secs" : "$secs";
+      hours.toString().length == 1 ? h = "0$hours" : h = hours.toString();
+      minutes.toString().length == 1 ? m = "0$minutes" : m = "$minutes";
+      secs.toString().length == 1 ? s = "0$secs" : s = "$secs";
       // Now that we have the duration, stop the player.
       setState(() {
         print(secs);
@@ -971,7 +967,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                               boxShadow: [
                                 BoxShadow(
                                   color: color_container_dark == Colors.black
-                                      ? Colors.white.withOpacity(.35)
+                                      ? Colors.transparent.withOpacity(.35)
                                       : Colors.black.withOpacity(.15),
                                   spreadRadius: 7,
                                   blurRadius: 19,
@@ -980,7 +976,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                 ),
                                 BoxShadow(
                                   color: color_container_dark == Colors.black
-                                      ? Colors.white.withOpacity(.35)
+                                      ? Colors.transparent.withOpacity(.35)
                                       : Colors.black.withOpacity(.15),
                                   spreadRadius: 7,
                                   blurRadius: 19,
@@ -1088,7 +1084,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                GestureDetector(
+                                                GestureDetector(        //coding in wrong oplacwe
                                                   onTap: () {
                                                     audioPlayer.stop();
                                                     setState(() {
@@ -1206,7 +1202,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                           await getExternalStorageDirectory();
                       var appDocPath = appDocDir?.path;
                       var file = File("${appDocPath!}/2.mp3");
-                      file.deleteSync();
+                      file.delete();
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 355),
