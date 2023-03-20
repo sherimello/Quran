@@ -58,6 +58,7 @@ dependencies:
   package_info_plus: ^3.0.3
   youtube_explode_dart: ^1.12.4
   audioplayers: ^3.0.1
+  connectivity_plus: ^3.0.3
 
 
 dev_dependencies:

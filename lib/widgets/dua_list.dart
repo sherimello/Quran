@@ -115,7 +115,7 @@ class _DuaListState extends State<DuaList> {
                                           Navigator.of(context).push(HeroDialogRoute(
                                             bgColor: Colors.black.withOpacity(0.85),
                                             builder: (context) => Center(
-                                                child: Duas(title: "after fard prayer", eng: widget.eng, ar: widget.ar,)),
+                                                child: Duas(title: "after fard prayer", eng: widget.eng, ar: widget.ar, theme: Color(0xff000000),)),
                                           ));
                                           // downloadSurahMP3();
                                         },

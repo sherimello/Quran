@@ -643,7 +643,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                         controller: autoScrollController,
                         scrollDirection: Axis.vertical,
                         physics: const BouncingScrollPhysics(),
-                        itemCount: widget.verses.length,
+                        itemCount: widget.translated_verse.isEmpty ? 0 : widget.translated_verse.length,
                         itemBuilder: (BuildContext context, int index) {
                           // print(
                           //     '${isPortraitMode() ? size.height / size.width : size.width / size.height}');

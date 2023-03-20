@@ -546,7 +546,7 @@ class _MenuState extends State<Menu> {
                           Navigator.of(context).push(HeroDialogRoute(
                             bgColor: bgColor.withOpacity(0.85),
                             builder: (context) => Center(
-                                child: Duas(title: "test", eng: widget.eng, ar: widget.ar,)),
+                                child: Duas(title: "test", eng: widget.eng, ar: widget.ar, theme: bgColor)),
                           ));
                           // setState(() {
                           //   if (flag == 1) {

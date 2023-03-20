@@ -109,17 +109,23 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                             const SizedBox(
                               height: 21,
                             ),
-                            Text(
-                              'ALLAH (SWT) says:',
-                              style: TextStyle(
-                                  fontFamily: 'varela-round.regular',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: top_heading_size,
-                                color: color_main_text
+                            Visibility(
+                              visible: widget.surah_name != "",
+                              child: Text(
+                                'ALLAH (SWT) says:',
+                                style: TextStyle(
+                                    fontFamily: 'varela-round.regular',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: top_heading_size,
+                                  color: color_main_text
+                                ),
                               ),
                             ),
-                            value_arabic_text ? const SizedBox(
-                              height: 11,
+                            value_arabic_text ? Visibility(
+                              visible: widget.surah_name == "",
+                              child: const SizedBox(
+                                height: 11,
+                              ),
                             ) : const SizedBox(),
                             value_arabic_text ? Text(
                               widget.verse_arabic,
@@ -153,6 +159,11 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                               height: 11,
                             ) : const SizedBox(),
                             value_reference_tag ? Text(
+                              widget.surah_name == "" ?
+                                  widget.verse_number == "0" ?
+                                      widget.surah_number
+                                  : "Qur'an [${widget.surah_number}:${widget.verse_number}]"
+                                  :
                               'Surah ${widget.surah_name} | [${widget.surah_number}:${widget.verse_number}]',
                               style: TextStyle(
                                   fontFamily: 'Rounded_Elegance',
@@ -160,6 +171,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                                   fontSize: surah_tag,
                                 color: color_main_text
                               ),
+                              textAlign: TextAlign.center,
                             ) : const SizedBox(),
                             const SizedBox(
                               height: 21,

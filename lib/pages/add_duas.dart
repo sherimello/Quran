@@ -140,11 +140,12 @@ class _AddDuasState extends State<AddDuas> {
                       fillColor: const Color(0xff1d3f5e),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: const Color(0xff1d3f5e))),
+                          borderSide:
+                          const BorderSide(color: Color(0xff1d3f5e))),
                       labelText: 'surah number',
                       hintText: '2',
                     ),
-                    style: TextStyle(fontFamily: "varela-round.regular"),
+                    style: const TextStyle(fontFamily: "varela-round.regular"),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -162,11 +163,11 @@ class _AddDuasState extends State<AddDuas> {
                       fillColor: const Color(0xff1d3f5e),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: const Color(0xff1d3f5e))),
+                          borderSide: const BorderSide(color: Color(0xff1d3f5e))),
                       labelText: 'verse number',
                       hintText: '127',
                     ),
-                    style: TextStyle(fontFamily: "varela-round.regular"),
+                    style: const TextStyle(fontFamily: "varela-round.regular"),
                     textAlign: TextAlign.center,
                   ),
                 ),
