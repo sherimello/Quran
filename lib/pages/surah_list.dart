@@ -658,7 +658,8 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                                       ),),
 
                                     const TextSpan(
-                                      text: 'Qur\'an',
+                                      text: 'The Book',
+                                      // 'Qur\'an',
                                       style: TextStyle(
                                           fontFamily: 'Bismillah Script',
                                           fontWeight: FontWeight.bold,

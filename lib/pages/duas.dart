@@ -357,6 +357,7 @@ class _DuasState extends State<Duas> {
                                                                 size.height /
                                                                     size.width,
                                                             style: TextStyle(
+                                                              color: widget.theme == Colors.black ? Colors.white : Colors.black,
                                                               // wordSpacing: 2,
                                                               fontFamily:
                                                                   'Al Majeed Quranic Font_shiped',
@@ -380,6 +381,7 @@ class _DuasState extends State<Duas> {
                                                             textAlign: TextAlign
                                                                 .center,
                                                             style: TextStyle(
+                                                              color: widget.theme == Colors.black ? Colors.white : Colors.black,
                                                               // wordSpacing: 2,
                                                               fontStyle:
                                                                   FontStyle
@@ -407,6 +409,7 @@ class _DuasState extends State<Duas> {
                                         duas[index]['english'],
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
+                                            color: widget.theme == Colors.black ? Colors.white : Colors.black,
                                             fontFamily: 'varela-round.regular',
                                             fontWeight: FontWeight.bold,
                                             fontSize: widget.eng),
@@ -422,6 +425,7 @@ class _DuasState extends State<Duas> {
                                       // 'k',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
+                                        color: widget.theme == Colors.black ? Colors.white : Colors.black,
                                         // wordSpacing: 2,
                                         fontStyle: FontStyle.italic,
                                         fontFamily: 'varela-round.regular',
@@ -459,6 +463,7 @@ class _DuasState extends State<Duas> {
                                         duas[index]['recommendation'],
                                         textAlign: TextAlign.start,
                                         style: TextStyle(
+                                            color: widget.theme == Colors.black ? Colors.white : Colors.black,
                                             fontFamily: 'varela-round.regular',
                                             fontSize: widget.eng),
                                       ),
