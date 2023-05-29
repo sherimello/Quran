@@ -233,7 +233,7 @@ class _SurahPageState extends State<SurahPage> {
                                                   style: const TextStyle(
                                                     wordSpacing: 2,
                                                     fontFamily:
-                                                        'Al Majeed Quranic Font_shiped',
+                                                        'KFGQPC Uthmanic Script HAFS Regular',
                                                     fontSize: 12,
                                                   ),
                                                 ),

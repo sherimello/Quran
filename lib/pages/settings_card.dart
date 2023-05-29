@@ -432,7 +432,7 @@ class _SettingsCardState extends State<SettingsCard> with SingleTickerProviderSt
                                                       style: TextStyle(
                                                         //101 + size.width * .1 * 2
                                                         height: 1,
-                                                        fontFamily: 'Al Majeed Quranic Font_shiped',
+                                                        fontFamily: 'Al_Mushaf',
                                                         color: Colors.black,
                                                         fontSize: widget.fontsize_arab,
                                                       ),

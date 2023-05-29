@@ -59,6 +59,7 @@ dependencies:
   youtube_explode_dart: ^1.12.4
   audioplayers: ^3.0.1
   connectivity_plus: ^3.0.3
+  al_quran: ^0.1.1+5
 
 
 dev_dependencies:
@@ -94,6 +95,7 @@ flutter:
     - lib/assets/images/
 #    - lib/assets/images/surah indices/
     - lib/assets/
+    - lib/assets/fonts/
     #   - images/a_dot_ham.jpeg
 
     # An image asset can refer to one or more resolution-specific "variants", see
@@ -126,6 +128,18 @@ flutter:
     - family: Bismillah Script
       fonts:
         - asset: lib/assets/fonts/Bismillah Script.ttf
+    - family: KFGQPC WARSH Uthmanic Script Regular
+      fonts:
+        - asset: lib/assets/fonts/KFGQPC WARSH Uthmanic Script.ttf
+    - family: KFGQPC HafsEx1 Uthmanic Script
+      fonts:
+        - asset: lib/assets/fonts/KFGQPC HafsEx1 Uthmanic Script.ttf
+    - family: Muhammadi Quranic Font
+      fonts:
+        - asset: lib/assets/fonts/Muhammadi Quranic Font.ttf
+    - family: Al_Mushaf
+      fonts:
+        - asset: lib/assets/fonts/Al_Mushaf.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

@@ -303,7 +303,15 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                     textAlign: TextAlign.right,
                                                     textScaleFactor:
                                                     (isPortraitMode() ? size.height / size.width : size.width / size.height),
-                                                    TextSpan(children: [
+                                                    TextSpan(
+                                                        style: TextStyle(
+                                                          color: color_main_text,
+                                                          // wordSpacing: 2,
+                                                          fontFamily:
+                                                          'Al_Mushaf',
+                                                          fontSize: widget.ar,
+                                                        ),
+                                                        children: [
                                                       TextSpan(
                                                         text: verses.isNotEmpty
                                                             ? '${verses[index]['arabic']}  '
@@ -311,9 +319,9 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                         // 'k',
                                                         style: TextStyle(
                                                           color: color_main_text,
-                                                          wordSpacing: 2,
+                                                          // wordSpacing: 2,
                                                           fontFamily:
-                                                          'Al Majeed Quranic Font_shiped',
+                                                          'Al_Mushaf',
                                                           fontSize: widget.ar,
                                                         ),
                                                       ),
@@ -330,13 +338,13 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
                                                       ),
                                                       TextSpan(
                                                         text: verses.isNotEmpty ? "${arabicNumber
-                                                            .convert(verses[index]['verse_id'])}:${arabicNumber
+                                                            .convert(verses[index]['verse_id'])}  :  ${arabicNumber
                                                             .convert(verses[index]['surah_id'])}" : "",
                                                         style: TextStyle(
                                                           color: color_main_text,
-                                                            wordSpacing: 3,
+                                                            // wordSpacing: 3,
                                                             fontSize: widget.ar - 5,
-                                                            fontWeight: FontWeight.bold
+                                                            fontWeight: FontWeight.bold,
                                                         ),
                                                       ),
                                                       TextSpan(

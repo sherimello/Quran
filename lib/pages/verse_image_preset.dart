@@ -136,7 +136,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                                 wordSpacing: 2,
                                 height: 1.5,
                                 fontFamily:
-                                'Al Majeed Quranic Font_shiped',
+                                'KFGQPC HafsEx1 Uthmanic Script',
                                 fontSize: arabic_size,
                                 color: color_main_text
                               ),
@@ -228,209 +228,211 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
         ),
       ),
       body: SafeArea(
-          child: Column(
-            children: [
-              Material(
-                color: Colors.transparent,
-                child: Padding(
-                  padding: const EdgeInsets.all(19.0),
-                  child: Hero(
-                      tag: widget.tag,
-                      createRectTween: (begin, end) {
-                        return CustomRectTween(begin: begin!, end: end!);
-                      },
-                      child: verseImage()),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Material(
+                  color: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.all(19.0),
+                    child: Hero(
+                        tag: widget.tag,
+                        createRectTween: (begin, end) {
+                          return CustomRectTween(begin: begin!, end: end!);
+                        },
+                        child: verseImage()),
+                  ),
                 ),
-              ),
-              SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(19.0),
-                      child: Text(
-                        '***adjust text size(s) with the help of the "+"/"-" button. otherwise it\'s very likely that you won\'t get all the information in your picture.' ,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'varela-round.regular',
-                            color: color_main_text,
-                            // color: Color(0xff1d3f5e),
-                            fontStyle: FontStyle.italic
-                        ),),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              top_heading_size -= .25;
-                              arabic_size -= 1;
-                              english_size -= 1;
-                              surah_tag -= .25;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(11),
-                                color: const Color(0xff1d3f5e)
-                            ),
-                            // width: 45,
-                            // height: 45,
-                            child: const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(
-                                  Icons.minimize_rounded,
-                                  color: Colors.white,
+                SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(19.0),
+                        child: Text(
+                          '***adjust text size(s) with the help of the "+"/"-" button. otherwise it\'s very likely that you won\'t get all the information in your picture.' ,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'varela-round.regular',
+                              color: color_main_text,
+                              // color: Color(0xff1d3f5e),
+                              fontStyle: FontStyle.italic
+                          ),),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                top_heading_size -= .25;
+                                arabic_size -= 1;
+                                english_size -= 1;
+                                surah_tag -= .25;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(11),
+                                  color: const Color(0xff1d3f5e)
+                              ),
+                              // width: 45,
+                              // height: 45,
+                              child: const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.minimize_rounded,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 11,),
-                        GestureDetector(
-                          onTap: (){
-                            setState(() {
-                              top_heading_size += .25;
-                              arabic_size += 1;
-                              english_size += 1;
-                              surah_tag += .25;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(11),
-                                color: const Color(0xff1d3f5e)
-                            ),
-                            // width: 45,
-                            // height: 45,
-                            child: const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
+                          const SizedBox(width: 11,),
+                          GestureDetector(
+                            onTap: (){
+                              setState(() {
+                                top_heading_size += .25;
+                                arabic_size += 1;
+                                english_size += 1;
+                                surah_tag += .25;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(11),
+                                  color: const Color(0xff1d3f5e)
+                              ),
+                              // width: 45,
+                              // height: 45,
+                              child: const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 19,
-                    ),
-                    Text.rich(
-                        style: TextStyle(
-                            fontFamily:
-                            'varela-round.regular',
-                            fontSize: 21,
-                            color: color_main_text,
-                            fontWeight:
-                            FontWeight.bold),
-                        TextSpan(
-                            children: [
-                              WidgetSpan(
-                                  alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                                side: MaterialStateBorderSide.resolveWith(
-                                      (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 19,
+                      ),
+                      Text.rich(
+                          style: TextStyle(
+                              fontFamily:
+                              'varela-round.regular',
+                              fontSize: 21,
+                              color: color_main_text,
+                              fontWeight:
+                              FontWeight.bold),
+                          TextSpan(
+                              children: [
+                                WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
                                 ),
-                                checkColor: color_check_color,  // color of tick Mark
-                                activeColor: color_favorite_and_index,
-                                value: value_arabic_text, onChanged: (bool? value) {
-                                  setState(() {
-                                    value_arabic_text = value!;
-                                  });
-                                },)),
-                              const TextSpan(
-                                  text: 'add arabic text'
-                              ),
-                            ]
-                        )
-                    ),
-                    Text.rich(
-                        style: const TextStyle(
-                            fontFamily:
-                            'varela-round.regular',
-                            fontSize: 21,
-                            color: Colors.black,
-                            fontWeight:
-                            FontWeight.bold),
-                        TextSpan(
-                            children: [
-                              WidgetSpan(
-                                  alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                                side: MaterialStateBorderSide.resolveWith(
-                                      (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
+                                  side: MaterialStateBorderSide.resolveWith(
+                                        (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
+                                  ),
+                                  checkColor: color_check_color,  // color of tick Mark
+                                  activeColor: color_favorite_and_index,
+                                  value: value_arabic_text, onChanged: (bool? value) {
+                                    setState(() {
+                                      value_arabic_text = value!;
+                                    });
+                                  },)),
+                                const TextSpan(
+                                    text: 'add arabic text'
                                 ),
-                                checkColor: color_check_color,  // color of tick Mark
-                                activeColor: color_favorite_and_index,
-                                value: value_english_tag, onChanged: (bool? value) {
-                                  setState(() {
-                                    value_english_tag = value!;
-                                  });
-                                },)),
-                              TextSpan(
-                                  text: 'add english text',
+                              ]
+                          )
+                      ),
+                      Text.rich(
+                          style: const TextStyle(
+                              fontFamily:
+                              'varela-round.regular',
+                              fontSize: 21,
+                              color: Colors.black,
+                              fontWeight:
+                              FontWeight.bold),
+                          TextSpan(
+                              children: [
+                                WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                  side: MaterialStateBorderSide.resolveWith(
+                                        (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
+                                  ),
+                                  checkColor: color_check_color,  // color of tick Mark
+                                  activeColor: color_favorite_and_index,
+                                  value: value_english_tag, onChanged: (bool? value) {
+                                    setState(() {
+                                      value_english_tag = value!;
+                                    });
+                                  },)),
+                                TextSpan(
+                                    text: 'add english text',
+                                    style: TextStyle(
+                                      color: color_main_text,
+                                      fontFamily:
+                                      'varela-round.regular',
+                                    )
+                                ),
+                              ]
+                          )
+                      ),
+                      Text.rich(
+                          style: TextStyle(
+                              fontFamily:
+                              'varela-round.regular',
+                              fontSize: 21,
+                              color: color_main_text,
+                              fontWeight:
+                              FontWeight.bold),
+                          TextSpan(
+                              children: [
+                                WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                  side: MaterialStateBorderSide.resolveWith(
+                                        (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
+                                  ),
+                                  checkColor: color_check_color,  // color of tick Mark
+                                  activeColor: color_favorite_and_index,
+                                  value: value_reference_tag, onChanged: (bool? value) {
+                                    setState(() {
+                                      value_reference_tag = value!;
+                                    });
+                                  },)),
+                                TextSpan(
+                                    text: 'add reference tag',
                                   style: TextStyle(
                                     color: color_main_text,
                                     fontFamily:
                                     'varela-round.regular',
                                   )
-                              ),
-                            ]
-                        )
-                    ),
-                    Text.rich(
-                        style: TextStyle(
-                            fontFamily:
-                            'varela-round.regular',
-                            fontSize: 21,
-                            color: color_main_text,
-                            fontWeight:
-                            FontWeight.bold),
-                        TextSpan(
-                            children: [
-                              WidgetSpan(
-                                  alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                                side: MaterialStateBorderSide.resolveWith(
-                                      (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
                                 ),
-                                checkColor: color_check_color,  // color of tick Mark
-                                activeColor: color_favorite_and_index,
-                                value: value_reference_tag, onChanged: (bool? value) {
-                                  setState(() {
-                                    value_reference_tag = value!;
-                                  });
-                                },)),
-                              TextSpan(
-                                  text: 'add reference tag',
-                                style: TextStyle(
-                                  color: color_main_text,
-                                  fontFamily:
-                                  'varela-round.regular',
-                                )
-                              ),
-                            ]
-                        )
-                    ),
-                    const SizedBox(
-                      height: 19,
-                    ),
-                  ],
+                              ]
+                          )
+                      ),
+                      const SizedBox(
+                        height: 19,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-            ],
+              ],
+            ),
           )),
     );
   }
