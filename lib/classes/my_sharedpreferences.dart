@@ -6,6 +6,11 @@ class MySharedPreferences {
   // static final MySharedPreferences instance =
   // MySharedPreferences._privateConstructor();
 
+  setDoubleValue(String key, double value) async {
+    SharedPreferences myPrefs = await SharedPreferences.getInstance();
+    myPrefs.setDouble(key, value);
+  }
+
   setStringValue(String key, String value) async {
     SharedPreferences myPrefs = await SharedPreferences.getInstance();
     myPrefs.setString(key, value);

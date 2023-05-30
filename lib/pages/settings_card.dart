@@ -355,7 +355,7 @@ class _SettingsCardState extends State<SettingsCard> with SingleTickerProviderSt
                                                 setState(() {
 
                                                   isArabicFontChanged = true;
-                                                  if(widget.fontsize_arab > 11) {
+                                                  if(widget.fontsize_arab > 13) {
                                                     widget.fontsize_arab -= 1;
                                                     saveArabicFontSize();
                                                   }
@@ -382,7 +382,7 @@ class _SettingsCardState extends State<SettingsCard> with SingleTickerProviderSt
                                               onTap: () {
                                                 setState(() {
                                                   isArabicFontChanged = true;
-                                                  if(widget.fontsize_arab < 17) {
+                                                  if(widget.fontsize_arab < 21) {
                                                     widget.fontsize_arab++;
                                                     saveArabicFontSize();
                                                   }
@@ -628,7 +628,7 @@ class _SettingsCardState extends State<SettingsCard> with SingleTickerProviderSt
                                           style: TextStyle(
                                             wordSpacing: 2,
                                             fontFamily:
-                                            'Al Majeed Quranic Font_shiped',
+                                            'Al_Mushaf',
                                             fontSize: 9,
                                             fontWeight: FontWeight.bold,
                                             color: textColor

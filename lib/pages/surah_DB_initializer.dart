@@ -36,8 +36,9 @@ class _SurahDBInitializerState extends State<SurahDBInitializer> {
 
   saveFontSizes() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setDouble("english_font_size", 15);
-    sharedPreferences.setDouble("arabic_font_size", 12);
+    sharedPreferences.setDouble("english_font_size", 17);
+    sharedPreferences.setDouble("arabic_font_size", 19);
+    sharedPreferences.setDouble("scroll_offset_for_surah_list", 0.0);
   }
 
   @override

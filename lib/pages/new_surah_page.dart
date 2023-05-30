@@ -21,7 +21,7 @@ import '../hero_transition_handler/hero_dialog_route.dart';
 class UpdatedSurahPage extends StatefulWidget {
   String surah_id, image, surah_name, arabic_name, verse_numbers;
   bool should_animate;
-  int scroll_to, pos;
+  int scroll_to;
   List<int> sujoodVerses;
   var bgColor;
   List<Map> verses, translated_verse;
@@ -30,7 +30,6 @@ class UpdatedSurahPage extends StatefulWidget {
   // const UpdatedSurahPage({Key? key, required this.surah_id, required this.image, required this.surah_name, required this.arabic_name, required this.sujood_index, required this.verse_numbers, required this.verses, required this.translated_verse}) : super(key: key);
   UpdatedSurahPage({Key? key,
     required this.surah_id,
-    this.pos = 0,
     this.bgColor = Colors.white,
     this.image = "",
     this.surah_name = "",
@@ -508,9 +507,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
 
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pushReplacement(context, MaterialPageRoute(
-            builder: (builder) =>
-                SurahList(eng: widget.eng, ar: widget.ar, pos: widget.pos, shouldAnimate: true,)));
+        Navigator.pop(context);
         return true;
       },
       child: Scaffold(

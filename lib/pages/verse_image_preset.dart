@@ -12,10 +12,13 @@ import '../hero_transition_handler/custom_rect_tween.dart';
 
 class VerseImagePreset extends StatefulWidget {
 
-  final String tag, verse_english, verse_arabic, verse_number, surah_number, surah_name;
+  final String tag, verse_english, verse_arabic, verse_number, surah_number,
+      surah_name;
   final Color theme;
 
-  const VerseImagePreset({Key? key, required this.verse_english, required this.verse_arabic, required this.verse_number, required this.surah_number, required this.surah_name, required this.tag, required this.theme}) : super(key: key);
+  const VerseImagePreset(
+      {Key? key, required this.verse_english, required this.verse_arabic, required this.verse_number, required this.surah_number, required this.surah_name, required this.tag, required this.theme})
+      : super(key: key);
 
   @override
   State<VerseImagePreset> createState() => _VerseImagePresetState();
@@ -23,12 +26,20 @@ class VerseImagePreset extends StatefulWidget {
 
 class _VerseImagePresetState extends State<VerseImagePreset> {
 
-  double top_heading_size = 11, arabic_size = 31, english_size = 19, surah_tag = 11;
-  bool value_arabic_text = true, value_english_tag = true, value_reference_tag = true;
+  double top_heading_size = 11,
+      arabic_size = 31,
+      english_size = 19,
+      surah_tag = 11;
+  bool value_arabic_text = true,
+      value_english_tag = true,
+      value_reference_tag = true;
   WidgetsToImageController controller = WidgetsToImageController();
   late Uint8List bytes;
-  var bgColor = Colors.white, color_favorite_and_index = const Color(0xff1d3f5e), color_main_text = Colors.black,
-  color_check_color = Colors.white;
+  var bgColor = Colors.white,
+      color_favorite_and_index = const Color(0xff1d3f5e),
+      color_main_text = Colors.black,
+      color_check_color = Colors.white;
+  bool imageSavingInProgress = false;
 
 
   assignmentForLightMode() {
@@ -46,7 +57,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
   }
 
   void initializeThemeStarters() {
-    if(widget.theme == Colors.white) {
+    if (widget.theme == Colors.white) {
       assignmentForLightMode();
     }
     else {
@@ -63,8 +74,9 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
 
   @override
   Widget build(BuildContext context) {
-
-    var size = MediaQuery.of(context).size;
+    var size = MediaQuery
+        .of(context)
+        .size;
 
     Widget verseImage() {
       return WidgetsToImage(
@@ -117,7 +129,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                                     fontFamily: 'varela-round.regular',
                                     fontWeight: FontWeight.bold,
                                     fontSize: top_heading_size,
-                                  color: color_main_text
+                                    color: color_main_text
                                 ),
                               ),
                             ),
@@ -133,12 +145,12 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                               textDirection: TextDirection.rtl,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                wordSpacing: 2,
-                                height: 1.5,
-                                fontFamily:
-                                'KFGQPC HafsEx1 Uthmanic Script',
-                                fontSize: arabic_size,
-                                color: color_main_text
+                                  wordSpacing: 2,
+                                  height: 1.5,
+                                  fontFamily:
+                                  'Al_Mushaf',
+                                  fontSize: arabic_size,
+                                  color: color_main_text
                               ),
                             ) : const SizedBox(),
                             value_english_tag ? const SizedBox(
@@ -149,10 +161,10 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                               // 'In the name of ALLAH, The Most Merciful, The Specially Merciful.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontFamily: 'varela-round.regular',
-                                  fontWeight: FontWeight.bold,
-                                  color: color_favorite_and_index,
-                                  fontSize: english_size,
+                                fontFamily: 'varela-round.regular',
+                                fontWeight: FontWeight.bold,
+                                color: color_favorite_and_index,
+                                fontSize: english_size,
                               ),
                             ) : const SizedBox(),
                             value_reference_tag ? const SizedBox(
@@ -160,16 +172,18 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                             ) : const SizedBox(),
                             value_reference_tag ? Text(
                               widget.surah_name == "" ?
-                                  widget.verse_number == "0" ?
-                                      widget.surah_number
-                                  : "Qur'an [${widget.surah_number}:${widget.verse_number}]"
+                              widget.verse_number == "0" ?
+                              widget.surah_number
+                                  : "Qur'an [${widget.surah_number}:${widget
+                                  .verse_number}]"
                                   :
-                              'Surah ${widget.surah_name} | [${widget.surah_number}:${widget.verse_number}]',
+                              'Surah ${widget.surah_name} | [${widget
+                                  .surah_number}:${widget.verse_number}]',
                               style: TextStyle(
                                   fontFamily: 'Rounded_Elegance',
                                   fontWeight: FontWeight.bold,
                                   fontSize: surah_tag,
-                                color: color_main_text
+                                  color: color_main_text
                               ),
                               textAlign: TextAlign.center,
                             ) : const SizedBox(),
@@ -187,37 +201,49 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
       );
     }
 
-    ScaffoldFeatureController<SnackBar, SnackBarClosedReason> snackBar(String message) {
+    ScaffoldFeatureController<SnackBar, SnackBarClosedReason> snackBar(
+        String message) {
       return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(message),
       ));
     }
 
     Future<void> saveImage() async {
+      await Permission.storage.request();
+      await Permission.manageExternalStorage.request();
 
-      await [Permission.storage].request();
-
-      if (await Permission.storage.isGranted) {
+      if (await Permission.storage.isGranted || await Permission.manageExternalStorage.isGranted) {
         final time = DateTime.now()
             .toIso8601String()
             .replaceAll('.', '_')
             .replaceAll(':', '_');
         final name = 'qur_an_$time';
-        await ImageGallerySaver.saveImage(bytes.buffer.asUint8List(), name: name);
+        await ImageGallerySaver.saveImage(
+            bytes.buffer.asUint8List(), name: name);
         snackBar("saved to gallery");
       }
-      else{
+      else {
         snackBar('storage permission denied!');
       }
     }
-    return Scaffold(
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+      Scaffold(
       backgroundColor: bgColor,
       floatingActionButton: FloatingActionButton(
-        onPressed: () async{
+        onPressed: () async {
+          setState(() {
+            imageSavingInProgress = true;
+          });
           final bytes = await controller.capture();
           setState(() {
             this.bytes = bytes!;
-            saveImage();
+          });
+          saveImage().whenComplete(() {
+            setState(() {
+              imageSavingInProgress = false;
+            });
           });
           print(bytes?.length.toString());
         },
@@ -250,7 +276,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                       Padding(
                         padding: const EdgeInsets.all(19.0),
                         child: Text(
-                          '***adjust text size(s) with the help of the "+"/"-" button. otherwise it\'s very likely that you won\'t get all the information in your picture.' ,
+                          '***adjust text size(s) with the help of the "+"/"-" button. otherwise it\'s very likely that you won\'t get all the information in your picture.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: 13,
@@ -265,7 +291,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               setState(() {
                                 top_heading_size -= .25;
                                 arabic_size -= 1;
@@ -293,7 +319,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                           ),
                           const SizedBox(width: 11,),
                           GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               setState(() {
                                 top_heading_size += .25;
                                 arabic_size += 1;
@@ -335,19 +361,26 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                           TextSpan(
                               children: [
                                 WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                                  side: MaterialStateBorderSide.resolveWith(
-                                        (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
-                                  ),
-                                  checkColor: color_check_color,  // color of tick Mark
-                                  activeColor: color_favorite_and_index,
-                                  value: value_arabic_text, onChanged: (bool? value) {
-                                    setState(() {
-                                      value_arabic_text = value!;
-                                    });
-                                  },)),
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Checkbox(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            5.0),
+                                      ),
+                                      side: MaterialStateBorderSide.resolveWith(
+                                            (states) =>
+                                            BorderSide(width: 2.0,
+                                                color: color_favorite_and_index),
+                                      ),
+                                      checkColor: color_check_color,
+                                      // color of tick Mark
+                                      activeColor: color_favorite_and_index,
+                                      value: value_arabic_text,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          value_arabic_text = value!;
+                                        });
+                                      },)),
                                 const TextSpan(
                                     text: 'add arabic text'
                                 ),
@@ -365,19 +398,26 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                           TextSpan(
                               children: [
                                 WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                                  side: MaterialStateBorderSide.resolveWith(
-                                        (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
-                                  ),
-                                  checkColor: color_check_color,  // color of tick Mark
-                                  activeColor: color_favorite_and_index,
-                                  value: value_english_tag, onChanged: (bool? value) {
-                                    setState(() {
-                                      value_english_tag = value!;
-                                    });
-                                  },)),
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Checkbox(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            5.0),
+                                      ),
+                                      side: MaterialStateBorderSide.resolveWith(
+                                            (states) =>
+                                            BorderSide(width: 2.0,
+                                                color: color_favorite_and_index),
+                                      ),
+                                      checkColor: color_check_color,
+                                      // color of tick Mark
+                                      activeColor: color_favorite_and_index,
+                                      value: value_english_tag,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          value_english_tag = value!;
+                                        });
+                                      },)),
                                 TextSpan(
                                     text: 'add english text',
                                     style: TextStyle(
@@ -400,26 +440,33 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                           TextSpan(
                               children: [
                                 WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,child: Checkbox(shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                                  side: MaterialStateBorderSide.resolveWith(
-                                        (states) => BorderSide(width: 2.0, color: color_favorite_and_index),
-                                  ),
-                                  checkColor: color_check_color,  // color of tick Mark
-                                  activeColor: color_favorite_and_index,
-                                  value: value_reference_tag, onChanged: (bool? value) {
-                                    setState(() {
-                                      value_reference_tag = value!;
-                                    });
-                                  },)),
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Checkbox(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            5.0),
+                                      ),
+                                      side: MaterialStateBorderSide.resolveWith(
+                                            (states) =>
+                                            BorderSide(width: 2.0,
+                                                color: color_favorite_and_index),
+                                      ),
+                                      checkColor: color_check_color,
+                                      // color of tick Mark
+                                      activeColor: color_favorite_and_index,
+                                      value: value_reference_tag,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          value_reference_tag = value!;
+                                        });
+                                      },)),
                                 TextSpan(
                                     text: 'add reference tag',
-                                  style: TextStyle(
-                                    color: color_main_text,
-                                    fontFamily:
-                                    'varela-round.regular',
-                                  )
+                                    style: TextStyle(
+                                      color: color_main_text,
+                                      fontFamily:
+                                      'varela-round.regular',
+                                    )
                                 ),
                               ]
                           )
@@ -434,6 +481,16 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
               ],
             ),
           )),
+    ),
+    Visibility(
+    visible: imageSavingInProgress,
+    child: CircularProgressIndicator(
+    color: Color(0xff1d3f5e),
+    ),
+    )
+    ,
+    ]
+    ,
     );
   }
 }

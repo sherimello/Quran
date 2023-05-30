@@ -20,20 +20,22 @@ import '../hero_transition_handler/custom_rect_tween.dart';
 import '../hero_transition_handler/hero_dialog_route.dart';
 import '../widgets/update_prompt.dart';
 
-
 class SurahList extends StatefulWidget {
-
   double eng, ar;
-  int pos;
   bool shouldAnimate;
 
-  SurahList({Key? key, required this.eng, required this.ar, this.pos = 0, this.shouldAnimate = false}) : super(key: key);
+  SurahList(
+      {Key? key,
+      required this.eng,
+      required this.ar,
+      this.shouldAnimate = false})
+      : super(key: key);
 
   @override
   State<SurahList> createState() => _SurahListState();
 }
 
-class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
+class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
   late Database database;
   late String path;
   late int sujood_index;
@@ -43,8 +45,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
       sujood_verse_indices = [],
       surah_name_arabic = [],
       surah_name_translated = [];
-  List<int>
-  selected_surah_sujood_verses = [],
+  List<int> selected_surah_sujood_verses = [],
       verse_numbers = [
         7,
         286,
@@ -218,72 +219,108 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
   late AnimationController controller;
   late final AnimationController animationController;
   late final Animation<double> _arrowAnimation;
-  var bgColor = Colors.white, color1 = Colors.black, toColor1 = Colors.white, color2 = const Color(0xff1d3f5e), toColor2 = Colors.white,
-  color3 = const Color(0xff1d3f5e), toColor3 = Colors.black, defTextColor = Colors.black;
+  var bgColor = Colors.white,
+      color1 = Colors.black,
+      toColor1 = Colors.white,
+      color2 = const Color(0xff1d3f5e),
+      toColor2 = Colors.white,
+      color3 = const Color(0xff1d3f5e),
+      toColor3 = Colors.black,
+      defTextColor = Colors.black;
   int darktheme = 0, clicked = 0, shouldReverse = 0;
   late final Duration halfDuration;
   late AutoScrollController autoScrollController;
   bool showRipples = true;
   late ScrollController scrollController;
-
+  double scrollOffset = 0.0;
 
   // Future justScroll() async{
   //   scrollController = ScrollController((
-  //  
+  //
   //   ))
   // }
 
-
   Future _scrollToIndex() async {
-    
-    // await autoScrollController.jumpTo(value)
-    
-    await autoScrollController.scrollToIndex(
-      widget.pos,
-        preferPosition: AutoScrollPosition.begin,
-    duration: const Duration(milliseconds: 250));
-    autoScrollController.addListener(() {
-      // Get the current visible range of items
-      final double maxScrollExtent = autoScrollController.position.maxScrollExtent;
-      final double currentScroll = autoScrollController.offset;
-      final double viewportHeight = autoScrollController.position.viewportDimension;
-      const double threshold = 0.0; // Adjust this value as needed
-
-      if (maxScrollExtent - currentScroll <= viewportHeight + threshold) {
-        print("showRipples");
-
-        Future.delayed(const Duration(milliseconds: 1000), () => setState(() {
-          print("jhhghjjhghjg");
-          showRipples = false;
-        }));
-        // The desired index is visible
-        // Auto scroll is complete
-        // Perform your desired actions here
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.containsKey("scroll_offset_for_surah_list")) {
+      scrollOffset =
+          sharedPreferences.getDouble("scroll_offset_for_surah_list")!;
+      if (autoScrollController.hasClients) {
+        autoScrollController.jumpTo(scrollOffset);
+        return;
       }
+      else {
+        Future.delayed(const Duration(milliseconds: 100), _scrollToIndex);
+        // _scrollToIndex();
+        return;
+      }
+      // autoScrollController.animateTo(
+      //   scrollOffset, // Replace 500.0 with your desired position
+      //   duration: const Duration(milliseconds: 500), // Set the desired duration
+      //   curve: Curves.easeInOut, // Set the desired curve
+      // );
+    }
 
+    // await autoScrollController.scrollToIndex(widget.pos,
+    //     preferPosition: AutoScrollPosition.begin,
+    //     duration: const Duration(milliseconds: 250));
 
-
-      // if (autoScrollController.position.isScrollingNotifier) {
-      //
-      //   if (autoScrollController.position.pixels == 0) {
-      //     // Scrolled to the top
-      //   } else {
-      //     print("showRipples");
-      //     Future.delayed(const Duration(milliseconds: 500), () => setState(() {
-      //       showRipples = false;
-      //     }));
-      //     // Scrolled to the bottom
-      //     // Auto scroll is complete
-      //     // Perform your desired actions here
-      //   }
-      // }
-    });
+    // if (autoScrollController.hasClients) {
+    //   autoScrollController.animateTo(
+    //     500.0, // Replace 500.0 with your desired position
+    //     duration: const Duration(milliseconds: 500), // Set the desired duration
+    //     curve: Curves.easeInOut, // Set the desired curve
+    //   );
+    // }
+    // }
+    // autoScrollController.addListener(() {
+    //   setState(() {
+    //     scrollOffset = autoScrollController.offset;
+    //   });
+    //   print(autoScrollController.offset);
+    //   // Get the current visible range of items
+    //   // final double maxScrollExtent =
+    //   //     autoScrollController.position.maxScrollExtent;
+    //   // final double currentScroll = autoScrollController.offset;
+    //   // final double viewportHeight =
+    //   //     autoScrollController.position.viewportDimension;
+    //   // const double threshold = 0.0; // Adjust this value as needed
+    //   //
+    //   // if (maxScrollExtent - currentScroll <= viewportHeight + threshold) {
+    //   //   print("showRipples");
+    //
+    //     // Future.delayed(
+    //     //     const Duration(milliseconds: 1000),
+    //     //     () => setState(() {
+    //     //           print("jhhghjjhghjg");
+    //     //           showRipples = false;
+    //     //         }));
+    //     // The desired index is visible
+    //     // Auto scroll is complete
+    //     // Perform your desired actions here
+    //   // }
+    //
+    //   // if (autoScrollController.position.isScrollingNotifier) {
+    //   //
+    //   //   if (autoScrollController.position.pixels == 0) {
+    //   //     // Scrolled to the top
+    //   //   } else {
+    //   //     print("showRipples");
+    //   //     Future.delayed(const Duration(milliseconds: 500), () => setState(() {
+    //   //       showRipples = false;
+    //   //     }));
+    //   //     // Scrolled to the bottom
+    //   //     // Auto scroll is complete
+    //   //     // Perform your desired actions here
+    //   //   }
+    //   // }
+    // });
   }
 
-  getFontSizes() async{
-   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-   widget.eng = sharedPreferences.getDouble("english_font_size")!;
-   widget.ar = sharedPreferences.getDouble("arabic_font_size")!;
+  getFontSizes() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    widget.eng = sharedPreferences.getDouble("english_font_size")!;
+    widget.ar = sharedPreferences.getDouble("arabic_font_size")!;
   }
 
   @override
@@ -292,7 +329,10 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
     checkForUpdates();
     themeLogics();
     super.initState();
-    animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 200),);
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
     // _addStatusListener();
 
     _arrowAnimation = Tween<double>(
@@ -301,23 +341,50 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
     ).animate(
       CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
     );
-    halfDuration = Duration(
-        milliseconds: animationController.duration!.inMilliseconds ~/ 2);
-    fetchSurahName();
-
     autoScrollController = AutoScrollController(
       axis: Axis.vertical,
     );
-    print(widget.pos);
+    halfDuration = Duration(
+        milliseconds: animationController.duration!.inMilliseconds ~/ 2);
+    fetchSurahName().whenComplete(() {
+      WidgetsFlutterBinding.ensureInitialized();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // _scrollToIndex();
+        // Future.delayed(Duration(milliseconds: 500), () => _scrollToIndex());
+      });
+      // _scrollToIndex();
+    });
 
     _scrollToIndex();
+    // autoScrollController.addListener(() {
+    //   setState(() {
+    //     scrollOffset = autoScrollController.offset;
+    //   });
+    //   print(autoScrollController.offset);
+    // });
+    // print(widget.pos);
+    // WidgetsFlutterBinding.ensureInitialized();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Future.delayed(Duration(milliseconds: 500), () => _scrollToIndex());
+    // });
+      // if(autoScrollController.hasClients)
+      // _scrollToIndex();});
+    // if (widget.pos > 0)
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    animationController.dispose();
+    autoScrollController.dispose();
+    controller.dispose();
   }
 
   void changeStatusBarColor(int colorCode) {
     setState(() {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          statusBarColor: Color(colorCode)
-      ));
+      SystemChrome.setSystemUIOverlayStyle(
+          SystemUiOverlayStyle(statusBarColor: Color(colorCode)));
     });
   }
 
@@ -346,14 +413,13 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
   }
 
   initializeThemeStarters() async {
-
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    if(sharedPreferences.containsKey('theme mode')) {
-      if(sharedPreferences.getString('theme mode') == "light") {
+    if (sharedPreferences.containsKey('theme mode')) {
+      if (sharedPreferences.getString('theme mode') == "light") {
         changeStatusBarColor(0xff1d3f5e);
         assignmentForLightMode();
       }
-      if(sharedPreferences.getString('theme mode') == "dark") {
+      if (sharedPreferences.getString('theme mode') == "dark") {
         changeStatusBarColor(0xff000000);
         assignmentForDarkMode();
       }
@@ -361,26 +427,22 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
   }
 
   Future<void> themeLogics() async {
-
-    await initializeThemeStarters().whenComplete((){
-      controller =
-          AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-      animation =
-      ColorTween(begin: color1, end: toColor1).animate(controller)
+    await initializeThemeStarters().whenComplete(() {
+      controller = AnimationController(
+          duration: const Duration(milliseconds: 500), vsync: this);
+      animation = ColorTween(begin: color1, end: toColor1).animate(controller)
         ..addListener(() {
           setState(() {
             // The state that has changed here is the animation object’s value.
           });
         });
-      animation2 =
-      ColorTween(begin: color2, end: toColor2).animate(controller)
+      animation2 = ColorTween(begin: color2, end: toColor2).animate(controller)
         ..addListener(() {
           setState(() {
             // The state that has changed here is the animation object’s value.
           });
         });
-      animation3 =
-      ColorTween(begin: color3, end: toColor3).animate(controller)
+      animation3 = ColorTween(begin: color3, end: toColor3).animate(controller)
         ..addListener(() {
           setState(() {
             // The state that has changed here is the animation object’s value.
@@ -390,7 +452,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
   }
 
   void animateColor() {
-    if(controller.isCompleted) {
+    if (controller.isCompleted) {
       controller.reverse();
       shouldReverse = 1;
     } else {
@@ -408,7 +470,6 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
 
     print(database.isOpen);
   }
-
 
   checkForUpdates() async {
     // if (await MySharedPreferences().containsKey("disable update auto prompt") ==
@@ -460,7 +521,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
     });
   }
 
-  fetchSurahName() {
+  Future fetchSurahName() async{
     initiateDB().whenComplete(() async {
       surah_name_arabic.clear();
       surah_name_translated.clear();
@@ -468,8 +529,10 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
           await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 1');
       surah_name_translated =
           await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 2');
-      sujood_surah_indices = await database.rawQuery('SELECT surah_id FROM sujood_verses');
-      sujood_verse_indices = await database.rawQuery('SELECT verse_id FROM sujood_verses');
+      sujood_surah_indices =
+          await database.rawQuery('SELECT surah_id FROM sujood_verses');
+      sujood_verse_indices =
+          await database.rawQuery('SELECT verse_id FROM sujood_verses');
       setState(() {
         // surahs.add(surah_name_arabic_temp);
         surah_name_arabic = surah_name_arabic;
@@ -480,16 +543,16 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
 
   Future<void> fetchSurahSujoodVerses(int surahId) async {
     selected_surah_sujood_verses = [];
-    for(int i = 0; i < sujood_surah_indices.length; i++) {
-      if(sujood_surah_indices[i]['surah_id'] == surahId) {
+    for (int i = 0; i < sujood_surah_indices.length; i++) {
+      if (sujood_surah_indices[i]['surah_id'] == surahId) {
         selected_surah_sujood_verses.add(sujood_verse_indices[i]['verse_id']);
       }
     }
   }
 
   int getSujoodSurahIndex(int id) {
-    for(int i = 0; i < sujood_surah_indices.length; i++) {
-      if(sujood_surah_indices[i]['surah_id'] == id) {
+    for (int i = 0; i < sujood_surah_indices.length; i++) {
+      if (sujood_surah_indices[i]['surah_id'] == id) {
         // sujood_surah_indices.removeAt(i);
         return i;
       }
@@ -498,8 +561,8 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
   }
 
   int getSujoodVerseIndex(int id) {
-    for(int i = 0; i < sujood_verse_indices.length; i++) {
-      if(sujood_verse_indices[i]['surah_id'] == id) {
+    for (int i = 0; i < sujood_verse_indices.length; i++) {
+      if (sujood_verse_indices[i]['surah_id'] == id) {
         sujood_verse_indices.removeAt(i);
         return i;
       }
@@ -535,72 +598,79 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
     // ArabicNumbers arabicNumber = ArabicNumbers();
 
     Future<bool> showExitPopup() async {
-      return await showDialog( //show confirm dialogue
-        //the return value will be from "Yes" or "No" options
-        context: context,
-        builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(31)
-          ),
-          title: const Text('Exit App',
-          style: TextStyle(
-            fontFamily: 'varela-round.regular'
-          ),),
-          content: const Text('Do you want to exit?',
-            style: TextStyle(
-                fontFamily: 'varela-round.regular'
-            ),),
-          actions:[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 11.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: const Color(0xff1d3f5e),
-                elevation: 7,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(31), // <-- Radius
-                ),
+      return await showDialog(
+            //show confirm dialogue
+            //the return value will be from "Yes" or "No" options
+            context: context,
+            builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(31)),
+              title: const Text(
+                'Exit App',
+                style: TextStyle(fontFamily: 'varela-round.regular'),
               ),
-                onPressed: () => Navigator.of(context).pop(false),
-                //return false when click on "NO"
-                child: const Text('No',
-
-                  style: TextStyle(
-                      fontFamily: 'varela-round.regular'
-                  ),),
+              content: const Text(
+                'Do you want to exit?',
+                style: TextStyle(fontFamily: 'varela-round.regular'),
               ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(right: 11.0, bottom: 11),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: const Color(0xff1d3f5e),
-                  elevation: 7,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(31), // <-- Radius
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 11.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: const Color(0xff1d3f5e),
+                      elevation: 7,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(31), // <-- Radius
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(context).pop(false),
+                    //return false when click on "NO"
+                    child: const Text(
+                      'No',
+                      style: TextStyle(fontFamily: 'varela-round.regular'),
+                    ),
                   ),
                 ),
-                onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
-                //return true when click on "Yes"
-                child: const Text('Yes',
-
-      style: TextStyle(
-      fontFamily: 'varela-round.regular'
-      ),),
-              ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 11.0, bottom: 11),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: const Color(0xff1d3f5e),
+                      elevation: 7,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(31), // <-- Radius
+                      ),
+                    ),
+                    onPressed: () => SystemChannels.platform
+                        .invokeMethod('SystemNavigator.pop'),
+                    //return true when click on "Yes"
+                    child: const Text(
+                      'Yes',
+                      style: TextStyle(fontFamily: 'varela-round.regular'),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      )??false; //if showDialouge had returned null, then return false
+          ) ??
+          false; //if showDialouge had returned null, then return false
     }
 
-    Future<bool> backToMenu() async{
-      return await Navigator.push(context, MaterialPageRoute(builder: (context)=>Menu(eng: widget.eng, ar: widget.ar,))) ?? false;
+    Future<bool> backToMenu() async {
+      return await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Menu(
+                        eng: widget.eng,
+                        ar: widget.ar,
+                      ))) ??
+          false;
     }
 
     saveThemeState(String theme) async {
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
       sharedPreferences.setString('theme mode', theme);
     }
 
@@ -610,7 +680,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
         child: Scaffold(
           floatingActionButton: ThemeSwitcher(
             builder: (context) => FloatingActionButton(
-              backgroundColor: const Color(0xff1d3f5e),
+                backgroundColor: const Color(0xff1d3f5e),
                 child: AnimatedBuilder(
                     animation: animationController,
                     builder: (BuildContext context, Widget? child) {
@@ -619,66 +689,66 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                         child: child,
                       );
                     },
-                    child: Icon(_icon, color: const Color(0xffffffff),)),
-                onPressed: ()
-                async {
+                    child: Icon(
+                      _icon,
+                      color: const Color(0xffffffff),
+                    )),
+                onPressed: () async {
                   setState(() {
                     widget.shouldAnimate = false;
-                    if(_icon == Icons.brightness_7_sharp) {
+                    if (_icon == Icons.brightness_7_sharp) {
                       _icon = Icons.brightness_4_outlined;
-                    }
-                    else {
+                    } else {
                       // changeStatusBarColor(0xff1d3f5e);
                       _icon = Icons.brightness_7_sharp;
                     }
                   });
-                  animationController.isCompleted ? animationController.reverse() :
-                  animationController.forward();
+                  animationController.isCompleted
+                      ? animationController.reverse()
+                      : animationController.forward();
 
                   clicked = 1;
 
-                  darktheme == 0 ?
-                  {
-                  bgColor = Colors.black,
-                    // assignmentForDarkMode(),
-                    // setState(() {
-                    //   bgColor = Colors.black;
-                    // }),
-                    ThemeSwitcher.of(context).changeTheme(
-                      theme: ThemeData(
-                        brightness: Brightness.dark,
-                      ),
-                    ),
+                  darktheme == 0
+                      ? {
+                          bgColor = Colors.black,
+                          // assignmentForDarkMode(),
+                          // setState(() {
+                          //   bgColor = Colors.black;
+                          // }),
+                          ThemeSwitcher.of(context).changeTheme(
+                            theme: ThemeData(
+                              brightness: Brightness.dark,
+                            ),
+                          ),
 
+                          await Future.delayed(
+                              const Duration(milliseconds: 500), () {
+                            animateColor();
+                          }),
 
-                    await Future.delayed(const Duration(milliseconds: 500), () {
-                      animateColor();
-                    }),
-
-                    darktheme = 1,
-                    saveThemeState("dark"),
-                  }
-                      :
-                  {
-                    bgColor = Colors.white,
-                    // assignmentForLightMode(),
-                    // setState(() {
-                    //   bgColor = Colors.white;
-                    // }),
-                    ThemeSwitcher.of(context).changeTheme(
-                        isReversed: true,
-                        theme: ThemeData(
-                          brightness: Brightness.light,
-                        )),
-                    await Future.delayed(const Duration(milliseconds: 500), () {
-                      animateColor();
-                    }),
-                    darktheme = 0,
-                    saveThemeState("light"),
-                  };
-
-                }
-            ),
+                          darktheme = 1,
+                          saveThemeState("dark"),
+                        }
+                      : {
+                          bgColor = Colors.white,
+                          // assignmentForLightMode(),
+                          // setState(() {
+                          //   bgColor = Colors.white;
+                          // }),
+                          ThemeSwitcher.of(context).changeTheme(
+                              isReversed: true,
+                              theme: ThemeData(
+                                brightness: Brightness.light,
+                              )),
+                          await Future.delayed(
+                              const Duration(milliseconds: 500), () {
+                            animateColor();
+                          }),
+                          darktheme = 0,
+                          saveThemeState("light"),
+                        };
+                }),
           ),
           backgroundColor: clicked == 1 ? animation3.value! : color3,
           appBar: AppBar(
@@ -698,82 +768,123 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                   height: appBar.preferredSize.height,
                   color: clicked == 1 ? animation3.value! : color3,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 11.0),
-                    child: Stack(
-                      children: [
+                      padding: const EdgeInsets.symmetric(horizontal: 11.0),
+                      child: Stack(children: [
                         Positioned(
-                          left: 0,
-                          top: 0,
-                          bottom: 0,
-                          child: Center(
-                            child: Text.rich(
-                              TextSpan(
-                                  children: [
-                                    WidgetSpan(
-                                      alignment: PlaceholderAlignment.middle,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(right: 11.0),
-                                        child: Container(
-                                            width: appBar.preferredSize.height -
-                                                appBar.preferredSize.height * .35,
-                                            height: appBar.preferredSize.height -
-                                                appBar.preferredSize.height * .35,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(1000),
-                                                color: Colors.white.withOpacity(.5)),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(2.0),
-                                              child: Image.asset('lib/assets/images/quran icon.png'),
-                                            )),
-                                      ),),
-
-                                    const TextSpan(
-                                      text: 'The Book',
-                                      // 'Qur\'an',
-                                      style: TextStyle(
-                                          fontFamily: 'Bismillah Script',
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1.5,
-                                          color: Colors.white,
-                                          fontSize: 21),
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: Text.rich(
+                                TextSpan(children: [
+                                  WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 11.0),
+                                      child: Container(
+                                          width: appBar.preferredSize.height -
+                                              appBar.preferredSize.height * .35,
+                                          height: appBar.preferredSize.height -
+                                              appBar.preferredSize.height * .35,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(1000),
+                                              color:
+                                                  Colors.white.withOpacity(.5)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(2.0),
+                                            child: Image.asset(
+                                                'lib/assets/images/quran icon.png'),
+                                          )),
                                     ),
-                                  ]
+                                  ),
+                                  const TextSpan(
+                                    text: 'The Book',
+                                    // 'Qur\'an',
+                                    style: TextStyle(
+                                        fontFamily: 'Bismillah Script',
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.5,
+                                        color: Colors.white,
+                                        fontSize: 21),
+                                  ),
+                                ]),
                               ),
-                            ),
-                          )
-                        ),
+                            )),
                         Positioned(
                           top: 0,
                           bottom: 0,
                           right: 0,
                           child: GestureDetector(
                               onTap: () async {
-                                await getFontSizes().whenComplete((){
-                                  Navigator.of(context).push(HeroDialogRoute(
+                                SharedPreferences sharedPreferences =
+                                    await SharedPreferences.getInstance();
+                                sharedPreferences.setDouble(
+                                    "scroll_offset_for_surah_list",
+                                    autoScrollController.offset);
+                                await getFontSizes().whenComplete(() {
+                                  Navigator.of(context)
+                                      .push(HeroDialogRoute(
+                                    fullscreenDialog: true,
                                     bgColor: bgColor.withOpacity(0.85),
-                                    builder: (b) => Options(tag: "options", theme: bgColor, eng: widget.eng, ar: widget.ar,),
-                                  )).then((value) async {
+                                    builder: (b) => Options(
+                                      tag: "options",
+                                      theme: bgColor,
+                                      eng: widget.eng,
+                                      ar: widget.ar,
+                                    ),
+                                  ))
+                                      .then((value) async {
+                                    setState(() {
+                                      scrollOffset =
+                                      sharedPreferences.getDouble("scroll_offset_for_surah_list")!;
+                                      autoScrollController.jumpTo(scrollOffset);
+                                    });
+
+                                  //       setState(() {
+                                  //         _scrollToIndex();
+                                  // });
                                     await themeLogics().whenComplete(() {
-                                      darktheme == 0?
-                                      ThemeSwitcher.of(context).changeTheme(
-                                        theme: ThemeData(
-                                          brightness: Brightness.light,
-                                        ),
-                                      ) :
-                                      ThemeSwitcher.of(context).changeTheme(
-                                        theme: ThemeData(
-                                          brightness: Brightness.dark,
-                                        ),
-                                      );
+
+                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder) => SurahList(eng: widget.eng, ar: widget.ar)));
+
+                                      // scrollOffset =
+                                      // sharedPreferences.getDouble("scroll_offset_for_surah_list")!;
+                                      // autoScrollController.jumpTo(scrollOffset);
+                                      print("kkk");
+                                      // _scrollToIndex();
+                                      if (darktheme == 0) {
+                                        try {
+                                          ThemeSwitcher.of(context).changeTheme(
+                                            theme: ThemeData(
+                                              brightness: Brightness.light,
+                                            ),
+                                          );
+                                        } catch (e) {
+                                          print(e);
+                                        }
+                                      } else {
+                                        try {
+                                          ThemeSwitcher.of(context).changeTheme(
+                                            theme: ThemeData(
+                                              brightness: Brightness.dark,
+                                            ),
+                                          );
+                                        } catch (e) {
+                                          print(e);
+                                        }
+                                      }
                                     });
                                   });
                                 });
                               },
-                              child: const Icon(Icons.more_vert, color: Colors.white,)),
+                              child: const Icon(
+                                Icons.more_vert,
+                                color: Colors.white,
+                              )),
                         )
-                        ]
-                        )
-                  ),
+                      ])),
                 ),
               ),
             ),
@@ -793,10 +904,11 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                       child: ListView.builder(
                           controller: autoScrollController,
                           scrollDirection: Axis.vertical,
-                          physics: const BouncingScrollPhysics(),
+                          // physics: const e(),
                           // padding: EdgeInsets.all(11),
                           itemCount: surah_name_translated.isNotEmpty ? 114 : 0,
-                          cacheExtent: surah_name_translated.isNotEmpty ? 114 : 0,
+                          cacheExtent:
+                              surah_name_translated.isNotEmpty ? 114 : 0,
                           itemBuilder: (BuildContext bcontext, int index) {
                             // sujood_surah_indices.clear();
 
@@ -821,43 +933,57 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                               controller: autoScrollController,
                               child: GestureDetector(
                                 onTap: () async {
+                                  SharedPreferences sharedPreferences =
+                                      await SharedPreferences.getInstance();
+                                  sharedPreferences.setDouble(
+                                      "scroll_offset_for_surah_list",
+                                      autoScrollController.offset);
                                   sujood_index = getSujoodSurahIndex(index + 1);
                                   await fetchSurahSujoodVerses(index + 1);
                                   await getFontSizes();
-                                  fetchVersesData('${index + 1}').whenComplete(() {
+                                  fetchVersesData('${index + 1}')
+                                      .whenComplete(() {
                                     print("index: $index");
                                     print("\nvnums: ${verse_numbers[index]}");
                                     Navigator.push(
                                         context,
                                         PageTransition(
-                                          type: PageTransitionType.fade,
+                                            type: PageTransitionType.fade,
                                             child: UpdatedSurahPage(
                                               bgColor: bgColor,
-                                              sujoodVerses: selected_surah_sujood_verses,
+                                              sujoodVerses:
+                                                  selected_surah_sujood_verses,
                                               surah_id: '${index + 1}',
                                               image: madani_surah
-                                                  .contains(index + 1)
+                                                      .contains(index + 1)
                                                   ? 'lib/assets/images/madinaWhiteIcon.png'
                                                   : 'lib/assets/images/makkaWhiteIcon.png',
                                               surah_name: surah_name_translated[
-                                              index]['translation']
+                                                      index]['translation']
                                                   .toString()
                                                   .substring(
-                                                  0,
-                                                  surah_name_translated[index]
-                                                  ['translation']
-                                                      .toString()
-                                                      .indexOf(':')),
-                                              arabic_name: surah_name_arabic[index]
-                                              ['translation'],
+                                                      0,
+                                                      surah_name_translated[
+                                                                  index]
+                                                              ['translation']
+                                                          .toString()
+                                                          .indexOf(':')),
+                                              arabic_name:
+                                                  surah_name_arabic[index]
+                                                      ['translation'],
                                               // sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
-                                              verse_numbers: verse_numbers[index].toString(),
+                                              verse_numbers:
+                                                  verse_numbers[index]
+                                                      .toString(),
                                               verses: verses,
-                                              translated_verse: translated_verse, eng: widget.eng, ar: widget.ar,
-                                              pos: index
-                                            )
-                                        )
-                                    );
+                                              translated_verse:
+                                                  translated_verse,
+                                              eng: widget.eng,
+                                              ar: widget.ar,
+                                            ))).then((value) {
+                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder) => SurahList(eng: widget.eng, ar: widget.ar)));
+
+                                    });
                                   });
                                 },
                                 child: ClipRRect(
@@ -868,90 +994,108 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                                         margin: const EdgeInsets.all(0),
                                         color: Colors.transparent,
                                         child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             // width: size.width,
                                             children: [
                                               Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Expanded(
                                                     child: Padding(
-                                                      padding: const EdgeInsets.all(3.0),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              3.0),
                                                       child: Row(
                                                         mainAxisAlignment:
-                                                            MainAxisAlignment.start,
+                                                            MainAxisAlignment
+                                                                .start,
                                                         crossAxisAlignment:
-                                                            CrossAxisAlignment.center,
+                                                            CrossAxisAlignment
+                                                                .center,
                                                         children: [
                                                           Padding(
                                                             padding:
-                                                                const EdgeInsets.fromLTRB(
-                                                                    11,11,11,11),
+                                                                const EdgeInsets
+                                                                    .fromLTRB(
+                                                                    11,
+                                                                    11,
+                                                                    11,
+                                                                    11),
                                                             child: Stack(
-                                                              alignment: Alignment.center,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
                                                               children: [
                                                                 Padding(
                                                                   padding:
-                                                                      const EdgeInsets.all(
+                                                                      const EdgeInsets
+                                                                          .all(
                                                                           1.0),
-                                                                  child: Image.asset(
+                                                                  child: Image
+                                                                      .asset(
                                                                     'lib/assets/images/indexDesign.png',
                                                                     height: isPortraitMode()
-                                                                        ? size.width * .10
-                                                                        : size.height * .10,
+                                                                        ? size.width *
+                                                                            .10
+                                                                        : size.height *
+                                                                            .10,
                                                                     width: isPortraitMode()
-                                                                        ? size.width * .10
-                                                                        : size.height * .10,
-                                                                    color: animation2.value,
+                                                                        ? size.width *
+                                                                            .10
+                                                                        : size.height *
+                                                                            .10,
+                                                                    color: animation2
+                                                                        .value,
                                                                   ),
                                                                 ),
                                                                 Text(
                                                                   '${index + 1}',
                                                                   // arabicNumber.convert(index + 1),
                                                                   textAlign:
-                                                                      TextAlign.center,
+                                                                      TextAlign
+                                                                          .center,
                                                                   style: TextStyle(
                                                                       color: animation2.value,
-                                                                      fontSize:
-                                                                          isPortraitMode()
-                                                                              ? size.width *
-                                                                                  .029
-                                                                              : size.height *
-                                                                                  .029,
+                                                                      fontSize: isPortraitMode() ? size.width * .029 : size.height * .029,
                                                                       // fontWeight: FontWeight.bold,
-                                                                      fontFamily:
-                                                                          'varela-round.regular'),
+                                                                      fontFamily: 'varela-round.regular'),
                                                                 )
                                                               ],
                                                             ),
                                                           ),
                                                           Expanded(
                                                             child: Wrap(
-                                                              direction: Axis.vertical,
+                                                              direction:
+                                                                  Axis.vertical,
                                                               crossAxisAlignment:
-                                                                  WrapCrossAlignment.start,
+                                                                  WrapCrossAlignment
+                                                                      .start,
                                                               children: [
                                                                 Padding(
-                                                                  padding:
-                                                                  const EdgeInsets.only(right: 11.0, left: 11),
+                                                                  padding: const EdgeInsets
+                                                                      .only(
+                                                                      right:
+                                                                          11.0,
+                                                                      left: 11),
                                                                   child: Text.rich(
                                                                       textDirection: TextDirection.rtl,
                                                                       textAlign: TextAlign.center,
                                                                       TextSpan(children: [
                                                                         TextSpan(
-                                                                          text: '﴿  ',
+                                                                          text:
+                                                                              '﴿  ',
                                                                           style: TextStyle(
-                                                                            wordSpacing: 3,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            fontFamily:
-                                                                            'Al Majeed Quranic Font_shiped',
+                                                                              wordSpacing: 3,
+                                                                              fontWeight: FontWeight.bold,
+                                                                              fontFamily: 'Al Majeed Quranic Font_shiped',
                                                                               fontSize: size.width * .039,
-                                                                            color: animation.value
-                                                                          ),
+                                                                              color: animation.value),
                                                                         ),
                                                                         TextSpan(
                                                                           text:
-                                                                          '${surah_name_arabic[index]['translation']}',
+                                                                              '${surah_name_arabic[index]['translation']}',
                                                                           style: TextStyle(
                                                                               color: animation.value,
                                                                               fontSize: size.width * .039,
@@ -959,135 +1103,142 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                                                                               fontFamily: 'Diwanltr'),
                                                                         ),
                                                                         TextSpan(
-                                                                          text: '  ﴾',
-                                                                          style: TextStyle(
-                                                                            wordSpacing: 3,
-                                                                            fontWeight: FontWeight.bold,
+                                                                          text:
+                                                                              '  ﴾',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            wordSpacing:
+                                                                                3,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
                                                                             fontFamily:
-                                                                            'Al Majeed Quranic Font_shiped',
-                                                                            fontSize: size.width * .039,
-                                                                            color: animation.value,
+                                                                                'Al Majeed Quranic Font_shiped',
+                                                                            fontSize:
+                                                                                size.width * .039,
+                                                                            color:
+                                                                                animation.value,
                                                                           ),
                                                                         ),
                                                                         TextSpan(
-                                                                          text: surah_name_translated.isNotEmpty ? "    ${surah_name_translated[
-                                                                          index]
-                                                                          ['translation']
-                                                                              .toString()
-                                                                              .substring(
-                                                                              0,
-                                                                              surah_name_translated[
-                                                                              index]
-                                                                              [
-                                                                              'translation']
-                                                                                  .toString()
-                                                                                  .indexOf(
-                                                                                  ':'))}" : "",
+                                                                          text: surah_name_translated.isNotEmpty
+                                                                              ? "    ${surah_name_translated[index]['translation'].toString().substring(0, surah_name_translated[index]['translation'].toString().indexOf(':'))}"
+                                                                              : "",
                                                                           style: TextStyle(
                                                                               color: animation2.value,
                                                                               fontSize: size.width * .039,
-                                                                              fontWeight:
-                                                                              FontWeight.bold,
-                                                                              fontFamily:
-                                                                              'Rounded_Elegance'),
+                                                                              fontWeight: FontWeight.bold,
+                                                                              fontFamily: 'Rounded_Elegance'),
                                                                         ),
                                                                       ])),
                                                                 ),
                                                                 Padding(
-                                                                  padding: const EdgeInsets
+                                                                  padding:
+                                                                      const EdgeInsets
                                                                           .fromLTRB(
-                                                                      11, 5, 17, 0),
+                                                                          11,
+                                                                          5,
+                                                                          17,
+                                                                          0),
                                                                   child: Text(
                                                                     '${surah_name_translated[index]['translation'].toString().substring(surah_name_translated[index]['translation'].toString().indexOf(':') + 2)} ●',
                                                                     style: TextStyle(
                                                                         color: animation2.value,
                                                                         fontSize: size.width * .031,
                                                                         // fontWeight: FontWeight.bold,
-                                                                        fontFamily:
-                                                                            'Rounded_Elegance'),
+                                                                        fontFamily: 'Rounded_Elegance'),
                                                                   ),
                                                                 ),
                                                                 Padding(
-                                                                  padding: const EdgeInsets
+                                                                  padding:
+                                                                      const EdgeInsets
                                                                           .fromLTRB(
-                                                                      11, 5, 17, 0),
+                                                                          11,
+                                                                          5,
+                                                                          17,
+                                                                          0),
                                                                   child: Wrap(
-                                                                    alignment: WrapAlignment
-                                                                        .center,
+                                                                    alignment:
+                                                                        WrapAlignment
+                                                                            .center,
                                                                     crossAxisAlignment:
                                                                         WrapCrossAlignment
                                                                             .center,
                                                                     children: [
                                                                       Wrap(
                                                                         alignment:
-                                                                            WrapAlignment
-                                                                                .center,
+                                                                            WrapAlignment.center,
                                                                         crossAxisAlignment:
-                                                                            WrapCrossAlignment
-                                                                                .center,
+                                                                            WrapCrossAlignment.center,
                                                                         children: [
-                                                                          Image.asset(
-                                                                            surah_type ==
-                                                                                        'Makki Surah' ||
-                                                                                    surah_type ==
-                                                                                        'Makki Surah (?)'
+                                                                          Image
+                                                                              .asset(
+                                                                            surah_type == 'Makki Surah' || surah_type == 'Makki Surah (?)'
                                                                                 ? 'lib/assets/images/makkaIcon.png'
                                                                                 : 'lib/assets/images/madinaIcon.png',
-                                                                            height: 13,
-                                                                            width: 13,
-                                                                            color: animation.value,
+                                                                            height:
+                                                                                13,
+                                                                            width:
+                                                                                13,
+                                                                            color:
+                                                                                animation.value,
                                                                           ),
                                                                           const SizedBox(
-                                                                            width: 7,
+                                                                            width:
+                                                                                7,
                                                                           ),
                                                                           Text(
                                                                             surah_type,
                                                                             style: TextStyle(
                                                                                 color: Color(0xffa69963),
-                                                                                fontWeight:
-                                                                                    FontWeight.bold,
+                                                                                fontWeight: FontWeight.bold,
                                                                                 fontSize: size.width * .031,
                                                                                 fontFamily: 'Rounded_Elegance'),
                                                                           ),
                                                                         ],
                                                                       ),
                                                                       Padding(
-                                                                        padding:
-                                                                            const EdgeInsets
-                                                                                    .symmetric(
-                                                                                horizontal:
-                                                                                    5.0),
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                5.0),
                                                                         child: Container(
-                                                                            width: 1,
-                                                                            height: 15,
-                                                                            color: const Color(
-                                                                                0xffa69963)),
+                                                                            width:
+                                                                                1,
+                                                                            height:
+                                                                                15,
+                                                                            color:
+                                                                                const Color(0xffa69963)),
                                                                       ),
                                                                       Text(
-                                                                          '${verse_numbers[index]} verses',
-                                                                          style:TextStyle(
-                                                                              color: Color(0xffa69963),
-                                                                              fontWeight:
-                                                                              FontWeight.bold,
-                                                                              fontSize: size.width * .031,
-                                                                              fontFamily: 'Rounded_Elegance'),),
+                                                                        '${verse_numbers[index]} verses',
+                                                                        style: TextStyle(
+                                                                            color: Color(
+                                                                                0xffa69963),
+                                                                            fontWeight: FontWeight
+                                                                                .bold,
+                                                                            fontSize: size.width *
+                                                                                .031,
+                                                                            fontFamily:
+                                                                                'Rounded_Elegance'),
+                                                                      ),
                                                                     ],
                                                                   ),
                                                                 ),
-                                                                sujood_index != -1
+                                                                sujood_index !=
+                                                                        -1
                                                                     ? Padding(
-                                                                        padding:
-                                                                            const EdgeInsets
-                                                                                    .only(
-                                                                                left: 11,
-                                                                                top: 5),
-                                                                        child: Wrap(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                11,
+                                                                            top:
+                                                                                5),
+                                                                        child:
+                                                                            Wrap(
                                                                           alignment:
-                                                                              WrapAlignment
-                                                                                  .center,
+                                                                              WrapAlignment.center,
                                                                           crossAxisAlignment:
-                                                                              WrapCrossAlignment
-                                                                                  .center,
+                                                                              WrapCrossAlignment.center,
                                                                           children: [
                                                                             Image.asset(
                                                                               'lib/assets/images/sujoodIcon.png',
@@ -1125,22 +1276,23 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin{
                                               )
                                             ]),
                                       ),
-
-                                      if (widget.shouldAnimate && index > 0 && index == widget.pos)
-                                        Center(
-                                          child: Visibility(
-                                            visible: showRipples,
-                                            child: RippleAnimation(
-                                                color: Color(0xff1d3f5e),
-                                                repeat: false,
-                                                ripplesCount: 11,
-                                                minRadius: size.width * .5,
-                                                duration: const Duration(
-                                                    milliseconds: 1500),
-                                                child: const Center(
-                                                    child: SizedBox())),
-                                          ),
-                                        )
+                                      // if (widget.shouldAnimate &&
+                                      //     index > 0 &&
+                                      //     index == widget.pos)
+                                      //   Center(
+                                      //     child: Visibility(
+                                      //       visible: showRipples,
+                                      //       child: RippleAnimation(
+                                      //           color: Color(0xff1d3f5e),
+                                      //           repeat: false,
+                                      //           ripplesCount: 11,
+                                      //           minRadius: size.width * .5,
+                                      //           duration: const Duration(
+                                      //               milliseconds: 1500),
+                                      //           child: const Center(
+                                      //               child: SizedBox())),
+                                      //     ),
+                                      //   )
                                     ],
                                   ),
                                 ),
