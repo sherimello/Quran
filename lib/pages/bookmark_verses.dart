@@ -311,16 +311,24 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                                     textAlign: TextAlign.right,
                                                     textScaleFactor:
                                                     (isPortraitMode() ? size.height / size.width : size.width / size.height),
-                                                    TextSpan(children: [
+                                                    TextSpan(
+                                                        style: TextStyle(
+                                                      // wordSpacing: 2,
+                                                        fontFamily:
+                                                        'Al_Mushaf',
+                                                        fontSize: widget.ar,
+                                                        color: color_main_text
+                                                    ),
+                                                        children: [
                                                       TextSpan(
                                                         text: verses.isNotEmpty
                                                             ? '${verses[index]['arabic']}  '
                                                             : '',
                                                         // 'k',
                                                         style: TextStyle(
-                                                          wordSpacing: 2,
+                                                          // wordSpacing: 2,
                                                           fontFamily:
-                                                          'Al Majeed Quranic Font_shiped',
+                                                          'Al_Mushaf',
                                                           fontSize: widget.ar,
                                                           color: color_main_text
                                                         ),
@@ -338,13 +346,13 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                                       ),
                                                       TextSpan(
                                                         text: verses.isNotEmpty ? "${arabicNumber
-                                                            .convert(verses[index]['verse_id'])}:${arabicNumber
+                                                            .convert(verses[index]['verse_id'])}  :  ${arabicNumber
                                                             .convert(verses[index]['surah_id'])}" : "",
                                                         style: TextStyle(
                                                             wordSpacing: 3,
                                                             fontSize: widget.ar - 5,
                                                             fontWeight: FontWeight.bold,
-                                                          color: color_main_text
+                                                          color: color_main_text,
                                                         ),
                                                       ),
                                                       TextSpan(

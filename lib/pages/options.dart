@@ -86,12 +86,12 @@ class _OptionsState extends State<Options> {
                                       child: Image.asset('lib/assets/images/quran icon.png'),
                                     )),
                               ),
-                              Row(
+                              const Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
-                                    'Qur\'an',
+                                    'The Book',
                                     style: TextStyle(
                                         fontFamily: 'Bismillah Script',
                                         fontWeight: FontWeight.bold,
