@@ -10,7 +10,8 @@ class Options extends StatefulWidget {
 
   final String tag;
   final Color theme;
-  final double eng, ar;
+  final double eng;
+  final double ar;
 
   const Options({Key? key, required this.tag, required this.theme, required this.eng, required this.ar}) : super(key: key);
 

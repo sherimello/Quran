@@ -9,15 +9,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  if (sharedPreferences.containsKey('theme mode')) {
-    sharedPreferences.getString("theme mode") == "light"
-        ? SystemChrome.setSystemUIOverlayStyle(
-            const SystemUiOverlayStyle(statusBarColor: Color(0xff1d3f5e)))
-        : SystemChrome.setSystemUIOverlayStyle(
-            const SystemUiOverlayStyle(statusBarColor: Color(0xff000000)));
-  }
+  await Firebase.initializeApp();
+  SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  // if (sharedPreferences.containsKey('theme mode')) {
+  //   sharedPreferences.getString("theme mode") == "light"
+  //       ? SystemChrome.setSystemUIOverlayStyle(
+  //           const SystemUiOverlayStyle(statusBarColor: Color(0xff1d3f5e)))
+  //       : SystemChrome.setSystemUIOverlayStyle(
+  //           const SystemUiOverlayStyle(statusBarColor: Color(0xff000000)));
+  // }
 
   runApp(const MyApp());
 }

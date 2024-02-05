@@ -15,10 +15,11 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 2.0.0+2
+version: 3.1.0+5
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
+
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
 
   flutter_secure_storage: ^8.0.0
-  sqflite: ^2.0.2
+  sqflite: ^2.3.0 #2.0.2
   path_provider: ^2.0.9
   arabic_numbers: ^1.0.0
   page_transition: ^2.0.9
@@ -53,13 +54,19 @@ dependencies:
   animated_theme_switcher: ^2.0.7
   url_launcher: ^6.1.7
   firebase_database: ^10.0.11
-  firebase_core: ^2.5.0
-  google_sign_in: ^5.3.1
+  firebase_core: ^2.22.0
+  google_sign_in: ^6.1.6
   package_info_plus: ^3.0.3
   youtube_explode_dart: ^1.12.4
   audioplayers: ^3.0.1
   connectivity_plus: ^3.0.3
   al_quran: ^0.1.1+5
+  firebase_auth: ^4.14.0
+  cached_network_image: ^3.3.0
+  csv: ^5.1.1
+  flutter_widget_from_html_core: ^0.14.9
+  html: ^0.15.4
+  flutter_statusbarcolor_ns: ^0.5.0
 
 
 dev_dependencies:
@@ -96,6 +103,7 @@ flutter:
 #    - lib/assets/images/surah indices/
     - lib/assets/
     - lib/assets/fonts/
+    - lib/assets/documents/
     #   - images/a_dot_ham.jpeg
 
     # An image asset can refer to one or more resolution-specific "variants", see
@@ -140,6 +148,9 @@ flutter:
     - family: Al_Mushaf
       fonts:
         - asset: lib/assets/fonts/Al_Mushaf.ttf
+    - family: NotoNaskhArabic-Medium
+      fonts:
+        - asset: lib/assets/fonts/NotoNaskhArabic-Medium.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

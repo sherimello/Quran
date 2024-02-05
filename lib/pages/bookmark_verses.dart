@@ -274,20 +274,23 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.all(1.0),
-                                            child: Image.asset(
-                                              'lib/assets/images/surahIndex.png',
-                                              height: isPortraitMode() ? size.width * .10 : size.height * .10,
-                                              width: isPortraitMode() ? size.width * .10 : size.height * .10,
-                                              color: color_favorite_and_index,
+                                            child: Opacity(
+                                              opacity: .5,
+                                              child: Image.asset(
+                                                'lib/assets/images/surahIndex.png',
+                                                height: isPortraitMode() ? size.width * .125 : size.height * .125,
+                                                width: isPortraitMode() ? size.width * .125 : size.height * .125,
+                                                color: color_favorite_and_index,
+                                              ),
                                             ),
                                           ),
                                           Text.rich(
                                             textAlign: TextAlign.center,
                                             TextSpan(
-                                              text: '${index + 1}',
+                                              text: "${index + 1}".length == 1 ? '00${index + 1}' : "${index + 1}".length == 2 ? '0${index + 1}' : '${index + 1}',
                                               style: TextStyle(
                                                 color: color_favorite_and_index,
-                                                fontSize: isPortraitMode() ? size.width * .023 : size.height * .023,
+                                                fontSize: isPortraitMode() ? size.width * .031 : size.height * .031,
                                                 fontWeight: FontWeight.bold,
                                                 fontFamily: 'varela-round.regular',
                                               ),
@@ -401,11 +404,11 @@ class _BookmarkVersesState extends State<BookmarkVerses> {
                                                       child: Padding(
                                                         padding: const EdgeInsets.only(bottom: 11.0, top: 22),
                                                         child: GestureDetector(
-                                                          onTap: () async {
+                                                          onTap: () {
                                                             // print((verses[index]['surah_id']).toString());
-                                                            await fetchSurahSujoodVerses(index + 1);
-                                                            Navigator.of(this.context)
-                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1, should_animate: true, eng: widget.eng, ar: widget.ar,)));
+                                                            fetchSurahSujoodVerses(index + 1).whenComplete(() => Navigator.of(this.context)
+                                                                .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: (verses[index]['surah_id']).toString(), scroll_to: verses[index]['verse_id']-1, should_animate: true, eng: widget.eng, ar: widget.ar, bgColor: bgColor,))));
+
                                                           },
                                                           child: Container(
                                                               decoration: BoxDecoration(

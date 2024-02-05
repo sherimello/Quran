@@ -9,10 +9,13 @@ class SQLQueries {
     var databasesPath = await getDatabasesPath();
     path = join(databasesPath, 'quran.db');
     await deleteDatabase(path);
-    database = await openDatabase(path, version: 1,
+    database = await openDatabase(path, version: 2,
         onCreate: (Database db, int version) async {
       await db.execute(
           'CREATE TABLE IF NOT EXISTS verses (lang_id INTEGER UNSIGNED, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED, text NVARCHAR)');
+
+      //await db.execute(
+        //  'CREATE TABLE IF NOT EXISTS verses_bn (serial_id INTEGER UNSIGNED, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED, text NVARCHAR)');
 
       await db.execute(
           'CREATE TABLE IF NOT EXISTS languages (id INTEGER UNSIGNED, ISO NVARCHAR, english_name NVARCHAR, name NVARCHAR)');

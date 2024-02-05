@@ -501,7 +501,7 @@ class _VersesSearchState extends State<VersesSearch> {
                                                   onTap: () async {
                                                     await fetchSurahSujoodVerses(index + 1);
                                                     Navigator.of(this.context)
-                                                        .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: translated_verse[index]['surah_id'].toString(), scroll_to: translated_verse[index]['verse_id']-1, should_animate: true, eng: widget.eng, ar: widget.ar,)));
+                                                        .push(MaterialPageRoute(builder: (context) => UpdatedSurahPage(surah_id: translated_verse[index]['surah_id'].toString(), scroll_to: translated_verse[index]['verse_id']-1, should_animate: true, eng: widget.eng, ar: widget.ar, bgColor: bgColor,)));
                                                   },
                                                   child: Container(
                                                     // width: size.width,

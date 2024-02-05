@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -11,6 +12,7 @@ import 'package:quran/pages/new_surah_page.dart';
 import 'package:quran/pages/surah_list.dart';
 import 'package:quran/pages/verses_search.dart';
 import 'package:quran/widgets/dua_list.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../hero_transition_handler/custom_rect_tween.dart';
@@ -49,10 +51,11 @@ class _MenuState extends State<Menu> {
 
   void changeStatusBarColor(int colorCode) {
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Color(colorCode)));
+        const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   }
 
   initializeThemeStarters() async {
+    // print(await getSynonyms("love"));
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.containsKey('theme mode')) {
       if (sharedPreferences.getString('theme mode') == "light") {
@@ -128,6 +131,7 @@ class _MenuState extends State<Menu> {
                   padding: const EdgeInsets.only(right: 11.0, bottom: 11),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
+                      primary: const Color(0xff1d3f5e),
                       elevation: 7,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(31), // <-- Radius
@@ -154,552 +158,488 @@ class _MenuState extends State<Menu> {
         color: Colors.transparent,
         child: Scaffold(
           backgroundColor: bgColor,
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    height: AppBar().preferredSize.height * 2,
+          body: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  height: AppBar().preferredSize.height * 2,
+                ),
+                Hero(
+                    tag: "animate",
+                    createRectTween: (begin, end) {
+                      return CustomRectTween(begin: begin!, end: end!);
+                    },
+                    child: Image.asset(
+                      'lib/assets/images/quran icon.png',
+                      width: size.width * 0.15,
+                      height: size.height * 0.15,
+                    )),
+                SizedBox(
+                  height: AppBar().preferredSize.height * .21,
+                ),
+                Text(
+                  'The Book',
+                  // 'Qur\'an',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Bismillah Script',
+                    fontSize: size.width * .079,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                    color: textColor,
                   ),
-                  Hero(
-                      tag: "animate",
-                      createRectTween: (begin, end) {
-                        return CustomRectTween(begin: begin!, end: end!);
-                      },
-                      child: Image.asset(
-                        'lib/assets/images/quran icon.png',
-                        width: size.width * 0.15,
-                        height: size.height * 0.15,
-                      )),
-                  SizedBox(
-                    height: AppBar().preferredSize.height * .21,
-                  ),
-                  Text(
-                    'The Book',
-                    // 'Qur\'an',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Bismillah Script',
-                      fontSize: size.width * .079,
+                ),
+                Text(
+                  '(search anniething)',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontFamily: 'varela-round.regular',
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
-                      color: textColor,
-                    ),
-                  ),
-                  Text(
-                    '(search anniething)',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontFamily: 'varela-round.regular',
-                        fontWeight: FontWeight.bold,
-                        height: 1,
-                        color: textColor),
-                  ),
-                  SizedBox(
-                    height: AppBar().preferredSize.height * 1.5,
-                  ),
-                  // Padding(
-                  //   padding: EdgeInsets.only(left: size.width * .13, bottom: 11),
-                  //   child: const Text('hear from الله :',
-                  //   style: TextStyle(
-                  //     fontFamily: 'varela-round.regular',
-                  //     fontWeight: FontWeight.bold,
-                  //     fontSize: 17,
-                  //     color: Colors.black
-                  //   ),
-                  //   ),
-                  // ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * .13),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SurahList(
-                                      eng: widget.eng,
-                                      ar: widget.ar,
-                                    )));
-                      },
-                      child: Container(
-                          width: size.width,
-                          // height: AppBar().preferredSize.height * .67,
-                          decoration: BoxDecoration(
-                            color: const Color(0xff1d3f5e),
-                            borderRadius: BorderRadius.circular(13),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    const Color(0xff1d3f5e).withOpacity(0.15),
-                                spreadRadius: 3,
-                                blurRadius: 19,
-                                offset: const Offset(
-                                    0, 0), // changes position of shadow
+                      height: 1,
+                      color: textColor),
+                ),
+                SizedBox(
+                  height: AppBar().preferredSize.height * 1.5,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: size.width * .13),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SurahList(
+                                    eng: widget.eng,
+                                    ar: widget.ar,
+                                  )));
+                    },
+                    child: Container(
+                      width: size.width,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: const Color(0xff1d3f5e).withOpacity(1)),
+                      // width: size.width * .1,
+                      // height: size.width * .075,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Center(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: size.width * .085,
+                                height: size.width * .085,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(1000),
+                                    color: Colors.white),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.menu_book_outlined,
+                                    color: Color(0xffa69963),
+                                    size: 19,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                "  read Qur'an ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    height: 0,
+                                    color: Colors.white,
+                                    fontFamily: 'varela-round.regular',
+                                    fontSize: size.width * .035,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
-                          child: const Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 11.0, vertical: 11),
-                              child: Center(
-                                child: Text.rich(
-                                  textAlign: TextAlign.center,
-                                  TextSpan(children: [
-                                    WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(right: 7.0),
-                                          child: Icon(
-                                            Icons.menu_book_outlined,
-                                            color: Colors.white,
-                                            size: 19,
-                                          ),
-                                        )),
-                                    TextSpan(
-                                        text: "  read Qur'an",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'varela-round.regular',
-                                            fontSize: 13,
-                                            color: Colors.white)),
-                                  ]),
-                                ),
-                              ),
-                            ),
-                          )),
+                        ),
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: size.width * .13, vertical: 7),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => VersesSearch(
-                                      theme: theme,
-                                      eng: widget.eng,
-                                      ar: widget.ar,
-                                    )));
-                      },
-                      child: Container(
-                          width: size.width,
-                          // height: AppBar().preferredSize.height * .67,
-                          decoration: BoxDecoration(
-                            color: const Color(0xff1d3f5e),
-                            borderRadius: BorderRadius.circular(13),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    const Color(0xff1d3f5e).withOpacity(0.15),
-                                spreadRadius: 3,
-                                blurRadius: 19,
-                                offset: const Offset(
-                                    0, 0), // changes position of shadow
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: size.width * .13, vertical: 7),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => VersesSearch(
+                                    theme: theme,
+                                    eng: widget.eng,
+                                    ar: widget.ar,
+                                  )));
+                    },
+                    child: Container(
+                      width: size.width,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: const Color(0xff1d3f5e).withOpacity(1)),
+                      // width: size.width * .1,
+                      // height: size.width * .075,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Center(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: size.width * .085,
+                                height: size.width * .085,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(1000),
+                                    color: Colors.white),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.manage_search,
+                                    color: Color(0xffa69963),
+                                    size: 19,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                "  search in Qur'an ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    height: 0,
+                                    color: Colors.white,
+                                    fontFamily: 'varela-round.regular',
+                                    fontSize: size.width * .035,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
-                          child: const Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 11.0, vertical: 11),
-                              child: Center(
-                                child: Text.rich(
-                                  textAlign: TextAlign.center,
-                                  TextSpan(children: [
-                                    WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(right: 7.0),
-                                          child: Icon(
-                                            Icons.search,
-                                            color: Colors.white,
-                                            size: 19,
-                                          ),
-                                        )),
-                                    TextSpan(
-                                        text: "  search in Qur'an",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'varela-round.regular',
-                                            fontSize: 13,
-                                            color: Colors.white)),
-                                  ]),
-                                ),
-                              ),
-                            ),
-                          )),
+                        ),
+                      ),
                     ),
                   ),
-                  Padding(
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: size.width * .13, vertical: 0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(HeroDialogRoute(
+                        bgColor: bgColor.withOpacity(0.85),
+                        builder: (context) => Center(
+                            child: BookmarkFolders(
+                          tag: "animate",
+                          from_where: "menu",
+                          theme: bgColor,
+                          eng: widget.eng,
+                          ar: widget.ar,
+                        )),
+                      ));
+                    },
+                    child: Container(
+                      width: size.width,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: const Color(0xff1d3f5e).withOpacity(1)),
+                      // width: size.width * .1,
+                      // height: size.width * .075,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Center(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: size.width * .085,
+                                height: size.width * .085,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(1000),
+                                    color: Colors.white),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.bookmark,
+                                    color: Color(0xffa69963),
+                                    size: 19,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                "  bookmark folders ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    height: 0,
+                                    color: Colors.white,
+                                    fontFamily: 'varela-round.regular',
+                                    fontSize: size.width * .035,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: size.width * .13, vertical: 7),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(HeroDialogRoute(
+                        bgColor: bgColor.withOpacity(0.85),
+                        builder: (context) => Center(
+                            child: FavoriteVerses(
+                          tag: "animate",
+                          from_where: "menu",
+                          theme: bgColor,
+                          eng: widget.eng,
+                          ar: widget.ar,
+                        )),
+                      ));
+                    },
+                    child: Container(
+                      width: size.width,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: const Color(0xff1d3f5e).withOpacity(1)),
+                      // width: size.width * .1,
+                      // height: size.width * .075,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Center(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: size.width * .085,
+                                height: size.width * .085,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(1000),
+                                    color: Colors.white),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.favorite_rounded,
+                                    color: Color(0xffa69963),
+                                    size: 19,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                "  favorite verses ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    height: 0,
+                                    color: Colors.white,
+                                    fontFamily: 'varela-round.regular',
+                                    fontSize: size.width * .035,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: value_last_read_exists ? true : false,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                        size.width * .13, 0, size.width * .13, 7),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(HeroDialogRoute(
+                          bgColor: bgColor.withOpacity(0.85),
+                          builder: (context) => Center(
+                              child: UpdatedSurahPage(
+                            surah_id: surah_id,
+                            scroll_to: (int.parse(verse_id) - 1),
+                            should_animate: true,
+                            eng: widget.eng,
+                            ar: widget.ar,
+                            bgColor: bgColor,
+                          )),
+                        ));
+                      },
+                      child: Container(
+                        width: size.width,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            color: const Color(0xff1d3f5e).withOpacity(1)),
+                        // width: size.width * .1,
+                        // height: size.width * .075,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Center(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: size.width * .085,
+                                  height: size.width * .085,
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.circular(1000),
+                                      color: Colors.white),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.timer,
+                                      color: Color(0xffa69963),
+                                      size: 19,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  "  last read ",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      height: 0,
+                                      color: Colors.white,
+                                      fontFamily: 'varela-round.regular',
+                                      fontSize: size.width * .035,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: true,
+                  child: Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * .13, vertical: 0),
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         Navigator.of(context).push(HeroDialogRoute(
                           bgColor: bgColor.withOpacity(0.85),
                           builder: (context) => Center(
-                              child: BookmarkFolders(
-                            tag: "animate",
-                            from_where: "menu",
-                            theme: bgColor,
-                            eng: widget.eng,
-                            ar: widget.ar,
-                          )),
+                              child: Duas(
+                                  title: "test",
+                                  eng: widget.eng,
+                                  ar: widget.ar,
+                                  theme: bgColor)),
                         ));
                       },
                       child: Container(
                           width: size.width,
-                          // height: AppBar().preferredSize.height * .67,
                           decoration: BoxDecoration(
-                            color: const Color(0xff1d3f5e),
-                            borderRadius: BorderRadius.circular(13),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    const Color(0xff1d3f5e).withOpacity(0.15),
-                                spreadRadius: 3,
-                                blurRadius: 19,
-                                offset: const Offset(
-                                    0, 0), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 11.0, vertical: 11),
-                              child: Center(
-                                child: Text.rich(
-                                  textAlign: TextAlign.center,
-                                  TextSpan(children: [
-                                    WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(right: 7.0),
-                                          child: Icon(
-                                            Icons.bookmark,
-                                            color: Colors.white,
-                                            size: 19,
-                                          ),
-                                        )),
-                                    TextSpan(
-                                        text: "  bookmarks",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'varela-round.regular',
-                                            fontSize: 13,
-                                            color: Colors.white)),
-                                  ]),
-                                ),
+                              borderRadius: BorderRadius.circular(100),
+                              color: const Color(0xff1d3f5e).withOpacity(1)),
+                          // width: size.width * .1,
+                          // height: size.width * .075,
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Center(
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: size.width * .085,
+                                    height: size.width * .085,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(1000),
+                                        color: Colors.white),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.mosque_rounded,
+                                        color: Color(0xffa69963),
+                                        size: 19,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "  du'as (supplications) ",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        height: 0,
+                                        color: Colors.white,
+                                        fontFamily: 'varela-round.regular',
+                                        fontSize: size.width * .035,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
                               ),
                             ),
                           )),
                     ),
                   ),
-                  Padding(
+                ),
+                Visibility(
+                  visible: true,
+                  child: Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: size.width * .13, vertical: 7),
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         Navigator.of(context).push(HeroDialogRoute(
                           bgColor: bgColor.withOpacity(0.85),
-                          builder: (context) => Center(
-                              child: FavoriteVerses(
-                            tag: "animate",
-                            from_where: "menu",
-                            theme: bgColor,
-                            eng: widget.eng,
-                            ar: widget.ar,
-                          )),
+                          builder: (context) =>
+                              Center(child: DailyDuas(theme: bgColor)),
                         ));
+                        // setState(() {
+                        //   if (flag == 1) {
+                        //     flag = 0;
+                        //   } else {
+                        //     flag = 1;
+                        //   }
+                        // });
+                        // if (flag == 0) {
+                        //   audioPlayer.pause();
+                        //   return;
+                        // }
+                        // final Directory? appDocDir =
+                        //     await getExternalStorageDirectory();
+                        // var appDocPath = appDocDir?.path;
+                        // var file = File("${appDocPath!}/2.mp3");
+                        // await file.exists() ? print("yes") : print("no");
+                        // audioPlayer.play(DeviceFileSource(file.path));
                       },
                       child: Container(
-                          width: size.width,
-                          // height: AppBar().preferredSize.height * .67,
-                          decoration: BoxDecoration(
-                            color: const Color(0xff1d3f5e),
-                            borderRadius: BorderRadius.circular(13),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    const Color(0xff1d3f5e).withOpacity(0.15),
-                                spreadRadius: 3,
-                                blurRadius: 19,
-                                offset: const Offset(
-                                    0, 0), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 11.0, vertical: 11),
-                              child: Center(
-                                child: Text.rich(
+                        width: size.width,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            color: const Color(0xff1d3f5e).withOpacity(1)),
+                        // width: size.width * .1,
+                        // height: size.width * .075,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Center(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: size.width * .085,
+                                  height: size.width * .085,
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.circular(1000),
+                                      color: Colors.white),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.video_collection,
+                                      color: Color(0xffa69963),
+                                      size: 19,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  "  daily videos ",
                                   textAlign: TextAlign.center,
-                                  TextSpan(children: [
-                                    WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(right: 7.0),
-                                          child: Icon(
-                                            Icons.favorite_sharp,
-                                            color: Colors.white,
-                                            size: 19,
-                                          ),
-                                        )),
-                                    TextSpan(
-                                        text: "  favorites",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'varela-round.regular',
-                                            fontSize: 13,
-                                            color: Colors.white)),
-                                  ]),
-                                ),
-                              ),
-                            ),
-                          )),
-                    ),
-                  ),
-                  Visibility(
-                    visible: value_last_read_exists ? true : false,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(size.width * .13, 0, size.width * .13, 7),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(HeroDialogRoute(
-                            bgColor: bgColor.withOpacity(0.85),
-                            builder: (context) => Center(
-                                child: UpdatedSurahPage(
-                              surah_id: surah_id,
-                              scroll_to: (int.parse(verse_id) - 1),
-                              should_animate: true,
-                              eng: widget.eng,
-                              ar: widget.ar,
-                            )),
-                          ));
-                        },
-                        child: Container(
-                            width: size.width,
-                            // height: AppBar().preferredSize.height * .67,
-                            decoration: BoxDecoration(
-                              color: const Color(0xff1d3f5e),
-                              borderRadius: BorderRadius.circular(13),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      const Color(0xff1d3f5e).withOpacity(0.15),
-                                  spreadRadius: 3,
-                                  blurRadius: 19,
-                                  offset: const Offset(
-                                      0, 0), // changes position of shadow
+                                  style: TextStyle(
+                                      height: 0,
+                                      color: Colors.white,
+                                      fontFamily: 'varela-round.regular',
+                                      fontSize: size.width * .035,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
-                            child: const Center(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 11.0, vertical: 11),
-                                child: Center(
-                                  child: Text.rich(
-                                    textAlign: TextAlign.center,
-                                    TextSpan(children: [
-                                      WidgetSpan(
-                                          alignment:
-                                              PlaceholderAlignment.middle,
-                                          child: Padding(
-                                            padding:
-                                                EdgeInsets.only(right: 7.0),
-                                            child: Icon(
-                                              Icons.hourglass_top,
-                                              color: Colors.white,
-                                              size: 19,
-                                            ),
-                                          )),
-                                      TextSpan(
-                                          text: "  last read",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily:
-                                                  'varela-round.regular',
-                                              fontSize: 13,
-                                              color: Colors.white)),
-                                    ]),
-                                  ),
-                                ),
-                              ),
-                            )),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  Visibility(
-                    visible: true,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: size.width * .13, vertical: 0),
-                      child: GestureDetector(
-                        onTap: () async {
-                          Navigator.of(context).push(HeroDialogRoute(
-                            bgColor: bgColor.withOpacity(0.85),
-                            builder: (context) => Center(
-                                child: Duas(title: "test", eng: widget.eng, ar: widget.ar, theme: bgColor)),
-                          ));
-                          // setState(() {
-                          //   if (flag == 1) {
-                          //     flag = 0;
-                          //   } else {
-                          //     flag = 1;
-                          //   }
-                          // });
-                          // if (flag == 0) {
-                          //   audioPlayer.pause();
-                          //   return;
-                          // }
-                          // final Directory? appDocDir =
-                          //     await getExternalStorageDirectory();
-                          // var appDocPath = appDocDir?.path;
-                          // var file = File("${appDocPath!}/2.mp3");
-                          // await file.exists() ? print("yes") : print("no");
-                          // audioPlayer.play(DeviceFileSource(file.path));
-                        },
-                        child: Container(
-                            width: size.width,
-                            // height: AppBar().preferredSize.height * .67,
-                            decoration: BoxDecoration(
-                              color: const Color(0xff1d3f5e),
-                              borderRadius: BorderRadius.circular(13),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      const Color(0xff1d3f5e).withOpacity(0.15),
-                                  spreadRadius: 3,
-                                  blurRadius: 19,
-                                  offset: const Offset(
-                                      0, 0), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: const Center(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 11.0, vertical: 11),
-                                child: Center(
-                                  child: Text.rich(
-                                    textAlign: TextAlign.center,
-                                    TextSpan(children: [
-                                      WidgetSpan(
-                                          alignment: PlaceholderAlignment.middle,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(right: 7.0),
-                                            child: Icon(
-                                              Icons.mosque,
-                                              color: Colors.white,
-                                              size: 19,
-                                            ),
-                                          )),
-                                      TextSpan(
-                                          text: "  du'as (supplications)",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'varela-round.regular',
-                                              fontSize: 13,
-                                              color: Colors.white)),
-                                    ]),
-                                  ),
-                                ),
-                              ),
-                            )),
-                      ),
-                    ),
-                  ),
-                  Visibility(
-                    visible: true,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: size.width * .13, vertical: 7),
-                      child: GestureDetector(
-                        onTap: () async {
-                          Navigator.of(context).push(HeroDialogRoute(
-                            bgColor: bgColor.withOpacity(0.85),
-                            builder: (context) => Center(
-                                child: DailyDuas(theme: bgColor)),
-                          ));
-                          // setState(() {
-                          //   if (flag == 1) {
-                          //     flag = 0;
-                          //   } else {
-                          //     flag = 1;
-                          //   }
-                          // });
-                          // if (flag == 0) {
-                          //   audioPlayer.pause();
-                          //   return;
-                          // }
-                          // final Directory? appDocDir =
-                          //     await getExternalStorageDirectory();
-                          // var appDocPath = appDocDir?.path;
-                          // var file = File("${appDocPath!}/2.mp3");
-                          // await file.exists() ? print("yes") : print("no");
-                          // audioPlayer.play(DeviceFileSource(file.path));
-                        },
-                        child: Container(
-                            width: size.width,
-                            // height: AppBar().preferredSize.height * .67,
-                            decoration: BoxDecoration(
-                              color: const Color(0xff1d3f5e),
-                              borderRadius: BorderRadius.circular(13),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      const Color(0xff1d3f5e).withOpacity(0.15),
-                                  spreadRadius: 3,
-                                  blurRadius: 19,
-                                  offset: const Offset(
-                                      0, 0), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: const Center(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 11.0, vertical: 11),
-                                child: Center(
-                                  child: Text.rich(
-                                    textAlign: TextAlign.center,
-                                    TextSpan(children: [
-                                      WidgetSpan(
-                                          alignment: PlaceholderAlignment.middle,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(right: 7.0),
-                                            child: Icon(
-                                              Icons.ondemand_video_rounded,
-                                              color: Colors.white,
-                                              size: 19,
-                                            ),
-                                          )),
-                                      TextSpan(
-                                          text: "  daily videos",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'varela-round.regular',
-                                              fontSize: 13,
-                                              color: Colors.white)),
-                                    ]),
-                                  ),
-                                ),
-                              ),
-                            )),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(
+                  height: size.width * .5,
+                )
+              ],
             ),
           ),
         ),

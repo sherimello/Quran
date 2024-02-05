@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran/assets/network%20operations/user_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -204,13 +205,16 @@ class _BookmarksState extends State<Bookmarks> {
                                             snack_text_padding = 39;
                                           }),
                                           Future.delayed(const Duration(seconds: 3), () {
-                                            setState(() {
+                                            if(mounted) {
+                                              setState(() {
                                               snack_text_size = 0;
                                               snack_text_padding = 0;
                                             });
+                                            }
                                           }),
                                         } : {
                                       message = "folder name empty",
+                                      if(mounted)
                                       setState(() {
                                         snack_text_size = 13;
                                         snack_text_padding = 41;
@@ -338,7 +342,8 @@ class _BookmarksState extends State<Bookmarks> {
                               child: GestureDetector(
                                 onTap: () async{
 
-                                  await addToBookmark(bookmarkFolders[index]['folder_name']).whenComplete(() {
+                                  await addToBookmark(bookmarkFolders[index]['folder_name']);
+                                  await UserData().addTheNewlyAddedBookmarkToServer("${widget.surah_id}:${widget.verse_id}", "${bookmarkFolders[index]['folder_name']}").whenComplete(() {
                                     setState(() {
                                       message = 'verse added to "${bookmarkFolders[index]['folder_name']}"';
                                       snack_text_size = 13;

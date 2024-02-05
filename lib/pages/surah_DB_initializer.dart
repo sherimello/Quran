@@ -22,7 +22,9 @@ class _SurahDBInitializerState extends State<SurahDBInitializer> {
 
   prepareDB() async {
     await saveFontSizes();
-    await sqlQueries.crazy1(await sqlQueries.crazy0()).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu(eng: 14.0, ar: 12.0))));
+    Database db = await sqlQueries.crazy0();
+    await sqlQueries.crazy1(db).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu(eng: 14.0, ar: 12.0))));
+    // await sqlQueries.crazy1(db).whenComplete(() async => await sqlQueries.crazy2().whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu(eng: 14.0, ar: 12.0)))));
     // sqlQueries.test1(await sqlQueries.test0()).whenComplete(() async => sqlQueries.test11(await sqlQueries.test00()).whenComplete(() async => sqlQueries.test111(await sqlQueries.test000())));
     // sqlQueries.test11(await sqlQueries.test00());
     // sqlQueries.test111(await sqlQueries.test000());

@@ -1,8 +1,3 @@
-
-/// {@template todo}
-/// Model for a todo. Can contain an optional list of [items] for
-/// additional sub-todos.
-/// {@endtemplate}
 class Todo {
   /// {@macro todo}
   const Todo({
@@ -21,9 +16,6 @@ class Todo {
   final List<Item> items;
 }
 
-/// {@template item}
-/// An individual item model, used within a [Todo].
-/// {@endtemplate}
 class Item {
   /// {@macro item}
   Item({

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran/assets/network%20operations/user_data.dart';
 import 'package:quran/pages/bookmark_folders.dart';
 import 'package:quran/pages/favorite_verses.dart';
 import 'package:quran/pages/surah_list.dart';
@@ -54,7 +55,7 @@ class _DeleteCardState extends State<DeleteCard> {
         await initiateDB().whenComplete(() {
           database.rawDelete('DELETE FROM bookmarks WHERE folder_name = ? AND surah_id = ? AND verse_id = ?', [widget.folder_name, widget.surah_number, widget.verse_number]);
           print('deleted');
-        })
+        }).whenComplete(() => UserData().removeBookmarkFromServer("${widget.surah_number}:${widget.verse_number}", widget.folder_name))
       } :
       {
         await initiateDB().whenComplete(() {
