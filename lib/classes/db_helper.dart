@@ -14,44 +14,44 @@ class DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database!;
 
-    _database = await initDatabase();
+    _database = await initDatabase("bn_bayaan.db");
     return _database!;
   }
 
-  Future<Database> initDatabase() async {
+  Future<Database> initDatabase(String dbName) async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'kathir.db');
+    String path = join(databasesPath, dbName);
 
     // Check if the database file exists in the documents directory
     if (!await databaseExists(path)) {
       // Copy the database from assets to the documents directory
-      await _copyDatabase(path);
+      await _copyDatabase(path, dbName);
     }
 
     // Open the database with read and write access
     return await openDatabase(
       path,
-      version: 1,
+      version: 4,
       readOnly: false,
     );
   }
 
-  Future<void> _copyDatabase(String path) async {
+  Future<void> _copyDatabase(String path, dbName) async {
     // Get the asset database file
-    ByteData data = await rootBundle.load('lib/assets/documents/kathir (1).db');
+    ByteData data = await rootBundle.load('lib/assets/documents/$dbName');
     List<int> bytes = data.buffer.asUint8List();
 
     // Write the bytes to the database file
     await File(path).writeAsBytes(bytes, flush: true);
   }
 
-  Future<List<Map<String, dynamic>>> fetchData() async {
+  Future<List<Map<String, dynamic>>> fetchData(var dbName) async {
     final Database db = await database;
 
     // Get all table names from the database
     var tableNames = await db.rawQuery("SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%'");
-    var tableData = await db.rawQuery("SELECT * FROM tafsir_kathir");
+    var tableData = await db.rawQuery("SELECT * FROM verses");
     print(tableData);
     print(tableNames);
 

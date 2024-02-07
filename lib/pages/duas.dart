@@ -1091,6 +1091,7 @@ class _DuasState extends State<Duas> {
                                                     should_animate: true,
                                                     eng: widget.eng,
                                                     ar: widget.ar,
+                                                        bgColor: widget.theme,
                                                   ),
                                                 ),
                                               );

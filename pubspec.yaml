@@ -104,6 +104,9 @@ flutter:
     - lib/assets/
     - lib/assets/fonts/
     - lib/assets/documents/
+    - lib/assets/documents/kathir_db.db
+    - lib/assets/documents/bn_bayaan.db
+    - lib/assets/documents/en_jalalayn.db
     #   - images/a_dot_ham.jpeg
 
     # An image asset can refer to one or more resolution-specific "variants", see

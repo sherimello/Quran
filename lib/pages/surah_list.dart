@@ -440,10 +440,10 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
   }
 
   checkForUpdates() async {
-    Future<Database> db = DatabaseHelper.instance.initDatabase();
+    Future<Database> db = DatabaseHelper.instance.initDatabase("kathir_db.db");
 
     List<Map<String, dynamic>> tafsir =
-        await DatabaseHelper.instance.fetchData();
+        await DatabaseHelper.instance.fetchData("bn_bayaan.db");
     print(tafsir);
     // List<String> tableNames =
     // tafsir.map((table) => table['name'] as String).toList();
@@ -513,11 +513,13 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
           await database.rawQuery('SELECT surah_id FROM sujood_verses');
       sujood_verse_indices =
           await database.rawQuery('SELECT verse_id FROM sujood_verses');
-      setState(() {
+      if(mounted) {
+        setState(() {
         // surahs.add(surah_name_arabic_temp);
         surah_name_arabic = surah_name_arabic;
         surah_name_translated = surah_name_translated;
       });
+      }
     });
   }
 
@@ -1032,7 +1034,8 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                           context,
                                           PageTransition(
                                               type: PageTransitionType.fade,
-                                              child: UpdatedSurahPage(
+                                              child:
+                                              UpdatedSurahPage(
                                                 bgColor: bgColor,
                                                 sujoodVerses:
                                                     selected_surah_sujood_verses,

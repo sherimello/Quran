@@ -10,7 +10,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:quran/classes/my_sharedpreferences.dart';
+import 'package:quran/pages/settings_card.dart';
 import 'package:quran/pages/verse_options_card.dart';
+import 'package:quran/widgets/settings_UI.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_ripple_animation/simple_ripple_animation.dart';
@@ -24,15 +27,14 @@ import '../hero_transition_handler/custom_rect_tween.dart';
 import '../hero_transition_handler/hero_dialog_route.dart';
 
 class UpdatedSurahPage extends StatefulWidget {
-  String surah_id, image, surah_name, arabic_name, verse_numbers;
+  String surah_id, image, surah_name, arabic_name, verse_numbers, lang;
   bool should_animate;
   int scroll_to;
   List<int> sujoodVerses;
   var bgColor;
   List<Map> verses, translated_verse;
-  final double eng, ar;
+  double eng, ar;
 
-  // const UpdatedSurahPage({Key? key, required this.surah_id, required this.image, required this.surah_name, required this.arabic_name, required this.sujood_index, required this.verse_numbers, required this.verses, required this.translated_verse}) : super(key: key);
   UpdatedSurahPage(
       {Key? key,
       required this.surah_id,
@@ -46,6 +48,7 @@ class UpdatedSurahPage extends StatefulWidget {
       this.scroll_to = 0,
       this.sujoodVerses = const [],
       this.should_animate = false,
+      this.lang = "eng",
       required this.eng,
       required this.ar})
       : super(key: key);
@@ -59,6 +62,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   bool scrolled_to_destination = false;
 
   bool downloadTapped = false;
+  bool _menuClicked = false;
   double progress = 0.0;
   var count = 0;
   var len = 0;
@@ -66,6 +70,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   bool show_tafsir = false;
   String tafsir = "";
   late int tafsirIndex = -1;
+  String current_lang = "", lang_img = "lib/assets/images/eng.png";
 
   List<int> madani_surah = [
         2,
@@ -119,6 +124,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
         112,
         113
       ];
+
   var bgColor = Colors.white,
       color_favorite_and_index = const Color(0xff1d3f5e),
       color_header = const Color(0xff1d3f5e),
@@ -167,7 +173,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   }
 
   initializeThemeStarters() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if (widget.bgColor == Colors.white) {
       changeStatusBarColor(0xff1d3f5e);
       assignmentForLightMode();
@@ -292,61 +297,77 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   }
 
   late Timer timer;
-  late Database db;
+  late Database db_tafsir, db_bn;
 
-  // initTafsirData() async {
-  //
-  //   db = await DatabaseHelper.instance.initDatabase();
-  //   timer = Timer(const Duration(milliseconds: 500), loadData);
-  // }
-
-  Future<String> specific_verse_tafsir(String surah, verse) async {
-    List<Map<dynamic, dynamic>> tafsir = await db.rawQuery(
-        "SELECT tafsir_text FROM tafsir_kathir WHERE surah = ? AND ayah = ?",
-        [surah, verse]);
+  Future<String> specific_verse_tafsir(int surah, verse) async {
+    // List<Map<dynamic, dynamic>> tafsir = await db_tafsir.rawQuery(
+    //     "SELECT tafsir_text FROM tafsir_kathir WHERE surah = ? AND ayah = ?",
+    //     [surah, verse]);
+    List<Map<dynamic, dynamic>> tafsir = await db_tafsir.rawQuery(
+        "SELECT text FROM verses WHERE sura = ? AND ayah = ?", [surah, verse]);
     // print(tafsir[0]["tafsir_text"].replaceAll("\\r", ""));
-    return tafsir[0]["tafsir_text"].replaceAll("\\r", "");
+    return tafsir[0]["text"].replaceAll("\\r", "");
   }
 
-  Future<void> loadData() async {
-    final String raw =
-    await rootBundle.loadString('lib/assets/documents/tafseer.csv');
-    List<List<dynamic>> csvTable = const CsvToListConverter().convert(raw);
+  bool dbFilesLoad = false;
 
-    // Convert the CSV data to a list of maps for easier access
-    List<Map<String, dynamic>> csvData = [];
-    for (List<dynamic> row in csvTable) {
-      csvData.add({
-        'surah': row[0],
-        'ayah': row[1],
-        'tafsir_text': row[2],
-      });
-    }
+  initOtherDBs() async {
+    DatabaseHelper databaseHelper = DatabaseHelper.instance;
+
+    db_tafsir = await databaseHelper.initDatabase("en_jalalayn.db");
+    db_bn = await databaseHelper.initDatabase("bn_bayaan.db");
+    setState(() {
+      db_tafsir = db_tafsir;
+      db_bn = db_bn;
+      dbFilesLoad = true;
+    });
+    // var databasesPath = await getDatabasesPath();
+    // path = join(databasesPath, 'quran.db');
+    //
+    // database = await openDatabase(path);
+    //
+    // print(database.isOpen);
+
+    // String databasePath1 = join('lib/assets/documents/', 'kathir_db.db');
+    // String databasePath2 = join('lib/assets/documents/', 'bn_bayan.db');
+    // db_tafsir = await openDatabase(databasePath1);
+    // db_bn = await openDatabase(databasePath2);
+
+    // final List<Map<String, dynamic>> tables = await db_bn.rawQuery(
+    //   'SELECT name FROM sqlite_master WHERE type = "table"',
+    // );
+    //
+    // for (final table in tables) {
+    //   print(table['name']);
+    // }
+  }
+
+  MySharedPreferences mySharedPreferences = MySharedPreferences();
+  late SharedPreferences sharedPreferences;
+
+  checkLanguage() async {
+    current_lang = await (mySharedPreferences.getStringValue("lang"));
 
     setState(() {
-      data = csvData;
+      current_lang = current_lang;
     });
   }
-  initTafsirData() async {
-    db = await DatabaseHelper.instance.initDatabase();
-    // await Future.wait(
-    //   [loadData()],
-    //   // Timer(const Duration(milliseconds: 500), loadData)
-    // );
-  }
 
-  @override
-  void initState() {
+  init() async {
+    autoScrollController = AutoScrollController(
+      axis: Axis.vertical,
+    );
+
+    _scrollToIndex();
     initializeThemeStarters();
-    // TODO: implement initState
-    super.initState();
+    await checkLanguage();
+    print(current_lang);
+    sharedPreferences = await SharedPreferences.getInstance();
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       // This function will be called after the widget has finished building
-      initTafsirData();
+      initOtherDBs();
     });
-    // initTafsirData();
-    // loadData();
     checkIfAudioExists();
 
     if (widget.image == "") {
@@ -362,12 +383,13 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     }
 
     startFetches();
+  }
 
-    autoScrollController = AutoScrollController(
-      axis: Axis.vertical,
-    );
-
-    _scrollToIndex();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    init();
   }
 
   bool isVerseFavorite(int verse_number) {
@@ -383,8 +405,32 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   Future<void> startFetches() async {
     initiateDB().whenComplete(() async {
       await fetchVersesData(widget.surah_id);
-      // await fetchSurahSujoodVerses(int.parse(widget.surah_id));
     });
+  }
+
+  Future<void> startENData() async {
+    widget.translated_verse = [
+      ...await database.rawQuery(
+          'SELECT text FROM verses WHERE lang_id = 2 AND surah_id = ?',
+          [widget.surah_id])
+    ];
+    setState(() {
+      widget.translated_verse = widget.translated_verse;
+    });
+  }
+
+  Future<void> startBNData() async {
+    // widget.translated_verse.clear();
+    widget.translated_verse = [
+      ...await db_bn.rawQuery('SELECT text FROM verses WHERE sura = ?',
+          [int.parse(widget.surah_id)])
+    ];
+    setState(() {
+      widget.translated_verse = widget.translated_verse;
+    });
+    List<Map<dynamic, dynamic>> temp =
+        await db_bn.rawQuery('SELECT text FROM verses WHERE sura = ?', ["1"]);
+    print(temp);
   }
 
   Future<void> initiateDB() async {
@@ -401,12 +447,18 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     // print(widget.verse_numbers);
     // verses.clear();
     await initiateDB().whenComplete(() async {
-      widget.verses = await database.rawQuery(
-          'SELECT text FROM verses WHERE lang_id = 1 AND surah_id = ?',
-          [widget.surah_id]);
-      widget.translated_verse = await database.rawQuery(
-          'SELECT text FROM verses WHERE lang_id = 2 AND surah_id = ?',
-          [widget.surah_id]);
+      widget.verses = [
+        ...await database.rawQuery(
+            'SELECT text FROM verses WHERE lang_id = 1 AND surah_id = ?',
+            [widget.surah_id])
+      ];
+      current_lang == "eng"
+          ? widget.translated_verse = [
+              ...await database.rawQuery(
+                  'SELECT text FROM verses WHERE lang_id = 2 AND surah_id = ?',
+                  [widget.surah_id])
+            ]
+          : initOtherDBs().whenComplete(() => startBNData());
       // widget.translated_verse = await database.rawQuery(
       //     'SELECT text FROM verses_bn WHERE surah_id = ?',
       //     [widget.surah_id]);
@@ -423,12 +475,14 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
       favorite_verses = await database.rawQuery(
           'SELECT * FROM favorites WHERE surah_id = ?', [widget.surah_id]);
     });
-    setState(() {
-      widget.verses = widget.verses;
-      widget.translated_verse = widget.translated_verse;
-      widget.surah_name = surah_name_translated[0]['translation'];
-      widget.arabic_name = surah_name_arabic[0]['translation'];
-    });
+    if (mounted) {
+      setState(() {
+        widget.verses = widget.verses;
+        widget.translated_verse = widget.translated_verse;
+        widget.surah_name = surah_name_translated[0]['translation'];
+        widget.arabic_name = surah_name_arabic[0]['translation'];
+      });
+    }
     print("translated verses: ${widget.translated_verse.length}");
   }
 
@@ -444,9 +498,11 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   Future _scrollToIndex() async {
     await autoScrollController.scrollToIndex(widget.scroll_to,
         preferPosition: AutoScrollPosition.begin);
-    setState(() {
-      scrolled_to_destination = true;
-    });
+    if (mounted) {
+      setState(() {
+        scrolled_to_destination = true;
+      });
+    }
   }
 
   @override
@@ -454,7 +510,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     // TODO: implement dispose
     super.dispose();
     data.clear();
-    // timer.cancel();
     yt.close();
     final Directory? appDocDir = await getExternalStorageDirectory();
     var appDocPath = appDocDir?.path;
@@ -523,25 +578,14 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
             fileStream.add(data);
           }
 
-          // Pipe all the content of the stream into the file.
-          // await stream.pipe(fileStream);
-
-          // Close the file.
           await fileStream.flush();
           await fileStream.close().whenComplete(() {
-            var fileStream = file.openRead();
-            //...
             playAudio();
-            // audioPlayer.setSource(AssetSource("$appDocPath/2.mp3"));
-            // audioPlayer.play("$appDocPath/2.mp3");
           });
         } else {
           print("denied");
         }
       }
-      // print(streamInfo);
-
-      // Close the YoutubeExplode's http client.
       yt.close();
     }
 
@@ -552,29 +596,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
 
     return Scaffold(
         backgroundColor: const Color(0xff1d3f5e),
-        // appBar: AppBar(
-        //   backgroundColor: color_header,
-        //   automaticallyImplyLeading: false,
-        //   titleSpacing: 0,
-        //   elevation: 0,
-        //   centerTitle: true,
-        //   title: Stack(
-        //     children: [
-        //
-        //
-        //     ],
-        //   ),
-        //
-        //     Positioned(
-        //       top: AppBar().preferredSize.height * .25,
-        //       right: size.width * .02,
-        //       child: Container(
-        //         width: size.width * .21,
-        //         height: AppBar().preferredSize.height * .5,
-        //         color: Colors.white,
-        //       ),
-        //     )
-        // ),
         body: Container(
           width: double.infinity,
           height: double.infinity,
@@ -582,82 +603,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
           child: SafeArea(
             child: Stack(
               children: [
-                Container(
-                  height: AppBar().preferredSize.height,
-                  width: size.width,
-                  color: color_container_dark == Colors.black
-                      ? Colors.black
-                      : playingAudio
-                          ? color_container_dark
-                          : const Color(0xff1d3f5e),
-                  child: Row(
-                    children: [
-                      Opacity(
-                        opacity: playingAudio ? 0 : .35,
-                        child: Image.asset(
-                          'lib/assets/images/headerDesignL.png',
-                          width: size.width * .25,
-                          fit: BoxFit.fitWidth,
-                        ),
-                      ),
-                      SizedBox(
-                        width: size.width * .5,
-                        height: AppBar().preferredSize.height,
-                        child: Column(
-                          // direction: Axis.vertical,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          // alignment: WrapAlignment.center,
-                          children: [
-                            Text.rich(
-                              textAlign: TextAlign.center,
-                              TextSpan(children: [
-                                WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,
-                                    child: Image.asset(
-                                      widget.image,
-                                      height: 13,
-                                      width: 13,
-                                    )),
-                                TextSpan(
-                                    text: '  ${widget.surah_name}  ',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'varela-round.regular',
-                                        color: Colors.white,
-                                        fontSize: 13)),
-                                TextSpan(
-                                  text: widget.arabic_name,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Diwanltr'),
-                                ),
-                              ]),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text('Verses: ${widget.verses.length}  ',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'varela-round.regular',
-                                    color: Colors.white,
-                                    fontSize: 11)),
-                          ],
-                        ),
-                      ),
-                      Opacity(
-                        opacity: playingAudio ? 0 : .35,
-                        child: Image.asset(
-                          'lib/assets/images/headerDesignR.png',
-                          width: size.width * .25,
-                          fit: BoxFit.fitWidth,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 AnimatedPositioned(
                   left: 0,
                   right: 0,
@@ -669,7 +614,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                   child: Container(
                     width: size.width,
                     color: color_container_dark,
-                    // height: AppBar().preferredSize.height,
                     padding: const EdgeInsets.all(0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -689,9 +633,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                               fontFamily: '110_Besmellah',
                               fontStyle: FontStyle.normal,
                               fontSize: AppBar().preferredSize.height * .71,
-                              // height: isPortraitMode()
-                              //     ? size.height / size.width
-                              //     : size.width / size.height
                             ),
                           ),
                         ),
@@ -743,8 +684,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                             ? 0
                             : widget.translated_verse.length,
                         itemBuilder: (BuildContext context, int index) {
-                          // print(
-                          //     '${isPortraitMode() ? size.height / size.width : size.width / size.height}');
                           return AutoScrollTag(
                             highlightColor: const Color(0xff1d3f5e),
                             key: ValueKey(index),
@@ -757,35 +696,36 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                     begin: begin!, end: end!);
                               },
                               child: GestureDetector(
-                                onTap: () async {
-                                  await Navigator.of(context)
-                                      .push(HeroDialogRoute(
-                                    bgColor: bgColor.withOpacity(.75),
-                                    builder: (context) => Center(
-                                      child: VerseOptionsCard(
-                                        tag: index.toString(),
-                                        verse_english:
-                                            widget.translated_verse[index]
-                                                    ['text'] +
-                                                "",
-                                        verse_arabic: widget.verses[index]
-                                            ['text'],
-                                        surah_name: widget.surah_name,
-                                        surah_number: widget.surah_id,
-                                        verse_number: (index + 1).toString(),
-                                        theme: bgColor,
-                                      ),
-                                    ),
-                                  ))
-                                      .then((_) {
-                                    // Here you will get callback after coming back from NextPage()
-                                    // Do your code here
-                                    widget.scroll_to = index;
-                                    startFetches().whenComplete(() {
-                                      _scrollToIndex();
-                                    });
-                                  });
-                                },
+                                onTap: !_menuClicked
+                                    ? () async {
+                                        await Navigator.of(context)
+                                            .push(HeroDialogRoute(
+                                          bgColor: bgColor.withOpacity(.75),
+                                          builder: (context) => Center(
+                                            child: VerseOptionsCard(
+                                              tag: index.toString(),
+                                              verse_english:
+                                                  widget.translated_verse[index]
+                                                          ['text'] +
+                                                      "",
+                                              verse_arabic: widget.verses[index]
+                                                  ['text'],
+                                              surah_name: widget.surah_name,
+                                              surah_number: widget.surah_id,
+                                              verse_number:
+                                                  (index + 1).toString(),
+                                              theme: bgColor,
+                                            ),
+                                          ),
+                                        ))
+                                            .then((_) {
+                                          widget.scroll_to = index;
+                                          startFetches().whenComplete(() {
+                                            _scrollToIndex();
+                                          });
+                                        });
+                                      }
+                                    : () {},
                                 child: Material(
                                   color: Colors.transparent,
                                   child: ClipRRect(
@@ -935,18 +875,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                                     color: color_main_text,
                                                                                   ),
                                                                                 ),
-                                                                                // TextSpan(
-                                                                                //   text:
-                                                                                //       '﴿  ',
-                                                                                //   style:
-                                                                                //       TextStyle(
-                                                                                //     // wordSpacing: 3,
-                                                                                //     fontWeight: FontWeight.bold,
-                                                                                //     fontFamily: 'Al Majeed Quranic Font_shiped',
-                                                                                //     fontSize: widget.ar - 5,
-                                                                                //     color: color_main_text,
-                                                                                //   ),
-                                                                                // ),
                                                                                 TextSpan(
                                                                                   text: arabicNumber.convert(index + 1),
                                                                                   style: TextStyle(
@@ -956,16 +884,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                                       color: color_main_text,
                                                                                       fontFamily: "KFGQPC HafsEx1 Uthmanic Script"),
                                                                                 ),
-                                                                                // TextSpan(
-                                                                                //   text:
-                                                                                //       '  ﴾        ',
-                                                                                //   style: TextStyle(
-                                                                                //       // wordSpacing: 3,
-                                                                                //       fontFamily: 'Al Majeed Quranic Font_shiped',
-                                                                                //       fontSize: widget.ar - 5,
-                                                                                //       color: color_main_text,
-                                                                                //       fontWeight: FontWeight.bold),
-                                                                                // ),
                                                                                 widget.sujoodVerses.contains(index + 1)
                                                                                     ? WidgetSpan(
                                                                                         alignment: PlaceholderAlignment.bottom,
@@ -992,7 +910,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                                 ? TextSpan(text: '\n\nverse of prostration ***', style: TextStyle(color: const Color(0xff518050), fontWeight: FontWeight.bold, fontFamily: 'varela-round.regular', fontSize: widget.eng))
                                                                                 : const TextSpan()
                                                                           ])),
-                                                                      // RichText(text: TextSpan(text: getTafsirText(index, int.parse(widget.surah_id)))),
                                                                     ],
                                                                   ),
                                                                 )
@@ -1014,9 +931,8 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                               const EdgeInsets
                                                                   .all(8.0),
                                                           child: Visibility(
-                                                              visible:
-                                                                  false,
-                                                                  // data.isEmpty,
+                                                              visible: false,
+                                                              // data.isEmpty,
                                                               child: SizedBox(
                                                                   width:
                                                                       size.width *
@@ -1034,61 +950,34 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                       Visibility(
                                                         visible: tafsirIndex !=
                                                             index,
-
-                                                        // visible:
-                                                        //     data.isNotEmpty &&
-                                                        //         tafsirIndex !=
-                                                        //             index,
                                                         child: Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
                                                                   .end,
                                                           children: [
                                                             GestureDetector(
-                                                              onTap: () async {
-                                                                setState(() {
-                                                                  show_tafsir =
-                                                                      true;
-                                                                  tafsirIndex =
-                                                                      index;
-                                                                });
-                                                                // if (data
-                                                                //     .isEmpty) {
-                                                                //   await loadData()
-                                                                //       .whenComplete(
-                                                                //           () async {
-                                                                //     tafsir = await specific_verse_tafsir(
-                                                                //         widget
-                                                                //             .surah_id,
-                                                                //         index +
-                                                                //             1);
-                                                                //     setState(
-                                                                //         () {
-                                                                //       tafsir = tafsir;
-                                                                //       // getTafsirText(int.parse(widget.surah_id), tafsirIndex + 1);
-                                                                //     });
-                                                                //   });
-                                                                // } else {
-                                                                  tafsir = await specific_verse_tafsir(
-                                                                      widget
-                                                                          .surah_id,
-                                                                      index +
-                                                                          1);
-                                                                  setState(() {
-                                                                    tafsir = tafsir;
-                                                                    // setState(() {
-                                                                    //   tafsir = getTafsirText(
-                                                                    //       int.parse(widget
-                                                                    //           .surah_id),
-                                                                    //       tafsirIndex +
-                                                                    //           1);
-                                                                    // });
-                                                                  });
-                                                                // }
-                                                              },
+                                                              onTap:
+                                                                  !_menuClicked
+                                                                      ? () async {
+                                                                          setState(
+                                                                              () {
+                                                                            show_tafsir =
+                                                                                true;
+                                                                            tafsirIndex =
+                                                                                index;
+                                                                          });
+                                                                          tafsir = await specific_verse_tafsir(
+                                                                              int.parse(widget.surah_id),
+                                                                              index + 1);
+                                                                          setState(
+                                                                              () {
+                                                                            tafsir =
+                                                                                tafsir;
+                                                                          });
+                                                                          // }
+                                                                        }
+                                                                      : () {},
                                                               child: Container(
-                                                                  // width: size.width,
-                                                                  // height: AppBar().preferredSize.height * .67,
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     color: const Color(
@@ -1600,7 +1489,239 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                       ),
                     ),
                   ),
-                )
+                ),
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 305),
+                  top: _menuClicked ? 17 : 0,
+                  left: _menuClicked ? 17 : 0,
+                  right: _menuClicked ? 17 : 0,
+                  child: AnimatedContainer(
+                      curve: Curves.ease,
+                      duration: const Duration(milliseconds: 355),
+                      // height: menuClicked ? 0 : AppBar().preferredSize.height,
+                      width: _menuClicked ? size.width - 22 : size.width,
+                      decoration: BoxDecoration(
+                          color: _menuClicked
+                              ? const Color(0x001d3f5e)
+                              : color_container_dark == Colors.black
+                                  ? Colors.black
+                                  : playingAudio
+                                      ? color_container_dark
+                                      : const Color(0xff1d3f5e),
+                          borderRadius:
+                              BorderRadius.circular(_menuClicked ? 31 : 0)),
+                      child: _menuClicked
+                          ? SettingsUI(
+                              tag: "",
+                              fontsize_english: widget.eng,
+                              fontsize_arab: widget.ar,
+                              theme: widget.bgColor,
+                              surah_id: widget.surah_id,
+                              toggleMenuClicked: () {
+                                // Passes the setter function to WidgetB
+                                setState(() {
+                                  widget.ar = sharedPreferences
+                                      .getDouble(("arabic_font_size"))!;
+                                  widget.eng = sharedPreferences
+                                      .getDouble(("english_font_size"))!;
+                                  String theme = sharedPreferences
+                                      .getString("theme mode")!;
+                                  print("theme : $theme");
+                                  theme == "dark"
+                                      ? widget.bgColor = Colors.black
+                                      : widget.bgColor = Colors.white;
+                                  theme == "dark"
+                                      ? bgColor = Colors.black
+                                      : bgColor = Colors.white;
+                                  initializeThemeStarters();
+                                  _menuClicked = false;
+                                  // init();
+                                  checkLanguage()
+                                      .whenComplete(() => startFetches());
+                                });
+                                print("menu clicked status: $_menuClicked");
+                              },
+                            )
+                          // Column(
+                          //   mainAxisSize: MainAxisSize.min,
+                          //   children: [
+                          //     Text(
+                          //         "hkjhkkhsadakjshk",
+                          //       style: TextStyle(
+                          //         color: Colors.white
+                          //       ),
+                          //     ),
+                          //   ],
+                          // )
+                          : SizedBox(
+                              height: AppBar().preferredSize.height,
+                              // width: size.width,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    Opacity(
+                                      opacity: playingAudio ? 0 : .21,
+                                      child: Image.asset(
+                                        'lib/assets/images/headerDesignL.png',
+                                        width: size.width * .25,
+                                        fit: BoxFit.fitWidth,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: size.width * .5,
+                                      height: AppBar().preferredSize.height,
+                                      child: Column(
+                                        // direction: Axis.vertical,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        // alignment: WrapAlignment.center,
+                                        children: [
+                                          Text.rich(
+                                            textAlign: TextAlign.center,
+                                            TextSpan(children: [
+                                              WidgetSpan(
+                                                  alignment:
+                                                      PlaceholderAlignment
+                                                          .middle,
+                                                  child: Image.asset(
+                                                    widget.image,
+                                                    height: 13,
+                                                    width: 13,
+                                                  )),
+                                              TextSpan(
+                                                  text:
+                                                      '  ${widget.surah_name}  ',
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily:
+                                                          'varela-round.regular',
+                                                      color: Colors.white,
+                                                      fontSize: 13)),
+                                              TextSpan(
+                                                text: widget.arabic_name,
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'Diwanltr'),
+                                              ),
+                                            ]),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Text(
+                                              'Verses: ${widget.verses.length}  ',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily:
+                                                      'varela-round.regular',
+                                                  color: Colors.white,
+                                                  fontSize: 11)),
+                                        ],
+                                      ),
+                                    ),
+                                    Opacity(
+                                      opacity: playingAudio ? 0 : .21,
+                                      child: Image.asset(
+                                        'lib/assets/images/headerDesignR.png',
+                                        width: size.width * .25,
+                                        fit: BoxFit.fitWidth,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )),
+                ),
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 355),
+                  curve: Curves.decelerate,
+                  top: AppBar().preferredSize.height * .5 -
+                      ((AppBar().preferredSize.height * .55) * .5),
+                  right: (((size.width * .25) -
+                              (AppBar().preferredSize.height * .71)) *
+                          .5) -
+                      ((AppBar().preferredSize.height * .55) * .5),
+                  // child: Icon(
+                  //   Icons.settings,
+                  //   color: Colors.white,
+                  //   size: AppBar().preferredSize.height * .55,
+                  // )
+                  child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _menuClicked == false
+                              ? _menuClicked = true
+                              : _menuClicked = false;
+                        });
+                        // if (current_lang == "eng") {
+                        //   setState(() {
+                        //     current_lang = "ben";
+                        //     lang_img = "lib/assets/images/ben.png";
+                        //     startBNData();
+                        //   });
+                        // } else {
+                        //   startENData();
+                        //   setState(() {
+                        //     current_lang = "eng";
+                        //     lang_img = "lib/assets/images/eng.png";
+                        //   });
+                        // }
+                      },
+                      child: Visibility(
+                        visible: !_menuClicked,
+                        child: Icon(
+                          Icons.settings,
+                          color: Colors.white,
+                          size: AppBar().preferredSize.height * .55,
+                        ),
+                      )
+
+                      // AnimatedContainer(
+                      //   duration: const Duration(milliseconds: 355),
+                      //   height: AppBar().preferredSize.height * .55,
+                      //   width: AppBar().preferredSize.height * .55,
+                      //   decoration: BoxDecoration(
+                      //       boxShadow: [
+                      //         BoxShadow(
+                      //           color: color_container_dark == Colors.black
+                      //               ? Colors.transparent.withOpacity(.35)
+                      //               : Colors.black.withOpacity(.15),
+                      //           spreadRadius: 7,
+                      //           blurRadius: 19,
+                      //           offset: const Offset(
+                      //               7, 7), // changes position of shadow
+                      //         ),
+                      //         BoxShadow(
+                      //           color: color_container_dark == Colors.black
+                      //               ? Colors.transparent.withOpacity(.35)
+                      //               : Colors.black.withOpacity(.15),
+                      //           spreadRadius: 7,
+                      //           blurRadius: 19,
+                      //           offset: const Offset(
+                      //               -7, -7), // changes position of shadow
+                      //         ),
+                      //       ],
+                      //       color: widget.bgColor == Colors.black
+                      //           ? Colors.white
+                      //           : Colors.black,
+                      //       borderRadius: BorderRadius.circular(1000)),
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.all(3.0),
+                      //     child: Opacity(
+                      //         opacity: .55,
+                      //         child: Image.asset(
+                      //           lang_img,
+                      //           fit: BoxFit.cover,
+                      //         )),
+                      //   ),
+                      // ),
+                      ),
+                ),
               ],
             ),
           ),
