@@ -734,7 +734,7 @@ class _DuasState extends State<Duas> {
 
   init() async {
     await initiateDB().whenComplete(() {
-      getDuasFromDB();
+      getDuasFromDB().whenComplete(() => setState(() => duas = duas.reversed.toList()));
     });
   }
 
@@ -750,7 +750,7 @@ class _DuasState extends State<Duas> {
     super.initState();
     changeStatusBarColor(
         widget.theme == Colors.black ? 0xff000000 : 0xff1d3f5e);
-    init();
+    init().whenComplete(() => setState(() => duas = duas.reversed.toList()));
   }
 
   @override
@@ -1091,7 +1091,7 @@ class _DuasState extends State<Duas> {
                                                     should_animate: true,
                                                     eng: widget.eng,
                                                     ar: widget.ar,
-                                                        bgColor: widget.theme,
+                                                    bgColor: widget.theme,
                                                   ),
                                                 ),
                                               );

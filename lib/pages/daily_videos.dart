@@ -246,14 +246,6 @@
 //   }
 // }
 
-
-
-
-
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -275,7 +267,7 @@ class _DailyDuasState extends State<DailyDuas> {
 
   Future<void> fetchVideos() async {
     final snapshot =
-    await FirebaseDatabase.instance.ref().child("daily videos").get();
+        await FirebaseDatabase.instance.ref().child("daily videos").get();
     final Map map = Map<String, dynamic>.from(snapshot.value as Map);
 
     map.forEach((key, value) async {
@@ -301,8 +293,13 @@ class _DailyDuasState extends State<DailyDuas> {
   @override
   void initState() {
     super.initState();
-    changeStatusBarColor(widget.theme == Colors.black ? 0xff000000 : 0xff1d3f5e);
-    fetchVideos();
+    changeStatusBarColor(
+        widget.theme == Colors.black ? 0xff000000 : 0xff1d3f5e);
+    fetchVideos().whenComplete(() => setState(() {
+          url = url.reversed.toList();
+          description = description.reversed.toList();
+          titles = titles.reversed.toList();
+        }));
   }
 
   @override
@@ -312,7 +309,7 @@ class _DailyDuasState extends State<DailyDuas> {
 
     return Scaffold(
       backgroundColor:
-      widget.theme == Colors.black ? Colors.black : Colors.white,
+          widget.theme == Colors.black ? Colors.black : Colors.white,
       body: SafeArea(
         child: Stack(
           children: [
@@ -346,8 +343,7 @@ class _DailyDuasState extends State<DailyDuas> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                                "videos (${url.length})",
+                            Text("videos (${url.length})",
                                 style: TextStyle(
                                     height: 0,
                                     fontWeight: FontWeight.bold,
@@ -379,8 +375,8 @@ class _DailyDuasState extends State<DailyDuas> {
                     padding: index == 0
                         ? const EdgeInsets.fromLTRB(11, 11, 11, 3.5)
                         : index == 12
-                        ? const EdgeInsets.fromLTRB(11, 3.5, 11, 11)
-                        : const EdgeInsets.fromLTRB(11, 3.5, 11, 3.5),
+                            ? const EdgeInsets.fromLTRB(11, 3.5, 11, 11)
+                            : const EdgeInsets.fromLTRB(11, 3.5, 11, 3.5),
                     child: GestureDetector(
                       onTap: () {
                         launchUrl(
@@ -411,13 +407,16 @@ class _DailyDuasState extends State<DailyDuas> {
                                     borderRadius: BorderRadius.circular(31),
                                     child: CachedNetworkImage(
                                       imageUrl:
-                                      "https://img.youtube.com/vi/${url[index]}/0.jpg",
+                                          "https://img.youtube.com/vi/${url[index]}/0.jpg",
                                       fit: BoxFit.cover,
                                     )),
                               ),
-                              const SizedBox(height: 11,),
+                              const SizedBox(
+                                height: 11,
+                              ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 11.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 11.0),
                                 child: Text(
                                   titles[index],
                                   style: TextStyle(
@@ -433,7 +432,8 @@ class _DailyDuasState extends State<DailyDuas> {
                                 height: 7,
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 11.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 11.0),
                                 child: Text(
                                   'description',
                                   style: TextStyle(
@@ -446,7 +446,8 @@ class _DailyDuasState extends State<DailyDuas> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(11.0, 5, 11, 11),
+                                padding:
+                                    const EdgeInsets.fromLTRB(11.0, 5, 11, 11),
                                 child: Text(
                                   description[index],
                                   style: TextStyle(

@@ -162,7 +162,11 @@ class _FavoriteVersesState extends State<FavoriteVerses> {
 
 
   Future<void> getData() async {
-    await initiateDB().whenComplete(() async=> await fetchVersesData());
+    await initiateDB().whenComplete(
+            () async => await fetchVersesData().whenComplete(() => setState(() {
+          verses = verses.reversed.toList();
+          translated_verse = translated_verse.reversed.toList();
+        })));
   }
 
   // Future<void> fetchSurahSujoodVerses(int surah_id) async {
