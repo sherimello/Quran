@@ -72,6 +72,8 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   late int tafsirIndex = -1;
   String current_lang = "", lang_img = "lib/assets/images/eng.png";
 
+  List<Map<dynamic, dynamic>> words = [];
+
   List<int> madani_surah = [
         2,
         3,
@@ -125,6 +127,8 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
         113
       ];
 
+  int selectedVerseForTafsir = 0;
+
   var bgColor = Colors.white,
       color_favorite_and_index = const Color(0xff1d3f5e),
       color_header = const Color(0xff1d3f5e),
@@ -138,7 +142,10 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
       sujood_verse_indices = [],
       surah_name_arabic = [],
       surah_name_translated = [],
-      favorite_verses = [];
+      favorite_verses = [],
+      transliterated_verses = [],
+      translated_words = [],
+      arabic_words = [];
 
   var yt = YoutubeExplode();
   bool audioExists = false, playingAudio = false, stopClicked = false;
@@ -209,9 +216,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
 
     audioPlayer.onPositionChanged.listen((event) {
       if (event.inSeconds != 0) {
-        // var duration = event.inMilliseconds; //get the duration of audio
-        // progress = (event.inMilliseconds / duration)*100; // get the current position in percent
-
         int secs = event.inSeconds;
         print(secs);
         int hours = (secs / 3600).floor();
@@ -220,8 +224,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
 
         secs = secs - minutes * 60;
 
-        // secs -= (hours * 3600) + (minutes * 60);
-
         String h = "", m = "", s = "";
 
         print("$hours:$minutes:$secs");
@@ -229,11 +231,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
         hours.toString().length == 1 ? h = "0$hours" : h = "$hours";
         minutes.toString().length == 1 ? m = "0$minutes" : m = "$minutes";
         secs.toString().length == 1 ? s = "0$secs" : s = "$secs";
-        // Now that we have the duration, stop the player.
         setState(() {
-          // print(secs);
-          // print("$hours:$minutes:$secs");
-          // playingAudio = true;
           currentTime = "$h:$m:$s";
           if (currentTime == audioLength) {
             play_pause_icon = Icons.play_circle_fill_rounded;
@@ -297,56 +295,100 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   }
 
   late Timer timer;
-  late Database db_tafsir, db_bn;
+  late Database db_en_tafsir,
+      db_bn,
+      db_transliteration,
+      db_bn_tafsir,
+      db_words_translations;
 
   Future<String> specific_verse_tafsir(int surah, verse) async {
-    // List<Map<dynamic, dynamic>> tafsir = await db_tafsir.rawQuery(
-    //     "SELECT tafsir_text FROM tafsir_kathir WHERE surah = ? AND ayah = ?",
-    //     [surah, verse]);
-    List<Map<dynamic, dynamic>> tafsir = await db_tafsir.rawQuery(
-        "SELECT text FROM verses WHERE sura = ? AND ayah = ?", [surah, verse]);
-    // print(tafsir[0]["tafsir_text"].replaceAll("\\r", ""));
+    List<Map<dynamic, dynamic>> tafsir = [];
+    current_lang == "eng"
+        ? tafsir = [
+            ...await db_en_tafsir.rawQuery(
+                "SELECT text FROM verses WHERE sura = ? AND ayah = ?",
+                [surah, verse])
+          ]
+        : tafsir = [
+            ...await db_bn_tafsir.rawQuery(
+                "SELECT text FROM verses WHERE sura = ? AND ayah = ?",
+                [surah, verse])
+          ];
+
     return tafsir[0]["text"].replaceAll("\\r", "");
   }
 
-  bool dbFilesLoad = false;
+  bool dbFilesLoad = false,
+      shouldShowWordMeaning = false,
+      shouldShowTransliteration = false,
+      shouldShowTafsir = false;
+
+  Future<bool> checkWordMeaningStatus() async {
+    setState(() {
+      shouldShowWordMeaning = (sharedPreferences.getBool("word meaning"))!;
+    });
+    return shouldShowWordMeaning;
+  }
+
+  Future<bool> checkTransliterationStatus() async {
+    setState(() {
+      shouldShowTransliteration =
+          (sharedPreferences.getBool("transliteration"))!;
+    });
+    return shouldShowTransliteration;
+  }
+
+  Future<bool> checkTafsirStatus() async {
+    setState(() {
+      shouldShowTafsir = (sharedPreferences.getBool("tafsir"))!;
+    });
+    return shouldShowTafsir;
+  }
 
   initOtherDBs() async {
     DatabaseHelper databaseHelper = DatabaseHelper.instance;
-
-    db_tafsir = await databaseHelper.initDatabase("en_jalalayn.db");
+    db_transliteration =
+        await databaseHelper.initDatabase("en_transliteration.db");
+    db_en_tafsir = await databaseHelper.initDatabase("en_jalalayn.db");
+    db_bn_tafsir = await databaseHelper.initDatabase("bn_tafsirbayaan.db");
     db_bn = await databaseHelper.initDatabase("bn_bayaan.db");
+    db_words_translations =
+        await databaseHelper.initDatabase("words_translations.db");
     setState(() {
-      db_tafsir = db_tafsir;
+      db_bn_tafsir = db_bn_tafsir;
+      db_transliteration = db_transliteration;
+      db_en_tafsir = db_en_tafsir;
       db_bn = db_bn;
+      db_words_translations = db_words_translations;
       dbFilesLoad = true;
     });
-    // var databasesPath = await getDatabasesPath();
-    // path = join(databasesPath, 'quran.db');
-    //
-    // database = await openDatabase(path);
-    //
-    // print(database.isOpen);
+  }
 
-    // String databasePath1 = join('lib/assets/documents/', 'kathir_db.db');
-    // String databasePath2 = join('lib/assets/documents/', 'bn_bayan.db');
-    // db_tafsir = await openDatabase(databasePath1);
-    // db_bn = await openDatabase(databasePath2);
+  Future<void> startWordsTranslationsDBFetch() async {
+    translated_words = [
+      ...await db_words_translations.rawQuery("SELECT * FROM words")
+    ];
+    setState(() {
+      translated_words = translated_words;
+    });
+  }
 
-    // final List<Map<String, dynamic>> tables = await db_bn.rawQuery(
-    //   'SELECT name FROM sqlite_master WHERE type = "table"',
-    // );
-    //
-    // for (final table in tables) {
-    //   print(table['name']);
-    // }
+  List<Map<dynamic, dynamic>> filterData(int surah, ayah) {
+    return translated_words
+        .where((quranData) =>
+            quranData['surah'] == surah && quranData['ayah'] == ayah)
+        .toList();
   }
 
   MySharedPreferences mySharedPreferences = MySharedPreferences();
   late SharedPreferences sharedPreferences;
 
   checkLanguage() async {
-    current_lang = await (mySharedPreferences.getStringValue("lang"));
+    if (await mySharedPreferences.containsKey("lang")) {
+      current_lang = await (mySharedPreferences.getStringValue("lang"));
+    } else {
+      current_lang = "eng";
+    }
 
     setState(() {
       current_lang = current_lang;
@@ -419,8 +461,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     });
   }
 
-  Future<void> startBNData() async {
-    // widget.translated_verse.clear();
+  Future<void> startBNDataFetch() async {
     widget.translated_verse = [
       ...await db_bn.rawQuery('SELECT text FROM verses WHERE sura = ?',
           [int.parse(widget.surah_id)])
@@ -428,9 +469,17 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
     setState(() {
       widget.translated_verse = widget.translated_verse;
     });
-    List<Map<dynamic, dynamic>> temp =
-        await db_bn.rawQuery('SELECT text FROM verses WHERE sura = ?', ["1"]);
-    print(temp);
+  }
+
+  Future<void> startTransliterationDataFetch() async {
+    transliterated_verses = [
+      ...await db_transliteration.rawQuery(
+          'SELECT text FROM verses WHERE sura = ?',
+          [int.parse(widget.surah_id)])
+    ];
+    setState(() {
+      transliterated_verses = transliterated_verses;
+    });
   }
 
   Future<void> initiateDB() async {
@@ -444,37 +493,44 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
   }
 
   Future<void> fetchVersesData(String surah_id) async {
-    // print(widget.verse_numbers);
-    // verses.clear();
-    await initiateDB().whenComplete(() async {
-      widget.verses = [
-        ...await database.rawQuery(
-            'SELECT text FROM verses WHERE lang_id = 1 AND surah_id = ?',
-            [widget.surah_id])
-      ];
-      current_lang == "eng"
-          ? widget.translated_verse = [
-              ...await database.rawQuery(
-                  'SELECT text FROM verses WHERE lang_id = 2 AND surah_id = ?',
-                  [widget.surah_id])
-            ]
-          : initOtherDBs().whenComplete(() => startBNData());
-      // widget.translated_verse = await database.rawQuery(
-      //     'SELECT text FROM verses_bn WHERE surah_id = ?',
-      //     [widget.surah_id]);
-      surah_name_arabic = await database.rawQuery(
-          'SELECT * FROM surahnames WHERE lang_id = 1 AND surah_id = ?',
-          [widget.surah_id]);
-      surah_name_translated = await database.rawQuery(
-          'SELECT * FROM surahnames WHERE lang_id = 2 AND surah_id = ?',
-          [widget.surah_id]);
-      sujood_surah_indices =
-          await database.rawQuery('SELECT surah_id FROM sujood_verses');
-      sujood_verse_indices =
-          await database.rawQuery('SELECT verse_id FROM sujood_verses');
-      favorite_verses = await database.rawQuery(
-          'SELECT * FROM favorites WHERE surah_id = ?', [widget.surah_id]);
-    });
+    await initiateDB().whenComplete(() => initOtherDBs().whenComplete(() async {
+          widget.verses = [
+            ...await database.rawQuery(
+                'SELECT text FROM verses WHERE lang_id = 1 AND surah_id = ?',
+                [widget.surah_id])
+          ];
+          if (current_lang == "eng") {
+            await startTransliterationDataFetch();
+          }
+
+          current_lang == "eng"
+              ? widget.translated_verse = [
+                  ...await database.rawQuery(
+                      'SELECT text FROM verses WHERE lang_id = 2 AND surah_id = ?',
+                      [widget.surah_id])
+                ]
+              : startBNDataFetch();
+          // : initOtherDBs().whenComplete(() => startBNDataFetch());
+          surah_name_arabic = await database.rawQuery(
+              'SELECT * FROM surahnames WHERE lang_id = 1 AND surah_id = ?',
+              [widget.surah_id]);
+          surah_name_translated = await database.rawQuery(
+              'SELECT * FROM surahnames WHERE lang_id = 2 AND surah_id = ?',
+              [widget.surah_id]);
+          sujood_surah_indices =
+              await database.rawQuery('SELECT surah_id FROM sujood_verses');
+          sujood_verse_indices =
+              await database.rawQuery('SELECT verse_id FROM sujood_verses');
+          favorite_verses = await database.rawQuery(
+              'SELECT * FROM favorites WHERE surah_id = ?', [widget.surah_id]);
+
+          await checkWordMeaningStatus()
+              ? startWordsTranslationsDBFetch()
+              : null;
+
+          await checkTafsirStatus();
+          await checkTransliterationStatus();
+        }));
     if (mounted) {
       setState(() {
         widget.verses = widget.verses;
@@ -684,6 +740,13 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                             ? 0
                             : widget.translated_verse.length,
                         itemBuilder: (BuildContext context, int index) {
+                          if (shouldShowWordMeaning) {
+                            words = [
+                              ...filterData(
+                                  int.parse(widget.surah_id), index + 1)
+                            ];
+                          }
+
                           return AutoScrollTag(
                             highlightColor: const Color(0xff1d3f5e),
                             key: ValueKey(index),
@@ -894,9 +957,30 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                                         ))
                                                                                     : const WidgetSpan(child: SizedBox())
                                                                               ])),
+                                                                      SizedBox(
+                                                                        height: shouldShowTransliteration
+                                                                            ? 11
+                                                                            : 0,
+                                                                      ),
+                                                                      Visibility(
+                                                                        visible:
+                                                                            shouldShowTransliteration,
+                                                                        child:
+                                                                            Text(
+                                                                          transliterated_verses.isEmpty
+                                                                              ? ""
+                                                                              : transliterated_verses[index]['text'],
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'varela-round.regular',
+                                                                              fontWeight: FontWeight.w400,
+                                                                              color: color_main_text.withOpacity(.55),
+                                                                              fontStyle: FontStyle.italic,
+                                                                              fontSize: widget.eng),
+                                                                        ),
+                                                                      ),
                                                                       const SizedBox(
                                                                         height:
-                                                                            11,
+                                                                            17,
                                                                       ),
                                                                       Text.rich(
                                                                           textAlign:
@@ -920,44 +1004,120 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                       ),
                                                     ],
                                                   ),
+                                                  Visibility(
+                                                    visible:
+                                                        shouldShowWordMeaning,
+                                                    child: const SizedBox(
+                                                      height: 17,
+                                                    ),
+                                                  ),
+                                                  Visibility(
+                                                    visible:
+                                                        shouldShowWordMeaning,
+                                                    child: Align(
+                                                      alignment:
+                                                          AlignmentDirectional
+                                                              .centerEnd,
+                                                      child: Wrap(
+                                                          crossAxisAlignment:
+                                                              WrapCrossAlignment
+                                                                  .end,
+                                                          alignment:
+                                                              WrapAlignment.end,
+                                                          runAlignment:
+                                                              WrapAlignment.end,
+                                                          textDirection:
+                                                              TextDirection.rtl,
+                                                          spacing: 5,
+                                                          runSpacing: 5,
+                                                          children:
+                                                              List.generate(
+                                                                  words.length,
+                                                                  (index) =>
+                                                                      Container(
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(21),
+                                                                            color: color_main_text.withOpacity(.19)),
+                                                                        child:
+                                                                            Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .all(
+                                                                              11.0),
+                                                                          child:
+                                                                              Column(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.center,
+                                                                            children: [
+                                                                              Text(
+                                                                                words[index]["arabic"],
+                                                                                textDirection: TextDirection.rtl,
+                                                                                textAlign: TextAlign.right,
+                                                                                textScaleFactor: (isPortraitMode() ? size.height / size.width : size.width / size.height),
+                                                                                style: TextStyle(
+                                                                                  height: 0,
+                                                                                  fontFamily: 'Al_Mushaf',
+                                                                                  fontWeight: FontWeight.w500,
+                                                                                  fontSize: widget.ar,
+                                                                                  color: color_main_text,
+                                                                                ),
+                                                                              ),
+                                                                              Text(
+                                                                                current_lang == "eng" ? words[index]["english"] : words[index]["bangla"],
+                                                                                textAlign: TextAlign.center,
+                                                                                style: TextStyle(height: 0, fontFamily: 'varela-round.regular', fontWeight: FontWeight.w600, color: color_main_text, fontSize: widget.eng),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ))),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 17,
+                                                  ),
                                                   Stack(
                                                     children: [
                                                       Align(
                                                         alignment:
                                                             AlignmentDirectional
                                                                 .centerEnd,
+                                                        child: Visibility(
+                                                            visible: false,
+                                                            // data.isEmpty,
+                                                            child: SizedBox(
+                                                                width:
+                                                                    size.width *
+                                                                        .05,
+                                                                height:
+                                                                    size.width *
+                                                                        .05,
+                                                                child:
+                                                                    const CircularProgressIndicator(
+                                                                  color: Color(
+                                                                      0xff1d3f5e),
+                                                                ))),
+                                                      ),
+                                                      Visibility(
+                                                        visible:
+                                                            shouldShowTafsir,
                                                         child: Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                  .all(8.0),
+                                                                  .all(5.0),
                                                           child: Visibility(
-                                                              visible: false,
-                                                              // data.isEmpty,
-                                                              child: SizedBox(
-                                                                  width:
-                                                                      size.width *
-                                                                          .05,
-                                                                  height:
-                                                                      size.width *
-                                                                          .05,
-                                                                  child:
-                                                                      const CircularProgressIndicator(
-                                                                    color: Color(
-                                                                        0xff1d3f5e),
-                                                                  ))),
-                                                        ),
-                                                      ),
-                                                      Visibility(
-                                                        visible: tafsirIndex !=
-                                                            index,
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            GestureDetector(
-                                                              onTap:
-                                                                  !_menuClicked
+                                                            visible:
+                                                                tafsirIndex !=
+                                                                    index,
+                                                            child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                GestureDetector(
+                                                                  onTap: !_menuClicked
                                                                       ? () async {
                                                                           setState(
                                                                               () {
@@ -965,6 +1125,8 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                                 true;
                                                                             tafsirIndex =
                                                                                 index;
+                                                                            selectedVerseForTafsir =
+                                                                                index + 1;
                                                                           });
                                                                           tafsir = await specific_verse_tafsir(
                                                                               int.parse(widget.surah_id),
@@ -977,62 +1139,52 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                                                           // }
                                                                         }
                                                                       : () {},
-                                                              child: Container(
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: const Color(
-                                                                        0xff1d3f5e),
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            1000),
-                                                                    boxShadow: [
-                                                                      BoxShadow(
-                                                                        color: const Color(0xff1d3f5e)
-                                                                            .withOpacity(0.15),
-                                                                        spreadRadius:
-                                                                            3,
-                                                                        blurRadius:
-                                                                            19,
-                                                                        offset: const Offset(
-                                                                            0,
-                                                                            0), // changes position of shadow
-                                                                      ),
-                                                                    ],
-                                                                  ),
                                                                   child:
-                                                                      const Center(
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              11.0,
-                                                                          vertical:
-                                                                              7),
-                                                                      child:
-                                                                          Center(
-                                                                        child: Text
-                                                                            .rich(
-                                                                          // textAlign: TextAlign.center,
-                                                                          TextSpan(
-                                                                              children: [
-                                                                                TextSpan(text: "show tafsir", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'varela-round.regular', fontSize: 12, color: Colors.white)),
-                                                                                WidgetSpan(
-                                                                                    alignment: PlaceholderAlignment.middle,
-                                                                                    child: Padding(
-                                                                                      padding: EdgeInsets.only(left: 7.0),
-                                                                                      child: Icon(
-                                                                                        Icons.info_outline,
-                                                                                        color: Colors.white,
-                                                                                        size: 19,
-                                                                                      ),
-                                                                                    ))
-                                                                              ]),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  )),
+                                                                      Container(
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                const Color(0xff1d3f5e),
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(1000),
+                                                                            boxShadow: [
+                                                                              BoxShadow(
+                                                                                color: const Color(0xff1d3f5e).withOpacity(0.15),
+                                                                                spreadRadius: 3,
+                                                                                blurRadius: 19,
+                                                                                offset: const Offset(0, 0), // changes position of shadow
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          child:
+                                                                              const Center(
+                                                                            child:
+                                                                                Padding(
+                                                                              padding: EdgeInsets.symmetric(horizontal: 11.0, vertical: 7),
+                                                                              child: Center(
+                                                                                child: Text.rich(
+                                                                                  // textAlign: TextAlign.center,
+                                                                                  TextSpan(children: [
+                                                                                    TextSpan(text: "show tafsir", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'varela-round.regular', fontSize: 12, color: Colors.white)),
+                                                                                    WidgetSpan(
+                                                                                        alignment: PlaceholderAlignment.middle,
+                                                                                        child: Padding(
+                                                                                          padding: EdgeInsets.only(left: 7.0),
+                                                                                          child: Icon(
+                                                                                            Icons.info_outline,
+                                                                                            color: Colors.white,
+                                                                                            size: 19,
+                                                                                          ),
+                                                                                        ))
+                                                                                  ]),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          )),
+                                                                ),
+                                                              ],
                                                             ),
-                                                          ],
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
@@ -1535,24 +1687,18 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                                       : bgColor = Colors.white;
                                   initializeThemeStarters();
                                   _menuClicked = false;
-                                  // init();
-                                  checkLanguage()
-                                      .whenComplete(() => startFetches());
+                                  checkLanguage().whenComplete(() async {
+                                    startFetches();
+                                    tafsir = await specific_verse_tafsir(
+                                            int.parse(widget.surah_id),
+                                            selectedVerseForTafsir)
+                                        .whenComplete(() =>
+                                            setState(() => tafsir = tafsir));
+                                  });
                                 });
                                 print("menu clicked status: $_menuClicked");
                               },
                             )
-                          // Column(
-                          //   mainAxisSize: MainAxisSize.min,
-                          //   children: [
-                          //     Text(
-                          //         "hkjhkkhsadakjshk",
-                          //       style: TextStyle(
-                          //         color: Colors.white
-                          //       ),
-                          //     ),
-                          //   ],
-                          // )
                           : SizedBox(
                               height: AppBar().preferredSize.height,
                               // width: size.width,
@@ -1646,11 +1792,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                               (AppBar().preferredSize.height * .71)) *
                           .5) -
                       ((AppBar().preferredSize.height * .55) * .5),
-                  // child: Icon(
-                  //   Icons.settings,
-                  //   color: Colors.white,
-                  //   size: AppBar().preferredSize.height * .55,
-                  // )
                   child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -1658,19 +1799,6 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                               ? _menuClicked = true
                               : _menuClicked = false;
                         });
-                        // if (current_lang == "eng") {
-                        //   setState(() {
-                        //     current_lang = "ben";
-                        //     lang_img = "lib/assets/images/ben.png";
-                        //     startBNData();
-                        //   });
-                        // } else {
-                        //   startENData();
-                        //   setState(() {
-                        //     current_lang = "eng";
-                        //     lang_img = "lib/assets/images/eng.png";
-                        //   });
-                        // }
                       },
                       child: Visibility(
                         visible: !_menuClicked,
@@ -1679,48 +1807,7 @@ class _UpdatedSurahPageState extends State<UpdatedSurahPage> {
                           color: Colors.white,
                           size: AppBar().preferredSize.height * .55,
                         ),
-                      )
-
-                      // AnimatedContainer(
-                      //   duration: const Duration(milliseconds: 355),
-                      //   height: AppBar().preferredSize.height * .55,
-                      //   width: AppBar().preferredSize.height * .55,
-                      //   decoration: BoxDecoration(
-                      //       boxShadow: [
-                      //         BoxShadow(
-                      //           color: color_container_dark == Colors.black
-                      //               ? Colors.transparent.withOpacity(.35)
-                      //               : Colors.black.withOpacity(.15),
-                      //           spreadRadius: 7,
-                      //           blurRadius: 19,
-                      //           offset: const Offset(
-                      //               7, 7), // changes position of shadow
-                      //         ),
-                      //         BoxShadow(
-                      //           color: color_container_dark == Colors.black
-                      //               ? Colors.transparent.withOpacity(.35)
-                      //               : Colors.black.withOpacity(.15),
-                      //           spreadRadius: 7,
-                      //           blurRadius: 19,
-                      //           offset: const Offset(
-                      //               -7, -7), // changes position of shadow
-                      //         ),
-                      //       ],
-                      //       color: widget.bgColor == Colors.black
-                      //           ? Colors.white
-                      //           : Colors.black,
-                      //       borderRadius: BorderRadius.circular(1000)),
-                      //   child: Padding(
-                      //     padding: const EdgeInsets.all(3.0),
-                      //     child: Opacity(
-                      //         opacity: .55,
-                      //         child: Image.asset(
-                      //           lang_img,
-                      //           fit: BoxFit.cover,
-                      //         )),
-                      //   ),
-                      // ),
-                      ),
+                      )),
                 ),
               ],
             ),

@@ -299,7 +299,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
     themeLogics().whenComplete(() => setState(() => isThemeInit = true));
     _auth = FirebaseAuth.instance;
     checkIfUserSignedIn();
-    checkForUpdates();
+    // checkForUpdates();
     super.initState();
     animationController = AnimationController(
       vsync: this,

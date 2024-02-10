@@ -32,7 +32,7 @@ class DatabaseHelper {
     // Open the database with read and write access
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       readOnly: false,
     );
   }

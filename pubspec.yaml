@@ -103,9 +103,12 @@ flutter:
 #    - lib/assets/images/surah indices/
     - lib/assets/
     - lib/assets/fonts/
-    - lib/assets/documents/
+#    - lib/assets/documents/
     - lib/assets/documents/bn_bayaan.db
     - lib/assets/documents/en_jalalayn.db
+    - lib/assets/documents/bn_tafsirbayaan.db
+    - lib/assets/documents/en_transliteration.db
+    - lib/assets/documents/words_translations.db
     #   - images/a_dot_ham.jpeg
 
     # An image asset can refer to one or more resolution-specific "variants", see
