@@ -8,7 +8,9 @@ import 'home.dart';
 import 'menu.dart';
 
 class SurahDBInitializer extends StatefulWidget {
-  const SurahDBInitializer({Key? key}) : super(key: key);
+  const SurahDBInitializer({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<SurahDBInitializer> createState() => _SurahDBInitializerState();
@@ -23,18 +25,14 @@ class _SurahDBInitializerState extends State<SurahDBInitializer> {
   prepareDB() async {
     await saveFontSizes();
     Database db = await sqlQueries.crazy0();
-    await sqlQueries.crazy1(db).whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu(eng: 14.0, ar: 12.0))));
-    // await sqlQueries.crazy1(db).whenComplete(() async => await sqlQueries.crazy2().whenComplete(() => Navigator.push(context, MaterialPageRoute(builder: (context)=>const Menu(eng: 14.0, ar: 12.0)))));
-    // sqlQueries.test1(await sqlQueries.test0()).whenComplete(() async => sqlQueries.test11(await sqlQueries.test00()).whenComplete(() async => sqlQueries.test111(await sqlQueries.test000())));
-    // sqlQueries.test11(await sqlQueries.test00());
-    // sqlQueries.test111(await sqlQueries.test000());
-    // sqlQueries.insertSurahNameData().whenComplete(() => sqlQueries.insertVersesData());
-    // sqlQueries.insertLanguageData();
-    // sqlQueries.insertSurahNameData();
-    // sqlQueries.insertLanguageData().whenComplete(() => sqlQueries.insertSurahNameData()).whenComplete(() => sqlQueries.insertVersesData());
-    // sqlQueries.insertSurahNameData();
+    await sqlQueries.crazy1(db).whenComplete(() => Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Menu(
+                  eng: 14.0,
+                  ar: 12.0,
+                ))));
   }
-
 
   saveFontSizes() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

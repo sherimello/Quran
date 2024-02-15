@@ -754,6 +754,13 @@ class _DuasState extends State<Duas> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    database.close();
+  }
+
+  @override
   Widget build(BuildContext context) {
     AppBar appBar = AppBar();
     var size = MediaQuery.of(context).size;

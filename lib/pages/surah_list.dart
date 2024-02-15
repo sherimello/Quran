@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,6 +12,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:path/path.dart';
 import 'package:quran/assets/network%20operations/user_data.dart';
 import 'package:quran/classes/db_helper.dart';
+import 'package:quran/classes/test_class.dart';
 import 'package:quran/pages/menu.dart';
 import 'package:quran/pages/new_surah_page.dart';
 import 'package:quran/pages/options.dart';
@@ -30,12 +33,12 @@ class SurahList extends StatefulWidget {
   double eng, ar;
   bool shouldAnimate;
 
-  SurahList(
-      {Key? key,
-      required this.eng,
-      required this.ar,
-      this.shouldAnimate = false})
-      : super(key: key);
+  SurahList({
+    Key? key,
+    required this.eng,
+    required this.ar,
+    this.shouldAnimate = false,
+  }) : super(key: key);
 
   @override
   State<SurahList> createState() => _SurahListState();
@@ -249,8 +252,10 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
   bool signedIn = false;
   String profile_picture_url = "";
 
-  checkIfUserSignedIn() {
+  checkIfUserSignedIn() async {
     // _auth = FirebaseAuth.instance;
+    // Future.wait([initFirebase()]);
+    await initFirebase();
     if (_auth.currentUser != null) {
       setState(() {
         signedIn = true;
@@ -274,8 +279,8 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
     if (sharedPreferences.containsKey("scroll_offset_for_surah_list")) {
       scrollOffset =
           sharedPreferences.getDouble("scroll_offset_for_surah_list")!;
-      if (autoScrollController.hasClients) {
-        autoScrollController.jumpTo(scrollOffset);
+      if (scrollController.hasClients) {
+        scrollController.jumpTo(scrollOffset);
         return;
       } else {
         Future.delayed(const Duration(milliseconds: 100), _scrollToIndex);
@@ -293,37 +298,45 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
 
   bool isThemeInit = false;
 
+  late TestClass dataClass;
+
+  Future<void> initData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jsonString = prefs.getString('testClass')!;
+
+    // Decode the JSON string
+    Map<String, dynamic> decoded = jsonDecode(jsonString);
+
+    // Create an instance of TestClass from the decoded JSON
+    dataClass = TestClass.fromJson(decoded);
+    // print(dataClass.surah_name_arabic);
+  }
+
+  Future<void> initFirebase() async {
+    Firebase.initializeApp();
+    _auth = FirebaseAuth.instance;
+  }
+
   @override
   void initState() {
-    Firebase.initializeApp();
-    themeLogics().whenComplete(() => setState(() => isThemeInit = true));
-    _auth = FirebaseAuth.instance;
-    checkIfUserSignedIn();
-    // checkForUpdates();
     super.initState();
-    animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    // _addStatusListener();
-
-    _arrowAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
-    );
-    autoScrollController = AutoScrollController(
-      axis: Axis.vertical,
-    );
-    halfDuration = Duration(
-        milliseconds: animationController.duration!.inMilliseconds ~/ 2);
-    fetchSurahName().whenComplete(() {
-      WidgetsFlutterBinding.ensureInitialized();
-      WidgetsBinding.instance.addPostFrameCallback((_) {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController = ScrollController();
+      _scrollToIndex();
     });
+    themeLogics().then((_) {
+      animationController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 355),
+      );
+      setState(() => isThemeInit = true);
+      checkIfUserSignedIn();
+      initData().then((_) {
+        fetchSurahName().then((_) {
 
-    _scrollToIndex();
+        });
+      });
+    });
   }
 
   @override
@@ -331,8 +344,9 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
     // TODO: implement dispose
     super.dispose();
     animationController.dispose();
-    autoScrollController.dispose();
+    // autoScrollController.dispose();
     controller.dispose();
+    scrollController.dispose();
   }
 
   void changeStatusBarColor(int colorCode) {
@@ -432,7 +446,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
-    path = join(databasesPath, 'quran.db');
+    path = join(databasesPath, 'en_ar_quran.db');
 
     database = await openDatabase(path);
 
@@ -440,11 +454,11 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
   }
 
   checkForUpdates() async {
-    Future<Database> db = DatabaseHelper.instance.initDatabase("kathir_db.db");
+    // Future<Database> db = DatabaseHelper.instance.initDatabase("kathir_db.db");
 
-    List<Map<String, dynamic>> tafsir =
-        await DatabaseHelper.instance.fetchData("bn_bayaan.db");
-    print(tafsir);
+    // List<Map<String, dynamic>> tafsir =
+    //     await DatabaseHelper.instance.fetchData("bn_bayaan.db");
+    // print(tafsir);
     // List<String> tableNames =
     // tafsir.map((table) => table['name'] as String).toList();
     // for (String entry in tableNames) {
@@ -484,42 +498,39 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
     // }
   }
 
-  Future<void> fetchVersesData(String surahId) async {
-    // print(widget.verse_numbers);
-    // verses.clear();
-    await initiateDB().whenComplete(() async {
-      verses = await database.rawQuery(
-          'SELECT text FROM verses WHERE lang_id = 1 AND surah_id = ?',
-          [surahId]);
-      translated_verse = await database.rawQuery(
-          'SELECT text FROM verses WHERE lang_id = 2 AND surah_id = ?',
-          [surahId]);
-    });
-    setState(() {
-      verses = verses;
-      translated_verse = translated_verse;
-    });
-  }
+  // Future<void> fetchVersesData(String surahId) async {
+  //   // print(widget.verse_numbers);
+  //   // verses.clear();
+  //   await initiateDB().whenComplete(() async {
+  //     verses = await database.rawQuery(
+  //         'SELECT text FROM verses WHERE lang_id = 1 AND surah_id = ?',
+  //         [surahId]);
+  //     translated_verse = await database.rawQuery(
+  //         'SELECT text FROM verses WHERE lang_id = 2 AND surah_id = ?',
+  //         [surahId]);
+  //   });
+  //   setState(() {
+  //     verses = verses;
+  //     translated_verse = translated_verse;
+  //   });
+  // }
 
   Future fetchSurahName() async {
     initiateDB().whenComplete(() async {
       surah_name_arabic.clear();
       surah_name_translated.clear();
-      surah_name_arabic =
-          await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 1');
-      surah_name_translated =
-          await database.rawQuery('SELECT * FROM surahnames WHERE lang_id = 2');
-      sujood_surah_indices =
-          await database.rawQuery('SELECT surah_id FROM sujood_verses');
-      sujood_verse_indices =
-          await database.rawQuery('SELECT verse_id FROM sujood_verses');
-      if(mounted) {
+      surah_name_arabic = dataClass.surah_name_arabic;
+      surah_name_translated = dataClass.surah_name_english;
+      sujood_surah_indices = dataClass.sujood_surah_indices;
+      sujood_verse_indices = dataClass.sujood_verse_indices;
+      if (mounted) {
         setState(() {
-        // surahs.add(surah_name_arabic_temp);
-        surah_name_arabic = surah_name_arabic;
-        surah_name_translated = surah_name_translated;
-      });
+          // surahs.add(surah_name_arabic_temp);
+          surah_name_arabic = surah_name_arabic;
+          surah_name_translated = surah_name_translated;
+        });
       }
+      // print(surah_name_translated);
     });
   }
 
@@ -678,18 +689,10 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                         ? Colors.white
                         : const Color(0xff1d3f5e)
                     : animation2.value,
-                child: AnimatedBuilder(
-                    animation: animationController,
-                    builder: (BuildContext context, Widget? child) {
-                      return Transform.rotate(
-                        angle: _arrowAnimation.value * 2.0 * math.pi,
-                        child: child,
-                      );
-                    },
-                    child: Icon(
-                      _icon,
-                      color: bgColor,
-                    )),
+                child: Icon(
+                  _icon,
+                  color: bgColor,
+                ),
                 onPressed: () async {
                   if (!themeSwitchingInProgress) {
                     setState(() {
@@ -813,7 +816,9 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                               fontFamily: 'Bismillah Script',
                                               fontWeight: FontWeight.bold,
                                               letterSpacing: 1.5,
-                                              color: isThemeInit ? animation.value : Colors.transparent,
+                                              color: isThemeInit
+                                                  ? animation.value
+                                                  : Colors.transparent,
                                               fontSize: 21),
                                         ),
                                       ]),
@@ -867,7 +872,9 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                                 )
                                               : Icon(
                                                   Icons.person_pin,
-                                                  color: isThemeInit ? animation.value : Colors.transparent,
+                                                  color: isThemeInit
+                                                      ? animation.value
+                                                      : Colors.transparent,
                                                   size: appBar.preferredSize
                                                           .height -
                                                       appBar.preferredSize
@@ -887,7 +894,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                                   .getInstance();
                                           sharedPreferences.setDouble(
                                               "scroll_offset_for_surah_list",
-                                              autoScrollController.offset);
+                                              scrollController.offset);
                                           await getFontSizes().whenComplete(() {
                                             Navigator.of(context)
                                                 .push(HeroDialogRoute(
@@ -906,7 +913,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                                 scrollOffset =
                                                     sharedPreferences.getDouble(
                                                         "scroll_offset_for_surah_list")!;
-                                                autoScrollController
+                                                scrollController
                                                     .jumpTo(scrollOffset);
                                               });
 
@@ -920,9 +927,9 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                                     MaterialPageRoute(
                                                         builder: (builder) =>
                                                             SurahList(
-                                                                eng: widget.eng,
-                                                                ar: widget
-                                                                    .ar)));
+                                                              eng: widget.eng,
+                                                              ar: widget.ar,
+                                                            )));
 
                                                 // scrollOffset =
                                                 // sharedPreferences.getDouble("scroll_offset_for_surah_list")!;
@@ -960,7 +967,9 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                         },
                                         child: Icon(
                                           Icons.settings,
-                                          color: isThemeInit ? animation.value : Colors.transparent,
+                                          color: isThemeInit
+                                              ? animation.value
+                                              : Colors.transparent,
                                           size: size.width * .065,
                                         )),
                                   ],
@@ -983,7 +992,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                             child: CircularProgressIndicator(),
                           )
                         : ListView.builder(
-                            controller: autoScrollController,
+                            controller: scrollController,
                             scrollDirection: Axis.vertical,
                             padding: EdgeInsets.zero,
                             itemCount:
@@ -991,12 +1000,8 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             cacheExtent:
                                 surah_name_translated.isNotEmpty ? 114 : 0,
-                            itemBuilder:
-                                (BuildContext bcontext, int index) {
-
-                              for (int i = 0;
-                                  i < madani_surah.length;
-                                  i++) {
+                            itemBuilder: (BuildContext bcontext, int index) {
+                              for (int i = 0; i < madani_surah.length; i++) {
                                 if (index + 1 == madani_surah[i]) {
                                   disputed_types.contains(index + 1)
                                       ? surah_type = 'Madani Surah (?)'
@@ -1008,340 +1013,388 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                       : surah_type = 'Makki Surah';
                                   // break;
                                 }
-                                sujood_index =
-                                    getSujoodSurahIndex(index + 1);
+                                sujood_index = getSujoodSurahIndex(index + 1);
                               }
-                              return AutoScrollTag(
-                                highlightColor: const Color(0xff1d3f5e),
-                                key: ValueKey(index),
-                                index: index,
-                                controller: autoScrollController,
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    SharedPreferences sharedPreferences =
-                                        await SharedPreferences
-                                            .getInstance();
-                                    sharedPreferences.setDouble(
-                                        "scroll_offset_for_surah_list",
-                                        autoScrollController.offset);
-                                    sujood_index =
-                                        getSujoodSurahIndex(index + 1);
-                                    await fetchSurahSujoodVerses(index + 1);
-                                    await getFontSizes();
-                                    fetchVersesData('${index + 1}')
-                                        .whenComplete(() {
-                                      Navigator.push(
+                              return GestureDetector(
+                                onTap: () async {
+                                  SharedPreferences sharedPreferences =
+                                      await SharedPreferences.getInstance();
+                                  sharedPreferences.setDouble(
+                                      "scroll_offset_for_surah_list",
+                                      scrollController.offset);
+                                  sujood_index = getSujoodSurahIndex(index + 1);
+                                  await fetchSurahSujoodVerses(index + 1);
+                                  await getFontSizes().whenComplete(() {
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.fade,
+                                            child: UpdatedSurahPage(
+                                              bgColor: bgColor,
+                                              sujoodVerses:
+                                                  selected_surah_sujood_verses,
+                                              surah_id: '${index + 1}',
+                                              image: madani_surah
+                                                      .contains(index + 1)
+                                                  ? 'lib/assets/images/madinaWhiteIcon.png'
+                                                  : 'lib/assets/images/makkaWhiteIcon.png',
+                                              surah_name: surah_name_translated[
+                                                      index]['translation']
+                                                  .toString()
+                                                  .substring(
+                                                      0,
+                                                      surah_name_translated[
+                                                                  index]
+                                                              ['translation']
+                                                          .toString()
+                                                          .indexOf(':')),
+                                              arabic_name:
+                                                  surah_name_arabic[index]
+                                                      ['translation'],
+                                              // sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
+                                              verse_numbers:
+                                                  verse_numbers[index]
+                                                      .toString(),
+                                              // verses: verses,
+                                              // translated_verse:
+                                              //     translated_verse,
+                                              eng: widget.eng,
+                                              ar: widget.ar,
+                                            ))).then((value) {
+                                      Navigator.pushReplacement(
                                           context,
-                                          PageTransition(
-                                              type: PageTransitionType.fade,
-                                              child:
-                                              UpdatedSurahPage(
-                                                bgColor: bgColor,
-                                                sujoodVerses:
-                                                    selected_surah_sujood_verses,
-                                                surah_id: '${index + 1}',
-                                                image: madani_surah
-                                                        .contains(index + 1)
-                                                    ? 'lib/assets/images/madinaWhiteIcon.png'
-                                                    : 'lib/assets/images/makkaWhiteIcon.png',
-                                                surah_name: surah_name_translated[
-                                                            index]
-                                                        ['translation']
-                                                    .toString()
-                                                    .substring(
-                                                        0,
-                                                        surah_name_translated[
-                                                                    index][
-                                                                'translation']
-                                                            .toString()
-                                                            .indexOf(':')),
-                                                arabic_name:
-                                                    surah_name_arabic[index]
-                                                        ['translation'],
-                                                // sujood_index: sujood_index != -1 ? sujood_verse_indices[sujood_index]['verse_id'].toString() : sujood_index.toString(),
-                                                verse_numbers:
-                                                    verse_numbers[index]
-                                                        .toString(),
-                                                verses: verses,
-                                                translated_verse:
-                                                    translated_verse,
-                                                eng: widget.eng,
-                                                ar: widget.ar,
-                                              ))).then((value) {
-                                        Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (builder) =>
-                                                    SurahList(
-                                                        eng: widget.eng,
-                                                        ar: widget.ar)));
-                                      });
+                                          MaterialPageRoute(
+                                              builder: (builder) => SurahList(
+                                                    eng: widget.eng,
+                                                    ar: widget.ar,
+                                                  )));
                                     });
-                                  },
-                                  child: ClipRRect(
-                                    child: Stack(
-                                      children: [
-                                        Card(
-                                          elevation: 0,
-                                          margin: const EdgeInsets.all(0),
-                                          color: Colors.transparent,
-                                          child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              // width: size.width,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
+                                  });
+                                },
+                                child: ClipRRect(
+                                  child: Stack(
+                                    children: [
+                                      Card(
+                                        elevation: 0,
+                                        margin: const EdgeInsets.all(0),
+                                        color: Colors.transparent,
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            // width: size.width,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Expanded(
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .fromLTRB(11,
+                                                                  11, 11, 11),
+                                                          child: Stack(
+                                                            alignment: Alignment
                                                                 .center,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .fromLTRB(
-                                                                    11,
-                                                                    11,
-                                                                    11,
-                                                                    11),
-                                                            child: Stack(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: const EdgeInsets
-                                                                      .all(
-                                                                      1.0),
-                                                                  child:
-                                                                      Opacity(
-                                                                    opacity:
-                                                                        .5,
-                                                                    child:
-                                                                        Image.asset(
-                                                                      'lib/assets/images/indexDesign.png',
-                                                                      height: isPortraitMode()
-                                                                          ? size.width * .125
-                                                                          : size.height * .125,
-                                                                      width: isPortraitMode()
-                                                                          ? size.width * .125
-                                                                          : size.height * .125,
-                                                                      color:
-                                                                          animation2.value,
-                                                                    ),
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        1.0),
+                                                                child: Opacity(
+                                                                  opacity: .5,
+                                                                  child: Image
+                                                                      .asset(
+                                                                    'lib/assets/images/indexDesign.png',
+                                                                    height: isPortraitMode()
+                                                                        ? size.width *
+                                                                            .125
+                                                                        : size.height *
+                                                                            .125,
+                                                                    width: isPortraitMode()
+                                                                        ? size.width *
+                                                                            .125
+                                                                        : size.height *
+                                                                            .125,
+                                                                    color: animation2
+                                                                        .value,
                                                                   ),
                                                                 ),
-                                                                Text(
-                                                                  "${index + 1}".length ==
-                                                                          1
-                                                                      ? '00${index + 1}'
-                                                                      : "${index + 1}".length == 2
-                                                                          ? '0${index + 1}'
-                                                                          : '${index + 1}',
-                                                                  // arabicNumber.convert(index + 1),
-                                                                  textAlign:
-                                                                      TextAlign.center,
+                                                              ),
+                                                              Text(
+                                                                "${index + 1}"
+                                                                            .length ==
+                                                                        1
+                                                                    ? '00${index + 1}'
+                                                                    : "${index + 1}".length ==
+                                                                            2
+                                                                        ? '0${index + 1}'
+                                                                        : '${index + 1}',
+                                                                // arabicNumber.convert(index + 1),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style:
+                                                                    TextStyle(
+                                                                        height:
+                                                                            0,
+                                                                        color: animation2
+                                                                            .value,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        fontSize: isPortraitMode()
+                                                                            ? size.width *
+                                                                                .031
+                                                                            : size.height *
+                                                                                .031,
+                                                                        // fontWeight: FontWeight.bold,
+                                                                        fontFamily:
+                                                                            'varela-round.regular'),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          child: Wrap(
+                                                            direction:
+                                                                Axis.vertical,
+                                                            crossAxisAlignment:
+                                                                WrapCrossAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            11.0,
+                                                                        left:
+                                                                            11),
+                                                                child:
+                                                                    Text.rich(
+                                                                        textDirection:
+                                                                            TextDirection
+                                                                                .rtl,
+                                                                        textAlign:
+                                                                            TextAlign
+                                                                                .center,
+                                                                        TextSpan(
+                                                                            children: [
+                                                                              TextSpan(
+                                                                                text: '﴿  ',
+                                                                                style: TextStyle(height: 0, wordSpacing: 3, fontWeight: FontWeight.bold, fontFamily: 'Al Majeed Quranic Font_shiped', fontSize: size.width * .041, color: isThemeInit ? animation.value : Colors.transparent),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: '${surah_name_arabic[index]['translation']}',
+                                                                                style: TextStyle(height: 0, color: isThemeInit ? animation.value : Colors.transparent, fontSize: size.width * .041, fontWeight: FontWeight.bold, fontFamily: 'Diwanltr'),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: '  ﴾',
+                                                                                style: TextStyle(
+                                                                                  height: 0,
+                                                                                  wordSpacing: 3,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  fontFamily: 'Al Majeed Quranic Font_shiped',
+                                                                                  fontSize: size.width * .041,
+                                                                                  color: isThemeInit ? animation.value : Colors.transparent,
+                                                                                ),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: surah_name_translated.isNotEmpty ? "    ${surah_name_translated[index]['translation'].toString().substring(0, surah_name_translated[index]['translation'].toString().indexOf(':'))}" : "",
+                                                                                style: TextStyle(height: 0, color: animation2.value, fontSize: size.width * .041, fontWeight: FontWeight.bold, fontFamily: 'Rounded_Elegance'),
+                                                                              ),
+                                                                            ])),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .fromLTRB(
+                                                                        11,
+                                                                        5,
+                                                                        17,
+                                                                        0),
+                                                                child: Text(
+                                                                  '${surah_name_translated[index]['translation'].toString().substring(surah_name_translated[index]['translation'].toString().indexOf(':') + 2)} ●',
                                                                   style: TextStyle(
                                                                       height: 0,
-                                                                      color: animation2.value,
-                                                                      fontWeight: FontWeight.bold,
-                                                                      fontSize: isPortraitMode() ? size.width * .031 : size.height * .031,
-                                                                      // fontWeight: FontWeight.bold,
-                                                                      fontFamily: 'varela-round.regular'),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Expanded(
-                                                            child: Wrap(
-                                                              direction: Axis
-                                                                  .vertical,
-                                                              crossAxisAlignment:
-                                                                  WrapCrossAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: const EdgeInsets
-                                                                      .only(
-                                                                      right:
-                                                                          11.0,
-                                                                      left:
-                                                                          11),
-                                                                  child: Text.rich(
-                                                                      textDirection: TextDirection.rtl,
-                                                                      textAlign: TextAlign.center,
-                                                                      TextSpan(children: [
-                                                                        TextSpan(
-                                                                          text: '﴿  ',
-                                                                          style: TextStyle(height: 0, wordSpacing: 3, fontWeight: FontWeight.bold, fontFamily: 'Al Majeed Quranic Font_shiped', fontSize: size.width * .041, color: isThemeInit ? animation.value : Colors.transparent),
-                                                                        ),
-                                                                        TextSpan(
-                                                                          text: '${surah_name_arabic[index]['translation']}',
-                                                                          style: TextStyle(height: 0, color: isThemeInit ? animation.value : Colors.transparent, fontSize: size.width * .041, fontWeight: FontWeight.bold, fontFamily: 'Diwanltr'),
-                                                                        ),
-                                                                        TextSpan(
-                                                                          text: '  ﴾',
-                                                                          style: TextStyle(
-                                                                            height: 0,
-                                                                            wordSpacing: 3,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            fontFamily: 'Al Majeed Quranic Font_shiped',
-                                                                            fontSize: size.width * .041,
-                                                                            color: isThemeInit ? animation.value : Colors.transparent,
+                                                                      color: animation2
+                                                                          .value,
+                                                                      fontSize:
+                                                                          size.width *
+                                                                              .035,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      fontFamily:
+                                                                          'Rounded_Elegance'),
+                                                                ),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .fromLTRB(
+                                                                        11,
+                                                                        5,
+                                                                        17,
+                                                                        0),
+                                                                child: Wrap(
+                                                                  alignment:
+                                                                      WrapAlignment
+                                                                          .center,
+                                                                  crossAxisAlignment:
+                                                                      WrapCrossAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    Wrap(
+                                                                      alignment:
+                                                                          WrapAlignment
+                                                                              .center,
+                                                                      crossAxisAlignment:
+                                                                          WrapCrossAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        Container(
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                const Color(0xffa69963),
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(1000),
+                                                                          ),
+                                                                          child:
+                                                                              Padding(
+                                                                            padding: const EdgeInsets.fromLTRB(
+                                                                                11,
+                                                                                4,
+                                                                                4,
+                                                                                4),
+                                                                            child:
+                                                                                Row(
+                                                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  surah_type == 'Makki Surah' || surah_type == 'Makki Surah (?)' ? 'lib/assets/images/makkaIcon.png' : 'lib/assets/images/madinaIcon.png',
+                                                                                  height: 19,
+                                                                                  width: 19,
+                                                                                  color: animation4.value,
+                                                                                ),
+                                                                                Text(
+                                                                                  "  $surah_type",
+                                                                                  style: TextStyle(
+                                                                                      height: 0,
+                                                                                      // color: const Color(0xffffffff),
+                                                                                      color: animation4.value,
+                                                                                      fontWeight: FontWeight.bold,
+                                                                                      fontSize: size.width * .035,
+                                                                                      fontFamily: 'Rounded_Elegance'),
+                                                                                ),
+                                                                                const SizedBox(
+                                                                                  width: 11,
+                                                                                ),
+                                                                              ],
+                                                                            ),
                                                                           ),
                                                                         ),
-                                                                        TextSpan(
-                                                                          text: surah_name_translated.isNotEmpty ? "    ${surah_name_translated[index]['translation'].toString().substring(0, surah_name_translated[index]['translation'].toString().indexOf(':'))}" : "",
-                                                                          style: TextStyle(height: 0, color: animation2.value, fontSize: size.width * .041, fontWeight: FontWeight.bold, fontFamily: 'Rounded_Elegance'),
-                                                                        ),
-                                                                      ])),
+                                                                      ],
+                                                                    ),
+                                                                    // Padding(
+                                                                    //   padding: const EdgeInsets
+                                                                    //       .symmetric(
+                                                                    //       horizontal:
+                                                                    //           5.0),
+                                                                    //   child: Container(
+                                                                    //       width:
+                                                                    //           2,
+                                                                    //       height:
+                                                                    //           15,
+                                                                    //       color:
+                                                                    //           const Color(0xffa69963)),
+                                                                    // ),
+                                                                    Text(
+                                                                      '  ${verse_numbers[index]} verses',
+                                                                      style: TextStyle(
+                                                                          height:
+                                                                              0,
+                                                                          color: const Color(
+                                                                              0xffa69963),
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize: size.width *
+                                                                              .035,
+                                                                          fontFamily:
+                                                                              'Rounded_Elegance'),
+                                                                    ),
+                                                                  ],
                                                                 ),
-                                                                Padding(
-                                                                  padding: const EdgeInsets
-                                                                      .fromLTRB(
-                                                                      11,
-                                                                      5,
-                                                                      17,
-                                                                      0),
-                                                                  child:
-                                                                      Text(
-                                                                    '${surah_name_translated[index]['translation'].toString().substring(surah_name_translated[index]['translation'].toString().indexOf(':') + 2)} ●',
-                                                                    style: TextStyle(
-                                                                        height: 0,
-                                                                        color: animation2.value,
-                                                                        fontSize: size.width * .035,
-                                                                        fontWeight: FontWeight.bold,
-                                                                        fontFamily: 'Rounded_Elegance'),
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding: const EdgeInsets
-                                                                      .fromLTRB(
-                                                                      11,
-                                                                      5,
-                                                                      17,
-                                                                      0),
-                                                                  child:
-                                                                      Wrap(
-                                                                    alignment:
-                                                                        WrapAlignment.center,
-                                                                    crossAxisAlignment:
-                                                                        WrapCrossAlignment.center,
-                                                                    children: [
-                                                                      Wrap(
-                                                                        alignment: WrapAlignment.center,
-                                                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                                              ),
+                                                              sujood_index != -1
+                                                                  ? Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          left:
+                                                                              11,
+                                                                          top:
+                                                                              5),
+                                                                      child:
+                                                                          Wrap(
+                                                                        alignment:
+                                                                            WrapAlignment.center,
+                                                                        crossAxisAlignment:
+                                                                            WrapCrossAlignment.center,
                                                                         children: [
-                                                                          Container(
-                                                                            decoration: BoxDecoration(
-                                                                              color: const Color(0xffa69963),
-                                                                              borderRadius: BorderRadius.circular(1000),
-                                                                            ),
-                                                                            child: Padding(
-                                                                              padding: const EdgeInsets.fromLTRB(11, 4, 4, 4),
-                                                                              child: Row(
-                                                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                                                children: [
-                                                                                  Image.asset(
-                                                                                    surah_type == 'Makki Surah' || surah_type == 'Makki Surah (?)' ? 'lib/assets/images/makkaIcon.png' : 'lib/assets/images/madinaIcon.png',
-                                                                                    height: 19,
-                                                                                    width: 19,
-                                                                                    color: animation4.value,
-                                                                                  ),
-                                                                                  Text(
-                                                                                    "  $surah_type",
-                                                                                    style: TextStyle(
-                                                                                        height: 0,
-                                                                                        // color: const Color(0xffffffff),
-                                                                                        color: animation4.value,
-                                                                                        fontWeight: FontWeight.bold,
-                                                                                        fontSize: size.width * .035,
-                                                                                        fontFamily: 'Rounded_Elegance'),
-                                                                                  ),
-                                                                                  const SizedBox(
-                                                                                    width: 11,
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
+                                                                          Image
+                                                                              .asset(
+                                                                            'lib/assets/images/sujoodIcon.png',
+                                                                            height:
+                                                                                13,
+                                                                            width:
+                                                                                13,
+                                                                          ),
+                                                                          const SizedBox(
+                                                                            width:
+                                                                                7,
+                                                                          ),
+                                                                          const Text(
+                                                                            'contains verse(s) of prostration.',
+                                                                            style: TextStyle(
+                                                                                color: Color(0xff518050),
+                                                                                // fontWeight:
+                                                                                //     FontWeight.bold,
+                                                                                fontSize: 13,
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontFamily: 'varela-round.regular'),
                                                                           ),
                                                                         ],
                                                                       ),
-                                                                      // Padding(
-                                                                      //   padding: const EdgeInsets
-                                                                      //       .symmetric(
-                                                                      //       horizontal:
-                                                                      //           5.0),
-                                                                      //   child: Container(
-                                                                      //       width:
-                                                                      //           2,
-                                                                      //       height:
-                                                                      //           15,
-                                                                      //       color:
-                                                                      //           const Color(0xffa69963)),
-                                                                      // ),
-                                                                      Text(
-                                                                        '  ${verse_numbers[index]} verses',
-                                                                        style: TextStyle(height: 0, color: const Color(0xffa69963), fontWeight: FontWeight.bold, fontSize: size.width * .035, fontFamily: 'Rounded_Elegance'),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                sujood_index !=
-                                                                        -1
-                                                                    ? Padding(
-                                                                        padding: const EdgeInsets.only(left: 11, top: 5),
-                                                                        child: Wrap(
-                                                                          alignment: WrapAlignment.center,
-                                                                          crossAxisAlignment: WrapCrossAlignment.center,
-                                                                          children: [
-                                                                            Image.asset(
-                                                                              'lib/assets/images/sujoodIcon.png',
-                                                                              height: 13,
-                                                                              width: 13,
-                                                                            ),
-                                                                            const SizedBox(
-                                                                              width: 7,
-                                                                            ),
-                                                                            const Text(
-                                                                              'contains verse(s) of prostration.',
-                                                                              style: TextStyle(
-                                                                                  color: Color(0xff518050),
-                                                                                  // fontWeight:
-                                                                                  //     FontWeight.bold,
-                                                                                  fontSize: 13,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                  fontFamily: 'varela-round.regular'),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      )
-                                                                    : const SizedBox()
-                                                              ],
-                                                            ),
+                                                                    )
+                                                                  : const SizedBox()
+                                                            ],
                                                           ),
-                                                        ],
-                                                      ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ],
-                                                ),
-                                                const Divider(
-                                                  color: Color(0x65dad4b7),
-                                                )
-                                              ]),
-                                        ),
-                                      ],
-                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const Divider(
+                                                color: Color(0x65dad4b7),
+                                              )
+                                            ]),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );

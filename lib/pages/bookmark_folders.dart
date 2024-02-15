@@ -35,7 +35,7 @@ class _BookmarkFoldersState extends State<BookmarkFolders> {
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
-    path = join(databasesPath, 'quran.db');
+    path = join(databasesPath, 'en_ar_quran.db');
 
     database1 = await openDatabase(path);
 

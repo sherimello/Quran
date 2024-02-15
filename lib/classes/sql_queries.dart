@@ -1,13 +1,95 @@
+import 'dart:io' as io;
+import 'dart:io';
+
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SQLQueries {
   late Database database;
   late String path;
 
+  Future<String> getDownloadsDirectoryPath() async {
+    Directory? externalPath = (await getExternalStorageDirectory());
+    String picturesDirName = "Pictures";
+    String appNameDirName = "app_name";
+
+// Splitting the externalPath
+    List<String> externalPathList = externalPath!.path.split('/');
+
+// getting Position of 'Android'
+    int posOfAndroidDir = externalPathList.indexOf('Android');
+
+//Joining the List<Strings> to generate the rootPath with "/" at the end.
+    String rootPath = externalPathList.sublist(0, posOfAndroidDir).join('/');
+    rootPath += "/";
+
+//Creating Pictures Directory (if not exist)
+    Directory picturesDir = Directory("$rootPath$picturesDirName/");
+    if (!picturesDir.existsSync()) {
+      //Creating Directory
+      await picturesDir.create(recursive: true);
+      return picturesDir.path;
+      //Directory Created
+    } else {
+      return picturesDir.path;
+      //Directory Already Existed
+    }
+
+    // Directory? appDocDir = await getExternalStorageDirectory();
+    // String appDocPath = appDocDir!.path;
+    // String dbPath = '$appDocPath/DCMI/database';
+    // print(dbPath);
+    // return dbPath;
+
+    // await Permission.storage.request();
+    // await Permission.manageExternalStorage.request();
+    //
+    // final dir = Directory('${(Platform.isAndroid
+    //     ? await getExternalStorageDirectory() //FOR ANDROID
+    //     : await getApplicationSupportDirectory() //FOR IOS
+    // )!
+    //     .path}/DCIM/database');
+    // var status = await Permission.storage.status;
+    // if (!status.isGranted) {
+    //   await Permission.storage.request();
+    // }
+    // if ((await dir.exists())) {
+    //   return dir.path;
+    // } else {
+    //   dir.create();
+    //   return dir.path;
+    // }
+
+    // if (Platform.isAndroid) {
+    //   // Request permission for external storage on Android
+    //   var status = await Permission.storage.request();
+    //   if (!status.isGranted) {
+    //     throw 'Permission denied for accessing downloads directory.';
+    //   }
+    // }
+
+    // Directory? downloadsDirectory = await getExternalStorageDirectory();
+    // return downloadsDirectory!.path;
+
+    // }
+    // Directory? directory = await getExternalStorageDirectory();
+    // if (directory != null) {
+    //   String? downloadsDirectoryPath = '${directory.path}/Download';
+    //   Directory downloadsDirectory = Directory(downloadsDirectoryPath);
+    //   if (await downloadsDirectory.exists()) {
+    //     return downloadsDirectoryPath;
+    //   }
+    // }
+    // throw Exception('Downloads directory not found');
+  }
+
   Future<Database> crazy0() async {
     var databasesPath = await getDatabasesPath();
-    path = join(databasesPath, 'quran.db');
+    // var databasesPath = io.Directory.current.path;
+    // var databasesPath = await getDownloadsDirectoryPath();
+    path = join(databasesPath, 'en_ar_quran.db');
     await deleteDatabase(path);
     database = await openDatabase(path, version: 2,
         onCreate: (Database db, int version) async {
@@ -15,7 +97,7 @@ class SQLQueries {
           'CREATE TABLE IF NOT EXISTS verses (lang_id INTEGER UNSIGNED, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED, text NVARCHAR)');
 
       //await db.execute(
-        //  'CREATE TABLE IF NOT EXISTS verses_bn (serial_id INTEGER UNSIGNED, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED, text NVARCHAR)');
+      //  'CREATE TABLE IF NOT EXISTS verses_bn (serial_id INTEGER UNSIGNED, surah_id INTEGER UNSIGNED, verse_id INTEGER UNSIGNED, text NVARCHAR)');
 
       await db.execute(
           'CREATE TABLE IF NOT EXISTS languages (id INTEGER UNSIGNED, ISO NVARCHAR, english_name NVARCHAR, name NVARCHAR)');
@@ -1629,60 +1711,26 @@ class SQLQueries {
       await txn.rawInsert(
         'INSERT INTO verses VALUES (2, 114, 1, \'Say, "I seek refuge in the Lord of mankind,\'), (2, 114, 2, \'The Sovereign of mankind.\'), (2, 114, 3, \'The God of mankind,\'), (2, 114, 4, \'From the evil of the retreating whisperer -\'), (2, 114, 5, \'Who whispers [evil] into the breasts of mankind -\'), (2, 114, 6, \'From among the jinn and mankind."\')',
       );
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (7, 206)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (13, 15)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (16, 49)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (17, 107)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (19, 58)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (22, 18)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (22, 77)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (25, 60)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (27, 25)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (32, 15)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (38, 24)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (41, 37)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (53, 62)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (84, 21)');
+      await txn.rawInsert('INSERT INTO sujood_verses VALUES (96, 19)');
+      await txn.rawInsert('INSERT INTO bookmark_folders VALUES (\'default\')');
       await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (7, 206)'
-      );
+          'INSERT INTO bookmarks VALUES (\'default\', \'قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ ۚ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا ۚ إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ ۞\', \'Say, \"O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful.\"\', 39, 53)');
       await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (13, 15)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (16, 49)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (17, 107)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (19, 58)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (22, 18)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (22, 77)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (25, 60)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (27, 25)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (32, 15)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (38, 24)'
-      );
-      await txn.rawInsert(
-          'INSERT INTO sujood_verses VALUES (41, 37)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (53, 62)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (84, 21)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO sujood_verses VALUES (96, 19)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO bookmark_folders VALUES (\'default\')'
-      );
-      await txn.rawInsert(
-        'INSERT INTO bookmarks VALUES (\'default\', \'قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ ۚ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا ۚ إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ ۞\', \'Say, \"O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful.\"\', 39, 53)'
-      );
-      await txn.rawInsert(
-        'INSERT INTO favorites VALUES (\'قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ ۚ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا ۚ إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ ۞\', \'Say, \"O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful.\"\', 39, 53)'
-      );
+          'INSERT INTO favorites VALUES (\'قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ ۚ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا ۚ إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ ۞\', \'Say, \"O My servants who have transgressed against themselves [by sinning], do not despair of the mercy of Allah. Indeed, Allah forgives all sins. Indeed, it is He who is the Forgiving, the Merciful.\"\', 39, 53)');
     });
   }
 }

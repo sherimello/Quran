@@ -1,18 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:quran/pages/bookmark_folders.dart';
 import 'package:quran/pages/daily_videos.dart';
 import 'package:quran/pages/duas.dart';
 import 'package:quran/pages/new_surah_page.dart';
 import 'package:quran/pages/surah_list.dart';
 import 'package:quran/pages/verses_search.dart';
-import 'package:quran/widgets/dua_list.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../hero_transition_handler/custom_rect_tween.dart';
@@ -20,9 +14,13 @@ import '../hero_transition_handler/hero_dialog_route.dart';
 import 'favorite_verses.dart';
 
 class Menu extends StatefulWidget {
-  final double eng, ar;
+  double eng, ar;
 
-  const Menu({Key? key, required this.eng, required this.ar}) : super(key: key);
+  Menu({
+    Key? key,
+    required this.eng,
+    required this.ar,
+  }) : super(key: key);
 
   @override
   State<Menu> createState() => _MenuState();
@@ -57,6 +55,12 @@ class _MenuState extends State<Menu> {
   initializeThemeStarters() async {
     // print(await getSynonyms("love"));
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.containsKey('english_font_size')) {
+      widget.eng = sharedPreferences.getDouble("english_font_size")!;
+    }
+    if (sharedPreferences.containsKey('arabic_font_size')) {
+      widget.ar = sharedPreferences.getDouble("arabic_font_size")!;
+    }
     if (sharedPreferences.containsKey('theme mode')) {
       if (sharedPreferences.getString('theme mode') == "light") {
         theme = "light";
@@ -471,8 +475,7 @@ class _MenuState extends State<Menu> {
                                   width: size.width * .085,
                                   height: size.width * .085,
                                   decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(1000),
+                                      borderRadius: BorderRadius.circular(1000),
                                       color: Colors.white),
                                   child: const Center(
                                     child: Icon(
@@ -511,10 +514,11 @@ class _MenuState extends State<Menu> {
                           bgColor: bgColor.withOpacity(0.85),
                           builder: (context) => Center(
                               child: Duas(
-                                  title: "test",
-                                  eng: widget.eng,
-                                  ar: widget.ar,
-                                  theme: bgColor)),
+                            title: "test",
+                            eng: widget.eng,
+                            ar: widget.ar,
+                            theme: bgColor,
+                          )),
                         ));
                       },
                       child: Container(
@@ -607,8 +611,7 @@ class _MenuState extends State<Menu> {
                                   width: size.width * .085,
                                   height: size.width * .085,
                                   decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(1000),
+                                      borderRadius: BorderRadius.circular(1000),
                                       color: Colors.white),
                                   child: const Center(
                                     child: Icon(

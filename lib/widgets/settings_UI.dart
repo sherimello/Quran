@@ -1,8 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quran/pages/surah_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_ripple_animation/simple_ripple_animation.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../classes/my_sharedpreferences.dart';
@@ -13,36 +15,32 @@ import '../pages/new_surah_page.dart';
 
 class SettingsUI extends StatefulWidget {
   final String tag, surah_id;
-  double fontsize_english = 14, fontsize_arab = 14;
+  double fontsize_english = 13, fontsize_arab = 13;
   Color theme;
   final void Function()? toggleMenuClicked;
 
-  SettingsUI(
-      {Key? key,
-      this.surah_id = "",
-      required this.toggleMenuClicked,
-      required this.tag,
-      required this.fontsize_english,
-      required this.fontsize_arab,
-      required this.theme})
-      : super(key: key);
+  SettingsUI({
+    Key? key,
+    this.surah_id = "",
+    required this.toggleMenuClicked,
+    required this.tag,
+    required this.fontsize_english,
+    required this.fontsize_arab,
+    required this.theme,
+  }) : super(key: key);
 
   @override
   State<SettingsUI> createState() => _SettingsUIState();
 }
 
-class _SettingsUIState extends State<SettingsUI>
-    with SingleTickerProviderStateMixin {
+class _SettingsUIState extends State<SettingsUI> {
   double snack_text_size = 0, snack_text_padding = 0;
-  IconData _icon_theme = Icons.brightness_7_sharp, _icon_words = Icons.translate;
+  IconData _icon_theme = Icons.brightness_7_sharp;
 
-  late Animation<double> animation;
+  bool wordMeaningStatus = false,
+      pronunciationStatus = false,
+      tafsirStatus = false;
 
-  late final AnimationController animationController;
-
-  bool wordMeaningStatus = true, pronunciationStatus = false, tafsirStatus = false;
-
-  late final Animation<double> _arrowAnimation;
   late final Duration halfDuration;
   bool isArabicFontChanged = false,
       shouldShowFontSizeChangeCard = false,
@@ -52,7 +50,6 @@ class _SettingsUIState extends State<SettingsUI>
       aspectRatio = 0,
       englishSize = 0,
       arabicSize = 0;
-  int en_counter = 1, ar_counter = 0;
   late SharedPreferences sharedPreferences;
   Color textColor = Colors.black;
   String selectedLanguage = "";
@@ -62,9 +59,11 @@ class _SettingsUIState extends State<SettingsUI>
     sharedPreferences = await SharedPreferences.getInstance();
   }
 
-  saveEnglishFontSize() {
+  saveEnglishFontSize() async {
+    // await initializeSP();
+    print(widget.fontsize_english);
     try {
-      sharedPreferences.setDouble("english_font_size", widget.fontsize_english);
+      sharedPreferences.setDouble("english_font_size", englishSize);
     } catch (e) {
       initializeSP().whenComplete(() {
         saveEnglishFontSize();
@@ -74,7 +73,7 @@ class _SettingsUIState extends State<SettingsUI>
 
   saveArabicFontSize() {
     try {
-      sharedPreferences.setDouble("arabic_font_size", widget.fontsize_arab);
+      sharedPreferences.setDouble("arabic_font_size", arabicSize);
     } catch (e) {
       initializeSP().whenComplete(() {
         saveEnglishFontSize();
@@ -82,63 +81,59 @@ class _SettingsUIState extends State<SettingsUI>
     }
   }
 
-  saveThemeState(String theme) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  Future<void> saveThemeState(String theme) async {
     sharedPreferences.setString('theme mode', theme);
   }
 
-
   Future<bool> checkWordMeaningStatus() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    setState(() {
-      wordMeaningStatus = (sharedPreferences.getBool("word meaning"))!;
-    });
+    if (sharedPreferences.containsKey("word meaning")) {
+      setState(() {
+        wordMeaningStatus = (sharedPreferences.getBool("word meaning"))!;
+      });
+    }
     return wordMeaningStatus;
   }
 
   Future<bool> checkTransliterationStatus() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    setState(() {
-      pronunciationStatus = (sharedPreferences.getBool("transliteration"))!;
-    });
+    if (sharedPreferences.containsKey("transliteration")) {
+      setState(() {
+        pronunciationStatus = (sharedPreferences.getBool("transliteration"))!;
+      });
+    }
     return pronunciationStatus;
   }
 
   Future<bool> checkTafsirStatus() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    setState(() {
-      tafsirStatus = (sharedPreferences.getBool("tafsir"))!;
-    });
+    if (sharedPreferences.containsKey("tafsir")) {
+      setState(() {
+        tafsirStatus = (sharedPreferences.getBool("tafsir"))!;
+      });
+    }
     return tafsirStatus;
   }
 
-  saveWordMeaningState(bool status) async {
+  Future<void> saveWordMeaningState(bool status) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setBool('word meaning', status);
   }
 
-  saveTransliterationState(bool status) async {
+  Future<void> saveTransliterationState(bool status) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setBool('transliteration', status);
   }
 
-  saveTafsirState(bool status) async {
+  Future<void> saveTafsirState(bool status) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setBool('tafsir', status);
   }
 
   init() async {
-    animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
+    // sharedPreferences = await SharedPreferences.getInstance();
 
-    _arrowAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(parent: animationController, curve: Curves.easeInOut),
-    );
+    setState(() {
+      englishSize = widget.fontsize_english;
+      arabicSize = widget.fontsize_arab;
+    });
 
     selectedLanguage = await (mySharedPreferences.getStringValue("lang"));
     if (selectedLanguage == "") {
@@ -155,16 +150,76 @@ class _SettingsUIState extends State<SettingsUI>
             _icon_theme = Icons.brightness_4_outlined;
             textColor = Colors.white;
           });
+    await initializeSP();
     checkWordMeaningStatus();
     checkTransliterationStatus();
     checkTafsirStatus();
-    initializeSP();
-    englishSize = widget.fontsize_english;
-    arabicSize = widget.fontsize_arab;
+    // englishSize = widget.fontsize_english;
+    // arabicSize = widget.fontsize_arab;
     // _addStatusListener();
+  }
 
-    halfDuration = Duration(
-        milliseconds: animationController.duration!.inMilliseconds ~/ 2);
+  Future<bool> showWarningPopup() async {
+    return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(31)),
+            title: const Text(
+              'caution!',
+              style: TextStyle(fontFamily: 'varela-round.regular'),
+            ),
+            content: const Text(
+              'this may lead to inaccurate pronunciation(s). it is highly discouraged to use this feature or solely rely upon it.',
+              style: TextStyle(fontFamily: 'varela-round.regular'),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 11.0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: const Color(0xff1d3f5e),
+                    elevation: 7,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(31), // <-- Radius
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    'keep it off',
+                    style: TextStyle(fontFamily: 'varela-round.regular'),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 11.0, bottom: 11),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: const Color(0xff1d3f5e),
+                    elevation: 7,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(31), // <-- Radius
+                    ),
+                  ),
+                  onPressed: () {
+                    saveTransliterationState(true);
+                    setState(() {
+                      pronunciationStatus = true;
+                    });
+
+                    Navigator.of(context).pop(false);
+                  },
+                  //return true when click on "Yes"
+                  child: const Text(
+                    'continue',
+                    style: TextStyle(fontFamily: 'varela-round.regular'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false; //if showDialouge had returned null, then return false
   }
 
   @override
@@ -175,7 +230,6 @@ class _SettingsUIState extends State<SettingsUI>
 
   @override
   void dispose() {
-    animationController.dispose();
     super.dispose();
   }
 
@@ -229,7 +283,8 @@ class _SettingsUIState extends State<SettingsUI>
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(right: 11.0),
+                                      padding:
+                                          const EdgeInsets.only(right: 11.0),
                                       child: Container(
                                           width: appBar.preferredSize.height -
                                               appBar.preferredSize.height * .35,
@@ -250,7 +305,8 @@ class _SettingsUIState extends State<SettingsUI>
                                     const Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Qur\'an',
@@ -269,17 +325,18 @@ class _SettingsUIState extends State<SettingsUI>
                                         child: GestureDetector(
                                             onTap: (widget.surah_id == "")
                                                 ? () {
-                                                    Navigator.of(context)
-                                                        .pushReplacement(
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (builder) =>
-                                                                        SurahList(
-                                                                          eng: widget
-                                                                              .fontsize_english,
-                                                                          ar: widget
-                                                                              .fontsize_arab,
-                                                                        )));
+                                                    Navigator.of(context).pop();
+                                                    // Navigator.of(context)
+                                                    //     .pushReplacement(
+                                                    //         MaterialPageRoute(
+                                                    //             builder:
+                                                    //                 (builder) =>
+                                                    //                     SurahList(
+                                                    //                       eng: widget
+                                                    //                           .fontsize_english,
+                                                    //                       ar: widget
+                                                    //                           .fontsize_arab,
+                                                    //                     )));
                                                   }
                                                 : widget.toggleMenuClicked,
                                             child: const Icon(
@@ -302,12 +359,11 @@ class _SettingsUIState extends State<SettingsUI>
                                         if (!isArabicFontChanged) {
                                           size_container_init = 101.0 +
                                               (size.width * .1) * 2 +
-                                              (widget.fontsize_english);
+                                              englishSize;
                                         } else {
                                           size_container_init = 101.0 +
                                               (size.width * .1) * 2 +
-                                              (widget.fontsize_arab + 1) *
-                                                  aspectRatio;
+                                              (englishSize + 1) * aspectRatio;
                                         }
                                       } else {
                                         size_container_init = 0;
@@ -361,7 +417,7 @@ class _SettingsUIState extends State<SettingsUI>
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                "english (${widget.fontsize_english} px):",
+                                                "english (${englishSize} px):",
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -376,23 +432,21 @@ class _SettingsUIState extends State<SettingsUI>
                                               GestureDetector(
                                                 onTap: () {
                                                   setState(() {
-                                                    en_counter >= 1
-                                                        ? en_counter -= 1
-                                                        : en_counter = 0;
                                                     if (isArabicFontChanged) {
-                                                      isArabicFontChanged = false;
+                                                      isArabicFontChanged =
+                                                          false;
                                                     }
-                                                    size_container_init = 101.0 +
-                                                        (size.width * .1 * 2) +
-                                                        widget.fontsize_english;
-
-                                                    if (widget.fontsize_english >
-                                                        13) {
-                                                      widget.fontsize_english -=
-                                                          1;
-                                                      saveEnglishFontSize();
+                                                    if (englishSize > 13) {
+                                                      englishSize -= 1;
                                                     }
+                                                    size_container_init =
+                                                        101.0 +
+                                                            (size.width *
+                                                                .1 *
+                                                                2) +
+                                                            englishSize;
                                                   });
+                                                  saveEnglishFontSize();
                                                 },
                                                 child: Container(
                                                   width: size.width * .1,
@@ -414,21 +468,22 @@ class _SettingsUIState extends State<SettingsUI>
                                               GestureDetector(
                                                 onTap: () {
                                                   setState(() {
-                                                    en_counter <= 7
-                                                        ? en_counter += 1
-                                                        : en_counter = 0;
                                                     if (isArabicFontChanged) {
-                                                      isArabicFontChanged = false;
+                                                      isArabicFontChanged =
+                                                          false;
                                                     }
-                                                    size_container_init = 101.0 +
-                                                        (size.width * .1) * 2 +
-                                                        widget.fontsize_english;
-
-                                                    if (widget.fontsize_english <
-                                                        17) {
-                                                      widget.fontsize_english++;
+                                                    if (englishSize < 17) {
+                                                      setState(() {
+                                                        englishSize =
+                                                            englishSize + 1;
+                                                      });
                                                       saveEnglishFontSize();
                                                     }
+                                                    size_container_init =
+                                                        101.0 +
+                                                            (size.width * .1) *
+                                                                2 +
+                                                            englishSize;
                                                   });
                                                 },
                                                 child: Container(
@@ -455,7 +510,7 @@ class _SettingsUIState extends State<SettingsUI>
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                "arabic (${widget.fontsize_arab} px):",
+                                                "arabic (${arabicSize} px):",
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
@@ -471,15 +526,16 @@ class _SettingsUIState extends State<SettingsUI>
                                                 onTap: () {
                                                   setState(() {
                                                     isArabicFontChanged = true;
-                                                    if (widget.fontsize_arab >
-                                                        13) {
-                                                      widget.fontsize_arab -= 1;
+                                                    if (arabicSize > 13) {
+                                                      arabicSize -= 1;
                                                       saveArabicFontSize();
                                                     }
-                                                    size_container_init = 101.0 +
-                                                        (size.width * .1) * 2 +
-                                                        widget.fontsize_arab *
-                                                            aspectRatio;
+                                                    size_container_init =
+                                                        101.0 +
+                                                            (size.width * .1) *
+                                                                2 +
+                                                            arabicSize *
+                                                                aspectRatio;
                                                   });
                                                 },
                                                 child: Container(
@@ -503,15 +559,16 @@ class _SettingsUIState extends State<SettingsUI>
                                                 onTap: () {
                                                   setState(() {
                                                     isArabicFontChanged = true;
-                                                    if (widget.fontsize_arab <
-                                                        21) {
-                                                      widget.fontsize_arab++;
+                                                    if (arabicSize < 21) {
+                                                      arabicSize += 1;
                                                       saveArabicFontSize();
                                                     }
-                                                    size_container_init = 101.0 +
-                                                        (size.width * .1) * 2 +
-                                                        widget.fontsize_arab *
-                                                            aspectRatio;
+                                                    size_container_init =
+                                                        101.0 +
+                                                            (size.width * .1) *
+                                                                2 +
+                                                            arabicSize *
+                                                                aspectRatio;
                                                   });
                                                 },
                                                 child: Container(
@@ -535,8 +592,8 @@ class _SettingsUIState extends State<SettingsUI>
                                           ),
                                           AnimatedContainer(
                                             curve: Curves.easeOut,
-                                            duration:
-                                                const Duration(milliseconds: 250),
+                                            duration: const Duration(
+                                                milliseconds: 250),
                                             decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(21),
@@ -549,7 +606,8 @@ class _SettingsUIState extends State<SettingsUI>
                                               child: Stack(
                                                 children: [
                                                   Visibility(
-                                                    visible: isArabicFontChanged,
+                                                    visible:
+                                                        isArabicFontChanged,
                                                     child: Center(
                                                       child: Text(
                                                         "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
@@ -558,37 +616,39 @@ class _SettingsUIState extends State<SettingsUI>
                                                         textAlign:
                                                             TextAlign.center,
                                                         maxLines: 1,
-                                                        overflow:
-                                                            TextOverflow.ellipsis,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         style: TextStyle(
                                                           //101 + size.width * .1 * 2
                                                           height: 1,
-                                                          fontFamily: 'Al_Mushaf',
+                                                          fontFamily:
+                                                              'Al Majeed Quranic Font_shiped',
                                                           color: Colors.black,
-                                                          fontSize: widget
-                                                              .fontsize_arab,
+                                                          fontSize: arabicSize,
                                                         ),
                                                       ),
                                                     ),
                                                   ),
                                                   Visibility(
-                                                    visible: !isArabicFontChanged,
+                                                    visible:
+                                                        !isArabicFontChanged,
                                                     child: Center(
                                                       child: Text(
                                                         'In the name of Allah, the Entirely Merciful, the Especially Merciful.',
                                                         textAlign:
                                                             TextAlign.center,
                                                         maxLines: 1,
-                                                        overflow:
-                                                            TextOverflow.ellipsis,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
                                                         style: TextStyle(
                                                           //101 + size.width * .1 * 2
                                                           height: 1,
                                                           fontFamily:
                                                               'varela-round.regular',
                                                           color: Colors.black,
-                                                          fontSize: widget
-                                                              .fontsize_english,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: englishSize,
                                                         ),
                                                       ),
                                                     ),
@@ -607,22 +667,26 @@ class _SettingsUIState extends State<SettingsUI>
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      if (_icon_theme == Icons.brightness_7_sharp) {
-                                        saveThemeState("dark");
-                                        widget.theme = Colors.black;
-                                        textColor = Colors.white;
-                                        _icon_theme = Icons.brightness_4_outlined;
-                                      } else {
-                                        saveThemeState("light");
-                                        widget.theme = Colors.white;
-                                        textColor = Colors.black;
-                                        _icon_theme = Icons.brightness_7_sharp;
-                                      }
-                                    });
-                                    animationController.isCompleted
-                                        ? animationController.reverse()
-                                        : animationController.forward();
+                                    if (_icon_theme ==
+                                        Icons.brightness_7_sharp) {
+                                      saveThemeState("dark").whenComplete(() {
+                                        setState(() {
+                                          widget.theme = Colors.black;
+                                          textColor = Colors.white;
+                                          _icon_theme =
+                                              Icons.brightness_4_outlined;
+                                        });
+                                      });
+                                    } else {
+                                      saveThemeState("light").whenComplete(() {
+                                        setState(() {
+                                          widget.theme = Colors.white;
+                                          textColor = Colors.black;
+                                          _icon_theme =
+                                              Icons.brightness_7_sharp;
+                                        });
+                                      });
+                                    }
                                   },
                                   child: Text.rich(TextSpan(
                                       style: const TextStyle(
@@ -634,26 +698,15 @@ class _SettingsUIState extends State<SettingsUI>
                                         WidgetSpan(
                                             alignment:
                                                 PlaceholderAlignment.middle,
-                                            child: AnimatedBuilder(
-                                                animation: animationController,
-                                                builder: (BuildContext context,
-                                                    Widget? child) {
-                                                  return Transform.rotate(
-                                                    angle: _arrowAnimation.value *
-                                                        2.0 *
-                                                        math.pi,
-                                                    child: child,
-                                                  );
-                                                },
-                                                child: Icon(
-                                                  _icon_theme,
-                                                  color: Colors.white,
-                                                ))),
+                                            child: Icon(
+                                              _icon_theme,
+                                              color: Colors.white,
+                                            )),
                                         TextSpan(
-                                            text:
-                                                _icon_theme == Icons.brightness_7_sharp
-                                                    ? '  dark mode: OFF'
-                                                    : '  dark mode: ON'),
+                                            text: _icon_theme ==
+                                                    Icons.brightness_7_sharp
+                                                ? '  dark mode: OFF'
+                                                : '  dark mode: ON'),
                                       ])),
                                 ),
 
@@ -662,15 +715,17 @@ class _SettingsUIState extends State<SettingsUI>
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      if (wordMeaningStatus) {
-                                        saveWordMeaningState(false);
-                                        wordMeaningStatus = false;
-                                      } else {
-                                        saveWordMeaningState(true);
-                                        wordMeaningStatus = true;
-                                      }
-                                    });
+                                    if (wordMeaningStatus) {
+                                      saveWordMeaningState(false)
+                                          .whenComplete(() => setState(() {
+                                                wordMeaningStatus = false;
+                                              }));
+                                    } else {
+                                      saveWordMeaningState(true)
+                                          .whenComplete(() => setState(() {
+                                                wordMeaningStatus = true;
+                                              }));
+                                    }
                                   },
                                   child: Text.rich(TextSpan(
                                       style: const TextStyle(
@@ -688,8 +743,8 @@ class _SettingsUIState extends State<SettingsUI>
                                             )),
                                         TextSpan(
                                             text: !wordMeaningStatus
-                                                    ? '  word meanings: OFF'
-                                                    : '  word meanings: ON'),
+                                                ? '  word meanings: OFF'
+                                                : '  word meanings: ON'),
                                       ])),
                                 ),
 
@@ -703,15 +758,14 @@ class _SettingsUIState extends State<SettingsUI>
                                   visible: selectedLanguage != "ben",
                                   child: GestureDetector(
                                     onTap: () {
-                                      setState(() {
-                                        if (pronunciationStatus) {
-                                          saveTransliterationState(false);
-                                          pronunciationStatus = false;
-                                        } else {
-                                          saveTransliterationState(true);
-                                          pronunciationStatus = true;
-                                        }
-                                      });
+                                      if (pronunciationStatus) {
+                                        saveTransliterationState(false)
+                                            .whenComplete(() => setState(() {
+                                                  pronunciationStatus = false;
+                                                }));
+                                      } else {
+                                        showWarningPopup();
+                                      }
                                     },
                                     child: Text.rich(TextSpan(
                                         style: const TextStyle(
@@ -729,8 +783,8 @@ class _SettingsUIState extends State<SettingsUI>
                                               )),
                                           TextSpan(
                                               text: !pronunciationStatus
-                                                      ? '  pronunciation: OFF'
-                                                      : '  pronunciation: ON'),
+                                                  ? '  pronunciation: OFF'
+                                                  : '  pronunciation: ON'),
                                         ])),
                                   ),
                                 ),
@@ -740,15 +794,13 @@ class _SettingsUIState extends State<SettingsUI>
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      if (tafsirStatus) {
-                                        saveTafsirState(false);
-                                        tafsirStatus = false;
-                                      } else {
-                                        saveTafsirState(true);
-                                        tafsirStatus = true;
-                                      }
-                                    });
+                                    if (tafsirStatus) {
+                                      saveTafsirState(false).whenComplete(() =>
+                                          setState(() => tafsirStatus = false));
+                                    } else {
+                                      saveTafsirState(true).whenComplete(() =>
+                                          setState(() => tafsirStatus = true));
+                                    }
                                   },
                                   child: Text.rich(TextSpan(
                                       style: const TextStyle(
@@ -766,8 +818,8 @@ class _SettingsUIState extends State<SettingsUI>
                                             )),
                                         TextSpan(
                                             text: !tafsirStatus
-                                                    ? '  tafsir: OFF'
-                                                    : '  tafsir: ON'),
+                                                ? '  tafsir: OFF'
+                                                : '  tafsir: ON'),
                                       ])),
                                 ),
                                 SizedBox(
@@ -778,7 +830,8 @@ class _SettingsUIState extends State<SettingsUI>
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        shouldShowAboutCard = !shouldShowAboutCard;
+                                        shouldShowAboutCard =
+                                            !shouldShowAboutCard;
                                       });
                                       //   builder: (context) => Center(child: FavoriteVerses(tag: widget.tag, from_where: "surah list",)),
                                       // ));
@@ -842,7 +895,8 @@ class _SettingsUIState extends State<SettingsUI>
                                                       child: Image.asset(
                                                         'lib/assets/images/dev picture.png',
                                                         width: size.width * .25,
-                                                        height: size.width * .25,
+                                                        height:
+                                                            size.width * .25,
                                                         fit: BoxFit.cover,
                                                       ),
                                                     ),
@@ -864,7 +918,8 @@ class _SettingsUIState extends State<SettingsUI>
                                               ),
                                               const WidgetSpan(
                                                   alignment:
-                                                      PlaceholderAlignment.middle,
+                                                      PlaceholderAlignment
+                                                          .middle,
                                                   child: Icon(
                                                     Icons.open_in_new,
                                                     color: Colors.blue,
@@ -879,17 +934,19 @@ class _SettingsUIState extends State<SettingsUI>
                                                       "varela-round.regular",
                                                   fontWeight: FontWeight.bold,
                                                 ),
-                                                recognizer: TapGestureRecognizer()
-                                                  ..onTap = () async {
-                                                    final url = Uri(
-                                                      scheme: 'mailto',
-                                                      path:
-                                                          'uchiha.sherimello@gmail.com',
-                                                    );
-                                                    if (!await launchUrl(url)) {
-                                                      throw 'Could not launch $url';
-                                                    }
-                                                  },
+                                                recognizer:
+                                                    TapGestureRecognizer()
+                                                      ..onTap = () async {
+                                                        final url = Uri(
+                                                          scheme: 'mailto',
+                                                          path:
+                                                              'uchiha.sherimello@gmail.com',
+                                                        );
+                                                        if (!await launchUrl(
+                                                            url)) {
+                                                          throw 'Could not launch $url';
+                                                        }
+                                                      },
                                               ),
                                             ],
                                           ),
@@ -1005,7 +1062,8 @@ class _SettingsUIState extends State<SettingsUI>
                                           style: TextStyle(
                                               height: 1,
                                               color: const Color(0xff1d3f5e),
-                                              fontFamily: 'varela-round.regular',
+                                              fontFamily:
+                                                  'varela-round.regular',
                                               fontSize: snack_text_size,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -1046,7 +1104,8 @@ class _SettingsUIState extends State<SettingsUI>
                                                 BorderRadius.circular(100),
                                             color: selectedLanguage == "ben"
                                                 ? Colors.black
-                                                : Colors.white.withOpacity(.35)),
+                                                : Colors.white
+                                                    .withOpacity(.35)),
                                         // width: size.width * .1,
                                         // height: size.width * .075,
                                         child: Padding(
@@ -1071,11 +1130,12 @@ class _SettingsUIState extends State<SettingsUI>
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                         height: 0,
-                                                        color: selectedLanguage ==
-                                                                "ben"
-                                                            ? const Color(
-                                                                0xff1d3f5e)
-                                                            : Colors.white,
+                                                        color:
+                                                            selectedLanguage ==
+                                                                    "ben"
+                                                                ? const Color(
+                                                                    0xff1d3f5e)
+                                                                : Colors.white,
                                                         fontFamily:
                                                             'varela-round.regular',
                                                         fontSize:
@@ -1092,7 +1152,8 @@ class _SettingsUIState extends State<SettingsUI>
                                                       color: Colors.white,
                                                       fontFamily:
                                                           'varela-round.regular',
-                                                      fontSize: size.width * .035,
+                                                      fontSize:
+                                                          size.width * .035,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
@@ -1121,7 +1182,8 @@ class _SettingsUIState extends State<SettingsUI>
                                                 BorderRadius.circular(100),
                                             color: selectedLanguage == "eng"
                                                 ? Colors.black
-                                                : Colors.white.withOpacity(.25)),
+                                                : Colors.white
+                                                    .withOpacity(.25)),
                                         // width: size.width * .1,
                                         // height: size.width * .075,
                                         child: Padding(
@@ -1146,11 +1208,12 @@ class _SettingsUIState extends State<SettingsUI>
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                         height: 0,
-                                                        color: selectedLanguage ==
-                                                                "eng"
-                                                            ? const Color(
-                                                                0xff1d3f5e)
-                                                            : Colors.white,
+                                                        color:
+                                                            selectedLanguage ==
+                                                                    "eng"
+                                                                ? const Color(
+                                                                    0xff1d3f5e)
+                                                                : Colors.white,
                                                         fontFamily:
                                                             'varela-round.regular',
                                                         fontSize:
@@ -1167,7 +1230,8 @@ class _SettingsUIState extends State<SettingsUI>
                                                       color: Colors.white,
                                                       fontFamily:
                                                           'varela-round.regular',
-                                                      fontSize: size.width * .035,
+                                                      fontSize:
+                                                          size.width * .035,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),

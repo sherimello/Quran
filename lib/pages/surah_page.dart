@@ -20,7 +20,7 @@ class _SurahPageState extends State<SurahPage> {
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
-    path = join(databasesPath, 'quran.db');
+    path = join(databasesPath, 'en_ar_quran.db');
 
     database = await openDatabase(path);
 

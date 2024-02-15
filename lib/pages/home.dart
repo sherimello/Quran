@@ -8,7 +8,7 @@ class Home extends StatefulWidget {
 
   final double eng, ar;
 
-  const Home({Key? key, required this.eng, required this.ar}) : super(key: key);
+  const Home({Key? key, required this.eng, required this.ar,}) : super(key: key);
 
   @override
   State<Home> createState() => _HomeState();
@@ -25,7 +25,7 @@ class _HomeState extends State<Home> {
   Future<void> initiateSurahDB() async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
-    path = join(databasesPath, 'quran.db');
+    path = join(databasesPath, 'en_ar_quran.db');
 
     database = await openDatabase(path);
 
@@ -36,7 +36,7 @@ class _HomeState extends State<Home> {
 
   Future<void> initiateDB() async {
     var databasesPath = await getDatabasesPath();
-    path = join(databasesPath, 'quran.db');
+    path = join(databasesPath, 'en_ar_quran.db');
 
     database = await openDatabase(path);
     print(database.isOpen);

@@ -52,3 +52,29 @@ class MyApp extends StatelessWidget {
         });
   }
 }
+
+// Future.wait(initOtherDBs().whenComplete(() async => await checkWordMeaningStatus() ? startWordsTranslationsDBFetch() : null));
+
+// @override
+// Future<void> dispose() async {
+//   // TODO: implement dispose
+//   super.dispose();
+//   if (db_transliteration.isOpen) {
+//     db_transliteration.close();
+//   }
+//   if (db_words_translations.isOpen) db_words_translations.close();
+//   if (db_bn_tafsir.isOpen) db_bn_tafsir.close();
+//   if (db_bn.isOpen) db_bn.close();
+//   if (db_en_tafsir.isOpen) db_en_tafsir.close();
+//   data.clear();
+//   yt.close();
+//   final Directory? appDocDir = await getExternalStorageDirectory();
+//   var appDocPath = appDocDir?.path;
+//   var file = File("${appDocPath!}/${widget.surah_id}.mp3");
+//   if (downloadTapped && progress != 100.0) {
+//     file.deleteSync();
+//   }
+//   if (playingAudio) {
+//     audioPlayer.stop();
+//   }
+// }

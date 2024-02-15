@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quran/widgets/dua_category_card.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'dart:io';
 import '../hero_transition_handler/custom_rect_tween.dart';
@@ -9,10 +10,24 @@ import 'package:path_provider/path_provider.dart';
 import '../hero_transition_handler/hero_dialog_route.dart';
 import '../pages/duas.dart';
 
-
 class DuaList extends StatefulWidget {
   final double eng, ar;
-  const DuaList({Key? key, required this.eng, required this.ar}) : super(key: key);
+  final Database db_en_tafsir,
+      db_bn,
+      db_transliteration,
+      db_bn_tafsir,
+      db_words_translations;
+
+  const DuaList(
+      {Key? key,
+      required this.eng,
+      required this.ar,
+      required this.db_en_tafsir,
+      required this.db_bn,
+      required this.db_transliteration,
+      required this.db_bn_tafsir,
+      required this.db_words_translations})
+      : super(key: key);
 
   @override
   State<DuaList> createState() => _DuaListState();
@@ -26,32 +41,31 @@ class _DuaListState extends State<DuaList> {
 
     Future<bool?> askForStorageManagementPermission() async {
       status = await Permission.storage.status;
-      if(status.isDenied) {
+      if (status.isDenied) {
         await Permission.storage.request().then((value) {
-          if(status.isDenied) {
+          if (status.isDenied) {
             askForStorageManagementPermission();
-          }
-          else {
+          } else {
             return true;
           }
         });
       }
       return true;
     }
+
     downloadSurahMP3() async {
       var yt = YoutubeExplode();
       var manifest = await yt.videos.streamsClient.getManifest('Dpp1sIL1m5Q');
       var streamInfo = manifest.audioOnly.withHighestBitrate();
       if (streamInfo != null) {
-        if(await askForStorageManagementPermission()==true) {
+        if (await askForStorageManagementPermission() == true) {
           final Directory? appDocDir = await getExternalStorageDirectory();
           var appDocPath = appDocDir?.path;
           // Get the actual stream
           var stream = yt.videos.streamsClient.get(streamInfo);
 
           // Open a file for writing.
-          var file = File(
-              "${appDocPath!}/number1.mp3");
+          var file = File("${appDocPath!}/number1.mp3");
           var fileStream = file.openWrite();
 
           // Pipe all the content of the stream into the file.
@@ -60,11 +74,9 @@ class _DuaListState extends State<DuaList> {
           // Close the file.
           await fileStream.flush();
           await fileStream.close();
-        }
-        else{
+        } else {
           print("denied");
         }
-
       }
       print(streamInfo);
 
@@ -109,17 +121,31 @@ class _DuaListState extends State<DuaList> {
                                 shrinkWrap: true,
                                 itemBuilder: (BuildContext context, int index) {
                                   return Padding(
-                                    padding: index == 2? const EdgeInsets.fromLTRB(15,3.5,15,15) : const EdgeInsets.symmetric(horizontal: 15.0, vertical: 3.5),
+                                    padding: index == 2
+                                        ? const EdgeInsets.fromLTRB(
+                                            15, 3.5, 15, 15)
+                                        : const EdgeInsets.symmetric(
+                                            horizontal: 15.0, vertical: 3.5),
                                     child: GestureDetector(
                                         onTap: () {
-                                          Navigator.of(context).push(HeroDialogRoute(
-                                            bgColor: Colors.black.withOpacity(0.85),
+                                          Navigator.of(context)
+                                              .push(HeroDialogRoute(
+                                            bgColor:
+                                                Colors.black.withOpacity(0.85),
                                             builder: (context) => Center(
-                                                child: Duas(title: "after fard prayer", eng: widget.eng, ar: widget.ar, theme: Color(0xff000000),)),
+                                                child: Duas(
+                                              title: "after fard prayer",
+                                              eng: widget.eng,
+                                              ar: widget.ar,
+                                              theme: const Color(0xff000000),
+                                            )),
                                           ));
                                           // downloadSurahMP3();
                                         },
-                                        child: const DuaCategoryCard(category_name: "after fard prayer", footer_text: "Call on Me; I will answer your (Prayer)\n(Surah Ghafir, 40:60)")),
+                                        child: const DuaCategoryCard(
+                                            category_name: "after fard prayer",
+                                            footer_text:
+                                                "Call on Me; I will answer your (Prayer)\n(Surah Ghafir, 40:60)")),
                                   );
                                 })
                           ],

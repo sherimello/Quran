@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import '../classes/db_helper.dart';
 import '../hero_transition_handler/custom_rect_tween.dart';
 
 class Bookmarks extends StatefulWidget {
@@ -51,10 +52,13 @@ class _BookmarksState extends State<Bookmarks> {
 
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
-    var databasesPath = await getDatabasesPath();
-    path = join(databasesPath, 'quran.db');
+    // var databasesPath = await getDatabasesPath();
+    // path = join(databasesPath, 'en_ar_quran.db');
+    //
+    // database1 = await openDatabase(path);
+    DatabaseHelper databaseHelper = DatabaseHelper.instance;
 
-    database1 = await openDatabase(path);
+    database1 = await databaseHelper.initDatabase('en_ar_quran.db');
 
     print(database1.isOpen);
   }
@@ -95,6 +99,15 @@ class _BookmarksState extends State<Bookmarks> {
     initializeThemeStarters();
     fetchBookmarkFolders();
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    database1.close();
+  }
+
+
   final TextEditingController folderController = TextEditingController();
   @override
   Widget build(BuildContext context) {

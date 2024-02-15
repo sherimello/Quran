@@ -13,7 +13,7 @@ class VersesSearch extends StatefulWidget {
   final String theme;
   final double eng, ar;
 
-  const VersesSearch({Key? key, required this.theme, required this.eng, required this.ar}) : super(key: key);
+  const VersesSearch({Key? key, required this.theme, required this.eng, required this.ar,}) : super(key: key);
 
   @override
   State<VersesSearch> createState() => _VersesSearchState();
@@ -93,7 +93,7 @@ class _VersesSearchState extends State<VersesSearch> {
   Future<void> initiateDB() async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
-    path = join(databasesPath, 'quran.db');
+    path = join(databasesPath, 'en_ar_quran.db');
 
     database = await openDatabase(path);
 
