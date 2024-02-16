@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -148,7 +149,7 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
                                   wordSpacing: 2,
                                   height: 1.5,
                                   fontFamily:
-                                  'Al_Mushaf',
+                                  'Al Majeed Quranic Font_shiped',
                                   fontSize: arabic_size,
                                   color: color_main_text
                               ),
@@ -208,11 +209,32 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
       ));
     }
 
-    Future<void> saveImage() async {
+    Future<void> requestStoragePermission() async {
       await Permission.storage.request();
-      await Permission.manageExternalStorage.request();
+    }
 
-      if (await Permission.storage.isGranted || await Permission.manageExternalStorage.isGranted) {
+    Future<void> saveImage() async {
+      // await Permission.storage.request();
+      final plugin = DeviceInfoPlugin();
+      final android = await plugin.androidInfo;
+
+      if (android.version.sdkInt < 33) {
+        await requestStoragePermission();
+        if (await Permission.storage.isGranted) {
+          final time = DateTime.now()
+              .toIso8601String()
+              .replaceAll('.', '_')
+              .replaceAll(':', '_');
+          final name = 'qur_an_$time';
+          await ImageGallerySaver.saveImage(
+              bytes.buffer.asUint8List(), name: name);
+          snackBar("saved to gallery");
+        }
+        else {
+          snackBar('storage permission denied!');
+        }
+      }
+      else {
         final time = DateTime.now()
             .toIso8601String()
             .replaceAll('.', '_')
@@ -222,9 +244,9 @@ class _VerseImagePresetState extends State<VerseImagePreset> {
             bytes.buffer.asUint8List(), name: name);
         snackBar("saved to gallery");
       }
-      else {
-        snackBar('storage permission denied!');
-      }
+          // PermissionStatus.granted;
+      // await requestStoragePermission();
+
     }
     return Stack(
       alignment: Alignment.center,
