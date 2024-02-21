@@ -324,6 +324,8 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
       scrollController = ScrollController();
       _scrollToIndex();
     });
+
+    Future.wait([
     themeLogics().then((_) {
       animationController = AnimationController(
         vsync: this,
@@ -336,7 +338,23 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
 
         });
       });
-    });
+    })
+    ]);
+
+    // Future.wait([
+    //   initializeThemeStarters(),
+    //   initiateDB(),
+    //   initData(),
+    //   fetchSurahName(),
+    // ]).then((_) {
+    //   themeLogics().then((_) {
+    //     animationController = AnimationController(
+    //       vsync: this,
+    //       duration: const Duration(milliseconds: 355),
+    //     );
+    //   });
+    //   checkIfUserSignedIn();
+    // });
   }
 
   @override
@@ -384,7 +402,16 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
     defTextColor = Colors.white;
   }
 
-  initializeThemeStarters() async {
+  String getSurahTypeImage(int index) {
+    String img = "";
+    madani_surah.contains(index + 1)
+        ? img = 'lib/assets/images/madinaWhiteIcon.png'
+        : img = 'lib/assets/images/makkaWhiteIcon.png';
+
+    return img;
+  }
+
+  Future<void> initializeThemeStarters() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.containsKey('theme mode')) {
       if (sharedPreferences.getString('theme mode') == "light") {
@@ -561,6 +588,23 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
       }
     }
     return -1;
+  }
+
+  void getSurahTypeAndSujoodIndex(int index) {
+    for (int i = 0; i < madani_surah.length; i++) {
+      if (index + 1 == madani_surah[i]) {
+        disputed_types.contains(index + 1)
+            ? surah_type = 'Madani Surah (?)'
+            : surah_type = 'Madani Surah';
+        break;
+      } else {
+        disputed_types.contains(index + 1)
+            ? surah_type = 'Makki Surah (?)'
+            : surah_type = 'Makki Surah';
+        // break;
+      }
+      sujood_index = getSujoodSurahIndex(index + 1);
+    }
   }
 
   List<BoxShadow> boxShadow(double blurRadius, double offset1, double offset2,
@@ -1001,20 +1045,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                             cacheExtent:
                                 surah_name_translated.isNotEmpty ? 114 : 0,
                             itemBuilder: (BuildContext bcontext, int index) {
-                              for (int i = 0; i < madani_surah.length; i++) {
-                                if (index + 1 == madani_surah[i]) {
-                                  disputed_types.contains(index + 1)
-                                      ? surah_type = 'Madani Surah (?)'
-                                      : surah_type = 'Madani Surah';
-                                  break;
-                                } else {
-                                  disputed_types.contains(index + 1)
-                                      ? surah_type = 'Makki Surah (?)'
-                                      : surah_type = 'Makki Surah';
-                                  // break;
-                                }
-                                sujood_index = getSujoodSurahIndex(index + 1);
-                              }
+                              getSurahTypeAndSujoodIndex(index);
                               return GestureDetector(
                                 onTap: () async {
                                   SharedPreferences sharedPreferences =
@@ -1034,10 +1065,7 @@ class _SurahListState extends State<SurahList> with TickerProviderStateMixin {
                                               sujoodVerses:
                                                   selected_surah_sujood_verses,
                                               surah_id: '${index + 1}',
-                                              image: madani_surah
-                                                      .contains(index + 1)
-                                                  ? 'lib/assets/images/madinaWhiteIcon.png'
-                                                  : 'lib/assets/images/makkaWhiteIcon.png',
+                                              image: getSurahTypeImage(index),
                                               surah_name: surah_name_translated[
                                                       index]['translation']
                                                   .toString()
